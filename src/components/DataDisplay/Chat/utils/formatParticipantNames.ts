@@ -1,4 +1,4 @@
-import { capitalize } from "@tracktor/react-utils";
+import { capitalize } from "@getsoren/react-utils";
 import type { ChatParticipant } from "@/components/DataDisplay/Chat/types";
 
 const defaultFormatName = ({ firstName, lastName }: ChatParticipant): string => `${capitalize(firstName)} ${capitalize(lastName)}`.trim();

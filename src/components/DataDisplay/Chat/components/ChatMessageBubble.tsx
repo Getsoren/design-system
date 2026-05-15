@@ -3,7 +3,7 @@ import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { getInitials } from "@tracktor/react-utils";
+import { getInitials } from "@getsoren/react-utils";
 import type { ReactNode } from "react";
 import Avatar from "@/components/DataDisplay/Avatar";
 import type { ChatMessageBubbleProps } from "@/components/DataDisplay/Chat/types";

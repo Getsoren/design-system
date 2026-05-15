@@ -25,7 +25,7 @@ const config: UserConfig = {
       output: {
         globals: {
           "@mui/material": "material",
-          "@tracktor/react-utils": "TracktorReactUtils",
+          "@getsoren/react-utils": "TracktorReactUtils",
           react: "React",
           "react-dom": "ReactDOM",
         },

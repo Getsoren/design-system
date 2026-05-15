@@ -3,7 +3,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { getInitials } from "@tracktor/react-utils";
+import { getInitials } from "@getsoren/react-utils";
 import { type Ref, useImperativeHandle, useRef } from "react";
 import Avatar from "@/components/DataDisplay/Avatar";
 import type { ChatSearchUser } from "@/components/DataDisplay/Chat/types";

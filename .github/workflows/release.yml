@@ -1,4 +1,4 @@
-name: Release
+name: 🚀 Release
 
 on:
   push:
@@ -8,21 +8,22 @@ on:
 
 permissions:
   contents: write
-  packages: write
+  id-token: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: 🛎️ Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install Bun
+      - name: 🐰 Setup Bun
         uses: oven-sh/setup-bun@v1
 
-      - name: Cache Bun dependencies
+      - name: ♻️ Cache Bun dependencies
         uses: actions/cache@v4
         with:
           path: |
@@ -32,32 +33,45 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: bun install --ignore-scripts
 
-      - name: Build package
+      - name: 🧑 Configure Git identity
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 🏷️ Bump version & generate changelog
+        id: bump
+        run: |
+          PREV_VERSION=$(jq -r .version package.json)
+          bun run release
+          NEW_VERSION=$(jq -r .version package.json)
+          echo "prev_version=$PREV_VERSION" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: 🚀 Push changes and tags
+        if: steps.bump.outputs.prev_version != steps.bump.outputs.new_version
+        run: |
+          git push origin HEAD:${{ github.ref }}
+          git push --tags
+
+      - name: 🏗️ Build
+        if: steps.bump.outputs.prev_version != steps.bump.outputs.new_version
         run: bun run build
 
-      - name: Configure npm auth
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ~/.npmrc
-          npm whoami
-
-      - name: Extract version from package.json
-        id: version
-        run: |
-          VERSION=$(jq -r .version package.json)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Create GitHub Release
-        run: |
-          if gh release view "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
-            echo "Release already exists, skipping."
-          else
-            gh release create "${{ steps.version.outputs.version }}" -F CHANGELOG.md
-          fi
+      - name: 📝 Create GitHub Release
+        if: steps.bump.outputs.prev_version != steps.bump.outputs.new_version
+        run: gh release create "${{ steps.bump.outputs.new_version }}" -F CHANGELOG.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish to npm
+      - name: 🔐 Setup npm auth
+        if: steps.bump.outputs.prev_version != steps.bump.outputs.new_version
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ~/.npmrc
+
+      - name: 📤 Publish to npm
+        if: steps.bump.outputs.prev_version != steps.bump.outputs.new_version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         run: npm publish --access public

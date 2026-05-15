@@ -35,7 +35,6 @@
   },
   "exclude": [
     "vite.config.ts",
-    ".circleci",
     ".github",
     ".husky",
     ".storybook",

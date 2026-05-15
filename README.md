@@ -1,8 +1,6 @@
-# Tracktor design system
+# @getsoren/design-system
 
-[![npm version](https://badge.fury.io/js/@tracktor%2Fdesign-system.svg)](https://badge.fury.io/js/@tracktor%2Fdesign-system)
-
-**A design system React library by [Tracktor](https://tracktor.fr/)**
+**A design system React library**
 
 > The library is based on [MUI Core](https://mui.com/material-ui/getting-started/overview/)
 
@@ -18,25 +16,25 @@
 **npm:**
 
 ```bash
-npm install @tracktor/design-system
+npm install @getsoren/design-system
 ```
 
 **bun:**
 
 ```bash
-bun add @tracktor/design-system
+bun add @getsoren/design-system
 ```
 
 **yarn**:
 
 ```bash
-yarn add @tracktor/design-system
+yarn add @getsoren/design-system
 ```
 
 **pnpm**:
 
 ```bash
-pnpm add @tracktor/design-system
+pnpm add @getsoren/design-system
 ```
 
 ## Usage
@@ -47,7 +45,7 @@ Put `<ThemeProvider>` around your application.
 Custom theme can be provided as prop `theme={YOUR_CUSTOM_THEME}`
 
 ```typescript jsx
-import { Button, ThemeProvider } from "@tracktor/design-system";
+import { Button, ThemeProvider } from "@getsoren/design-system";
 
 const App = () => (
   <ThemeProvider>
@@ -60,7 +58,7 @@ export default App;
 
 ## Package
 
-Package are available in `@tracktor/design-system/{package}`
+Package are available in `@getsoren/design-system/{package}`
 
 | Package | Description                                   |
 |---------|-----------------------------------------------|

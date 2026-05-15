@@ -1,6 +1,6 @@
 {
-  "name": "@tracktor/design-system",
-  "description": "Tracktor Design System",
+  "name": "@getsoren/design-system",
+  "description": "Design System React library",
   "sideEffects": false,
   "version": "4.39.2",
   "license": "ISC",
@@ -26,15 +26,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/Tracktor/design-system.git"
+    "url": "git+https://github.com/getsoren/design-system.git"
   },
   "author": {
     "name": "Mickaël Austoni"
   },
   "bugs": {
-    "url": "https://github.com/Tracktor/design-system/issues"
+    "url": "https://github.com/getsoren/design-system/issues"
   },
-  "homepage": "https://github.com/Tracktor/design-system#readme",
+  "homepage": "https://github.com/getsoren/design-system#readme",
   "scripts": {
     "build": "tsc && vite build",
     "build-storybook": "storybook build",
@@ -46,7 +46,8 @@
     "storybook": "storybook dev -p 6006",
     "test": "bun run lint && vitest",
     "test-ui": "vitest --ui",
-    "test-visual": "chromatic --project-token=c9bbc986d0d6 --exit-zero-on-changes"
+    "test-visual": "chromatic --project-token=c9bbc986d0d6 --exit-zero-on-changes",
+    "release": "commit-and-tag-version"
   },
   "devDependencies": {
     "@babel/core": "^7.22.9",
@@ -60,7 +61,7 @@
     "@testing-library/react": "^14.0.0",
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.4.3",
-    "@tracktor/biome-config-react": "^1.1.1",
+    "@getsoren/biome-config-react": "^1.1.1",
     "@types/node": "^18.19.61",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
@@ -79,28 +80,31 @@
     "typescript": "^5.8.3",
     "unplugin-dts": "^1.0.0-beta.6",
     "vite": "8.0.3",
-    "vitest": "^1.6.1"
+    "vitest": "^1.6.1",
+    "commit-and-tag-version": "^12.6.0"
   },
   "dependencies": {
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
     "@mui/material": "^7.0.0",
     "@tanstack/react-virtual": "^3.13.23",
-    "@tracktor/react-utils": "^1.28.3"
+    "@getsoren/react-utils": "^1.28.3"
   },
   "peerDependencies": {
     "@emotion/react": ">=11.0.0",
     "@emotion/styled": ">=11.0.0",
     "@mui/material": ">=6.0.0",
-    "@tracktor/react-utils": ">=1.24.0",
+    "@getsoren/react-utils": ">=1.24.0",
     "@tanstack/react-virtual": ">=3.0.0",
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
   },
-  "readme": "ERROR: No README data found!",
   "resolutions": {
     "jackspeak": "2.1.1",
     "semver": "^7.7.3"
   },
-  "_id": "design-system-tracktor@1.8.4"
+  "commit-and-tag-version": {
+    "releaseCommitMessageFormat": "chore(release): {{currentTag}} [skip ci]",
+    "tagPrefix": ""
+  }
 }

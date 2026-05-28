@@ -15,21 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🔍 Debug token presence
-        env:
-          TOKEN: ${{ secrets.BUMP_TOKEN }}
-        run: |
-          if [ -z "$TOKEN" ]; then
-            echo "BUMP_TOKEN is EMPTY or not accessible from this repo"
-          else
-            echo "BUMP_TOKEN present (length=${#TOKEN})"
-          fi
-
       - name: 🛎️ Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.BUMP_TOKEN }}
+          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: 🐰 Setup Bun
         uses: oven-sh/setup-bun@v1

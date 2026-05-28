@@ -61,7 +61,7 @@
     "@testing-library/react": "^14.0.0",
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.4.3",
-    "@getsoren/biome-config-react": "^1.1.1",
+    "@getsoren/biome-config-react": "^1.4.1",
     "@types/node": "^18.19.61",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",

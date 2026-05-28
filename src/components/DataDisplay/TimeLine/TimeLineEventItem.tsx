@@ -1,5 +1,5 @@
-import { Box, Chip, Collapse as CollapseMui, Divider, Stack, Tooltip, Typography } from "@mui/material";
 import { isString } from "@getsoren/react-utils";
+import { Box, Chip, Collapse as CollapseMui, Divider, Stack, Tooltip, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import FileViewer from "@/components/DataDisplay/FileViewer";
 import ArrowRightIcon from "@/components/DataDisplay/Icons/ArrowRightIcon";

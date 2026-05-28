@@ -95,7 +95,7 @@ const File = forwardRef<HTMLInputElement, FileUploadProps>(
     const htmlId = id || name;
     const labelRef = useRef<ComponentRef<"label">>(null);
     const inputRef = useRef<HTMLInputElementFile>(null);
-    const files = value !== undefined ? value : internalFiles;
+    const files = value === undefined ? internalFiles : value;
     const fileName = getFileNames(files);
 
     /**

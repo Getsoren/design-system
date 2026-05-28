@@ -261,4 +261,4 @@ const dark = {
   },
 };
 
-export { light, dark };
+export { dark, light };

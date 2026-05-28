@@ -1,6 +1,6 @@
+import { capitalize, useInView } from "@getsoren/react-utils";
 import { Box, Card, CircularProgress, Skeleton, Stack } from "@mui/material";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { capitalize, useInView } from "@getsoren/react-utils";
 import { memo, useEffect, useRef } from "react";
 import ChipStatusKanban from "@/components/DataDisplay/Kanban/components/ChipStatusKanban";
 import KanbanCard from "@/components/DataDisplay/Kanban/components/KanbanCard";

@@ -258,7 +258,7 @@ function ChipFilter<T = OptionValue>({
         const newValue = value !== undefined && value !== null ? undefined : (options as Option<T>)?.value;
 
         if (multiple) {
-          (onChange as (val: T[]) => void)?.(newValue !== undefined ? [newValue] : []);
+          (onChange as (val: T[]) => void)?.(newValue === undefined ? [] : [newValue]);
         } else {
           (onChange as (val?: T) => void)?.(newValue);
         }

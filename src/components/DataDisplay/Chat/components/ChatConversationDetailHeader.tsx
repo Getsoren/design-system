@@ -1,3 +1,4 @@
+import { getInitials } from "@getsoren/react-utils";
 import { Theme } from "@mui/material";
 import AvatarGroup from "@mui/material/AvatarGroup";
 import IconButton from "@mui/material/IconButton";
@@ -6,7 +7,6 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { getInitials } from "@getsoren/react-utils";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import Avatar from "@/components/DataDisplay/Avatar";

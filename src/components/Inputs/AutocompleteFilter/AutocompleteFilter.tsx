@@ -669,13 +669,13 @@ const AutocompleteFilter = <
             }}
             {...params}
             slotProps={{
-              input: {
-                ...params.InputProps,
-                endAdornment: getAdornmentElement(),
-              },
               htmlInput: {
                 ...params.inputProps,
                 ...(placeholder && { "aria-label": placeholder }),
+              },
+              input: {
+                ...params.InputProps,
+                endAdornment: getAdornmentElement(),
               },
             }}
             placeholder={getPlaceholder()}

@@ -1,3 +1,4 @@
+import { getInitials } from "@getsoren/react-utils";
 import { Theme } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -11,7 +12,6 @@ import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { getInitials } from "@getsoren/react-utils";
 import { useEffect, useRef, useState } from "react";
 import Avatar from "@/components/DataDisplay/Avatar";
 import type { ChatConversationListProps } from "@/components/DataDisplay/Chat/types";

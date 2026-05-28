@@ -673,6 +673,10 @@ const AutocompleteFilter = <
                 ...params.InputProps,
                 endAdornment: getAdornmentElement(),
               },
+              htmlInput: {
+                ...params.inputProps,
+                ...(placeholder && { "aria-label": placeholder }),
+              },
             }}
             placeholder={getPlaceholder()}
           />

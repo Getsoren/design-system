@@ -16,7 +16,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { cloneElement, isValidElement, PropsWithChildren, ReactNode } from "react";
+import { cloneElement, isValidElement, MouseEventHandler, PropsWithChildren, ReactNode } from "react";
 import AvatarAppBar from "@/components/DataDisplay/AvatarAppBar";
 import MenuIcon from "@/components/DataDisplay/Icons/MenuIcon";
 import Logo, { LogoProps } from "@/components/DataDisplay/Logo";
@@ -39,8 +39,9 @@ interface AppBarProps extends PropsWithChildren {
   actionProps?: ButtonProps;
   logoProps?: LogoProps;
   searchProps?: TextFieldProps;
-  avatarProps?: AvatarProps & {
+  avatarProps?: Omit<AvatarProps, "onClick"> & {
     menuItems?: NavigationItem[];
+    onClick?: MouseEventHandler<HTMLButtonElement>;
   };
 }
 
@@ -63,8 +64,8 @@ const AppBar = ({
   elevation = 0,
 }: AppBarProps) => {
   const { breakpoints } = useTheme();
-  const { closeMenu, isMenuOpen, anchorMenu, openMenu } = useMenu();
-  const { menuItems, ...avatarPropsWithoutItems } = avatarProps || {};
+  const { closeMenu, isMenuOpen, anchorMenu, openMenu } = useMenu<HTMLButtonElement>();
+  const { menuItems, onClick: onAvatarClick, ...avatarPropsWithoutItems } = avatarProps || {};
   const isMobile = useMediaQuery(breakpoints.down("sm"));
   const isTablet = useMediaQuery(breakpoints.between("sm", "md"));
   const isSmallScreen = isMobile || isTablet;
@@ -129,16 +130,19 @@ const AppBar = ({
             {AvatarComponent === null
               ? null
               : AvatarComponent || (
-                  <AvatarAppBar
-                    {...avatarPropsWithoutItems}
-                    sx={{
-                      cursor: menuItems ? "pointer" : "default",
-                    }}
+                  <IconButton
+                    sx={{ p: 0 }}
+                    disableRipple
+                    aria-haspopup={menuItems ? "menu" : undefined}
+                    aria-controls={menuItems && isMenuOpen ? DEFAULT_AVATAR_MENU_ID : undefined}
+                    aria-expanded={menuItems ? isMenuOpen : undefined}
                     onClick={(e) => {
                       openMenu(e);
-                      avatarProps?.onClick?.(e);
+                      onAvatarClick?.(e);
                     }}
-                  />
+                  >
+                    <AvatarAppBar {...avatarPropsWithoutItems} />
+                  </IconButton>
                 )}
           </Stack>
         </Stack>

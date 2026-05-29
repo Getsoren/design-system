@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.39.6](https://github.com/getsoren/design-system/compare/4.39.5...4.39.6) (2026-05-29)
+
+
+### Bug Fixes
+
+* **AppBar:** update avatarProps to include onClick handler and adjust menu interaction ([4a18483](https://github.com/getsoren/design-system/commit/4a1848383185898bd8c5a196d2a8ff9b2b1b7959))
+
 ## [4.39.5](https://github.com/getsoren/design-system/compare/4.39.4...4.39.5) (2026-05-29)
 
 

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.39.5](https://github.com/getsoren/design-system/compare/4.39.4...4.39.5) (2026-05-29)
+
+
+### Bug Fixes
+
+* **AppBar:** remove Backdrop component and adjust Menu props ([8352020](https://github.com/getsoren/design-system/commit/8352020bba191bbc1f696fd970cb328a8bcaa0f9))
+
 ## [4.39.4](https://github.com/getsoren/design-system/compare/4.39.2...4.39.4) (2026-05-28)
 
 

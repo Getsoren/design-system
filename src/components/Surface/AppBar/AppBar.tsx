@@ -2,7 +2,6 @@ import {
   AppBar as AppBarMui,
   AvatarProps,
   alpha,
-  Backdrop,
   Box,
   ButtonProps,
   IconButton,
@@ -145,55 +144,55 @@ const AppBar = ({
         </Stack>
       </AppBarMui>
       {menuItems && (
-        <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isMenuOpen} onClick={closeMenu}>
-          <Menu
-            id={DEFAULT_AVATAR_MENU_ID}
-            anchorEl={anchorMenu}
-            open={isMenuOpen}
-            onClose={closeMenu}
-            onChange={closeMenu}
-            anchorOrigin={{
-              horizontal: "right",
-              vertical: "bottom",
-            }}
-            slotProps={{
-              paper: {
-                sx: {
-                  minWidth: 260,
-                },
+        <Menu
+          id={DEFAULT_AVATAR_MENU_ID}
+          anchorEl={anchorMenu}
+          open={isMenuOpen}
+          onClose={closeMenu}
+          anchorOrigin={{
+            horizontal: "right",
+            vertical: "bottom",
+          }}
+          slotProps={{
+            backdrop: {
+              invisible: false,
+            },
+            paper: {
+              sx: {
+                minWidth: 260,
               },
-            }}
-          >
-            {menuItems?.map((item, index) => {
-              // Is React Element then return it
-              if (isValidElement(item)) {
-                if (item.key) {
-                  return item;
-                }
-
-                const key = `${menuItems}-${index}`;
-                return cloneElement(item, { key }); // Add key to the element
+            },
+          }}
+        >
+          {menuItems?.map((item, index) => {
+            // Is React Element then return it
+            if (isValidElement(item)) {
+              if (item.key) {
+                return item;
               }
 
-              // Is Object then return NavLinkItem
-              if (item && typeof item === "object" && "url" in item) {
-                const { url, label, icon, active, end, state } = item;
-                const key = `${url}-${label}-${index}`;
+              const key = `${menuItems}-${index}`;
+              return cloneElement(item, { key }); // Add key to the element
+            }
 
-                return (
-                  <MenuItem key={key} sx={styles.menuItem} onClick={closeMenu}>
-                    <NavLinkItem url={url} key={key} component={NavLink} active={active} end={end} state={state}>
-                      {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                      {label && <ListItemText>{label}</ListItemText>}
-                    </NavLinkItem>
-                  </MenuItem>
-                );
-              }
+            // Is Object then return NavLinkItem
+            if (item && typeof item === "object" && "url" in item) {
+              const { url, label, icon, active, end, state } = item;
+              const key = `${url}-${label}-${index}`;
 
-              return null;
-            })}
-          </Menu>
-        </Backdrop>
+              return (
+                <MenuItem key={key} sx={styles.menuItem} onClick={closeMenu}>
+                  <NavLinkItem url={url} key={key} component={NavLink} active={active} end={end} state={state}>
+                    {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                    {label && <ListItemText>{label}</ListItemText>}
+                  </NavLinkItem>
+                </MenuItem>
+              );
+            }
+
+            return null;
+          })}
+        </Menu>
       )}
     </>
   );

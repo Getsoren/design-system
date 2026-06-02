@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.40.2](https://github.com/getsoren/design-system/compare/4.40.1...4.40.2) (2026-06-02)
+
+
+### Bug Fixes
+
+* **theme:** enhance button hover style with gradient and updated border color ([83d9084](https://github.com/getsoren/design-system/commit/83d90844113aea77b52f20e612f8c076562abb52))
+
 ## [4.40.1](https://github.com/getsoren/design-system/compare/4.40.0...4.40.1) (2026-06-02)
 
 

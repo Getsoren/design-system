@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.40.0](https://github.com/getsoren/design-system/compare/4.39.6...4.40.0) (2026-06-02)
+
+
+### Features
+
+* **NavigationMenu:** add support for grouped navigation items in sidebar ([20727a4](https://github.com/getsoren/design-system/commit/20727a48cd5ae8f513a8e5b1b26f5f6be4e94424))
+
 ## [4.39.6](https://github.com/getsoren/design-system/compare/4.39.5...4.39.6) (2026-05-29)
 
 

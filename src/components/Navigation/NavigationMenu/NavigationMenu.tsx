@@ -19,6 +19,36 @@ export type ObjectNavigationItem = {
   target?: string;
 };
 
+export type NavigationGroupItem = {
+  /**
+   * Section title displayed above the grouped links
+   */
+  groupLabel: string;
+  /**
+   * Links belonging to this group
+   */
+  items: ObjectNavigationItem[];
+  /**
+   * Allow the group to be collapsed/expanded by clicking its header.
+   * Set to false to keep the group permanently expanded.
+   * @default true
+   */
+  collapsible?: boolean;
+  /**
+   * Initial expanded state when collapsible
+   * @default true
+   */
+  defaultExpanded?: boolean;
+  /**
+   * Hide the whole group on mobile
+   */
+  hideOnMobile?: boolean;
+  /**
+   * Hide the whole group when the user has no access to it
+   */
+  hasAccess?: boolean;
+};
+
 export interface BottomLinkProps {
   url?: string;
   state?: any;
@@ -41,7 +71,7 @@ export interface NavLinkProps {
   target?: string;
 }
 
-export type NavigationItem = ObjectNavigationItem | ReactNode;
+export type NavigationItem = ObjectNavigationItem | NavigationGroupItem | ReactNode;
 
 export interface NavigationMenuProps {
   /**

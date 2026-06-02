@@ -97,6 +97,32 @@ const ITEMS_WITH_CUSTOM_NODE = [
   <Alert key={1}>Custom Node</Alert>,
 ];
 
+const ITEMS_WITH_GROUPS = [
+  {
+    active: true,
+    icon: <RestoreIcon />,
+    label: "Dashboard",
+    url: "#",
+  },
+  {
+    groupLabel: "Orders",
+    items: [
+      { icon: <RestoreIcon />, label: "Kanban", url: "#" },
+      { icon: <FavoriteIcon />, label: "Planning", url: "#" },
+      { count: 4, icon: <LocationIcon />, label: "List", url: "#" },
+    ],
+  },
+  {
+    collapsible: false,
+    groupLabel: "Directory",
+    items: [
+      { icon: <LocationIcon />, label: "Worksites", url: "#" },
+      { icon: <FavoriteIcon />, label: "Partners", url: "#" },
+      { icon: <RestoreIcon />, label: "References", url: "#" },
+    ],
+  },
+];
+
 const Template: StoryFn<typeof NavigationMenu> = (args) => <NavigationMenu {...args} />;
 
 export const Basic = Template.bind({});
@@ -244,6 +270,12 @@ WithBottomLinkMenuMobile.parameters = {
     defaultViewport: "mobile",
     viewports: VIEWPORTS,
   },
+};
+
+export const WithGroups = Template.bind({});
+WithGroups.args = {
+  items: ITEMS_WITH_GROUPS,
+  Logo: <Logo colorShape="white" />,
 };
 
 export const WithFooter = Template.bind({});

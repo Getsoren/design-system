@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.40.1](https://github.com/getsoren/design-system/compare/4.40.0...4.40.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* **AppBar:** close menu on item click to improve interaction ([060f0a3](https://github.com/getsoren/design-system/commit/060f0a3d0b250029766ada4991f50961f1048d47))
+
 ## [4.40.0](https://github.com/getsoren/design-system/compare/4.39.6...4.40.0) (2026-06-02)
 
 

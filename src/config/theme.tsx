@@ -394,10 +394,19 @@ const commonThemeOptions: MuiThemeOptions = {
             color: "primary",
             variant: "outlined",
           },
-          style: ({ theme }) => ({
-            backgroundColor: theme.palette.tertiary.main,
-            borderColor: theme.palette.divider,
-          }),
+          style: ({ theme }) => {
+            const hoverOverlay = alpha(theme.palette.text.primary, theme.palette.action.hoverOpacity);
+
+            return {
+              "&:hover": {
+                backgroundColor: theme.palette.tertiary.main,
+                backgroundImage: `linear-gradient(${hoverOverlay}, ${hoverOverlay})`,
+                borderColor: theme.palette.text.disabled,
+              },
+              backgroundColor: theme.palette.tertiary.main,
+              borderColor: theme.palette.divider,
+            };
+          },
         },
         {
           props: { size: "small" },

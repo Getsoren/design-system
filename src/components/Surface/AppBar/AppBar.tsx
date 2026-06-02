@@ -161,6 +161,10 @@ const AppBar = ({
             backdrop: {
               invisible: false,
             },
+            // Close the menu on any item click (covers custom element children, not just object items).
+            list: {
+              onClick: closeMenu,
+            },
             paper: {
               sx: {
                 minWidth: 260,

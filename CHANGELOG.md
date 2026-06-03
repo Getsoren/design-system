@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.42.0](https://github.com/getsoren/design-system/compare/4.41.0...4.42.0) (2026-06-03)
+
+
+### Features
+
+* **AutocompleteFilter:** add tooltip story for enhanced user guidance ([3d71ec7](https://github.com/getsoren/design-system/commit/3d71ec73301d31e007be898e991255381c4d1c32))
+
 ## [4.41.0](https://github.com/getsoren/design-system/compare/4.40.2...4.41.0) (2026-06-03)
 
 

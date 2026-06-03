@@ -19,6 +19,8 @@ import {
   Paper,
   PaperProps,
   TextField,
+  Tooltip,
+  TooltipProps,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -130,6 +132,17 @@ export interface AutocompleteFilterProps<
     selectAll?: string;
     reset?: string;
   };
+  /**
+   *  When provided, wraps the field in a Tooltip with this content.
+   *  Useful to explain a disabled state without wrapping the component at every call site.
+   *  @default undefined
+   */
+  tooltip?: ReactNode;
+  /**
+   *  Extra props forwarded to the Tooltip (e.g. placement). Ignored when `tooltip` is not set.
+   *  @default undefined
+   */
+  tooltipProps?: Omit<TooltipProps, "title" | "children">;
 }
 
 const checkboxStyle = { padding: 0, paddingRight: 1 };
@@ -353,6 +366,8 @@ const AutocompleteFilter = <
     multiple = true,
     options = [],
     slotProps,
+    tooltip,
+    tooltipProps,
     ...props
   }: AutocompleteFilterProps<Multiple, DisableClearable, FreeSolo, ChipComponent, Value> & { inputValue?: string },
   ref: Ref<HTMLDivElement>,
@@ -382,7 +397,7 @@ const AutocompleteFilter = <
     }
   };
 
-  return (
+  const autocomplete = (
     <MuiAutocomplete
       freeSolo={false as FreeSolo}
       multiple={multiple as Multiple}
@@ -684,6 +699,16 @@ const AutocompleteFilter = <
       }}
       {...props}
     />
+  );
+
+  if (!tooltip) {
+    return autocomplete;
+  }
+
+  return (
+    <Tooltip title={tooltip} {...tooltipProps}>
+      {autocomplete}
+    </Tooltip>
   );
 };
 

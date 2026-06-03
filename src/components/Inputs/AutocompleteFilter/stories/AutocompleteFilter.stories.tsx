@@ -115,6 +115,21 @@ const TemplateChip: StoryFn<typeof AutocompleteFilter> = (args) => {
   );
 };
 
+const TemplateTooltip: StoryFn<typeof AutocompleteFilter> = (args) => {
+  const [enabledValue, setEnabledValue] = useState<AutocompleteFilterOption[]>([]);
+
+  const handleChangeEnabled = (_: SyntheticEvent, value: AutocompleteFilterOption[]) => {
+    setEnabledValue(value);
+  };
+
+  return (
+    <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <AutocompleteFilter {...args} sx={{ width: 300 }} onChange={handleChangeEnabled} value={enabledValue} />
+      <AutocompleteFilter {...args} sx={{ width: 300 }} disabled value={[data[0]]} />
+    </Stack>
+  );
+};
+
 export const Basic = Template.bind({});
 Basic.args = {
   options: data,
@@ -208,6 +223,13 @@ ChipVariant.args = {
   options: data,
   placeholder: "Search",
   variant: "chip",
+};
+
+export const WithTooltip = TemplateTooltip.bind({});
+WithTooltip.args = {
+  options: data,
+  placeholder: "Filter",
+  tooltip: "A global filter is active. Clear it to filter manually here.",
 };
 
 export default {

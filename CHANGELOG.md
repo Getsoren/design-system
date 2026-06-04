@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.43.0](https://github.com/getsoren/design-system/compare/4.42.0...4.43.0) (2026-06-04)
+
+
+### Features
+
+* **AppBar:** add data-testid prop for improved testing support ([f0a3541](https://github.com/getsoren/design-system/commit/f0a3541f9199d11997dea21a9e5e254edfa7847d))
+
 ## [4.42.0](https://github.com/getsoren/design-system/compare/4.41.0...4.42.0) (2026-06-03)
 
 

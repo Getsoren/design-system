@@ -150,7 +150,7 @@ const SideBarNavRow = ({ item }: { item: ObjectNavigationItem }) => {
  */
 const SideBarMenuGroup = ({ group }: { group: NavigationGroupItem }) => {
   const { isMobile, isCollapsed } = useContext(NavigationMenuContext);
-  const { groupLabel, items, collapsible = true, defaultExpanded = true } = group;
+  const { groupLabel, items, collapsible = false, defaultExpanded = true } = group;
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   const visibleItems = items.filter((child) => !isItemHidden(child, isMobile));

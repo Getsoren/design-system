@@ -31,7 +31,7 @@ export type NavigationGroupItem = {
   /**
    * Allow the group to be collapsed/expanded by clicking its header.
    * Set to false to keep the group permanently expanded.
-   * @default true
+   * @default false
    */
   collapsible?: boolean;
   /**

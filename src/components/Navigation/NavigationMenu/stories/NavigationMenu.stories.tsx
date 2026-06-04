@@ -105,6 +105,7 @@ const ITEMS_WITH_GROUPS = [
     url: "#",
   },
   {
+    collapsible: true,
     groupLabel: "Orders",
     items: [
       { icon: <RestoreIcon />, label: "Kanban", url: "#" },

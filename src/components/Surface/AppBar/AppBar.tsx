@@ -42,6 +42,7 @@ interface AppBarProps extends PropsWithChildren {
   avatarProps?: Omit<AvatarProps, "onClick"> & {
     menuItems?: NavigationItem[];
     onClick?: MouseEventHandler<HTMLButtonElement>;
+    "data-testid"?: string;
   };
 }
 

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.43.1](https://github.com/getsoren/design-system/compare/4.43.0...4.43.1) (2026-06-04)
+
+
+### Bug Fixes
+
+* **NavigationMenu:** update default collapsible prop to false for better usability ([62494a6](https://github.com/getsoren/design-system/commit/62494a6a1a86ac6605e87cbf3418c895fd8f8a46))
+
 ## [4.43.0](https://github.com/getsoren/design-system/compare/4.42.0...4.43.0) (2026-06-04)
 
 

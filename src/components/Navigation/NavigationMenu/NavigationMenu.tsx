@@ -1,5 +1,5 @@
 import { ChipProps, SwipeableDrawer, useMediaQuery, useTheme } from "@mui/material";
-import { createContext, MouseEvent, memo, ReactElement, ReactNode, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, MouseEvent, memo, ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import BurgerAppBar from "@/components/Navigation/NavigationMenu/BurgerAppBar";
 import SideBar from "@/components/Navigation/NavigationMenu/SideBar";
 import SideBarMenu from "@/components/Navigation/NavigationMenu/SideBarMenu";
@@ -126,7 +126,23 @@ export interface NavigationMenuProps {
    * Search component
    */
   Footer?: ReactNode;
+  /**
+   * localStorage key used to persist the sidebar collapsed state
+   * @default "soren-navigation-menu-collapsed"
+   */
+  storageKey?: string;
 }
+
+const DEFAULT_COLLAPSED_STORAGE_KEY = "soren-navigation-menu-collapsed";
+
+const getStoredCollapsed = (storageKey: string) => {
+  try {
+    return globalThis.localStorage?.getItem(storageKey) === "true";
+  } catch {
+    // localStorage unavailable (SSR, privacy mode...)
+    return false;
+  }
+};
 
 const DEFAULT_CONTEXT_VALUE = {
   closeDrawerMenu: () => {},
@@ -178,12 +194,13 @@ const NavigationMenu = ({
   hideSearchDesktop,
   bottomLink,
   sideBarWidth = 260,
+  storageKey = DEFAULT_COLLAPSED_STORAGE_KEY,
 }: NavigationMenuProps) => {
   const { breakpoints } = useTheme();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(DEFAULT_CONTEXT_VALUE.isDrawerOpen);
+  const [isCollapsed, setIsCollapsed] = useState(() => getStoredCollapsed(storageKey));
   const isMobile = useMediaQuery(breakpoints.down("sm"));
   const isTablet = useMediaQuery(breakpoints.between("sm", "md"));
-  const [isDrawerOpen, setIsDrawerOpen] = useState(DEFAULT_CONTEXT_VALUE.isDrawerOpen);
-  const [isCollapsed, setIsCollapsed] = useState(DEFAULT_CONTEXT_VALUE.isCollapsed);
 
   const closeDrawerMenu = useCallback(() => {
     setIsDrawerOpen(false);
@@ -196,6 +213,17 @@ const NavigationMenu = ({
   const toggleCollapse = useCallback(() => {
     setIsCollapsed((prev) => !prev);
   }, []);
+
+  /**
+   * Persist the sidebar collapsed state so it survives page reloads
+   */
+  useEffect(() => {
+    try {
+      globalThis.localStorage?.setItem(storageKey, String(isCollapsed));
+    } catch {
+      // localStorage unavailable (SSR, privacy mode...)
+    }
+  }, [isCollapsed, storageKey]);
 
   const value = useMemo(
     () => ({

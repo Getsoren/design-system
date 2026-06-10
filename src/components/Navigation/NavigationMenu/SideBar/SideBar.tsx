@@ -1,4 +1,4 @@
-import { Box, Divider, Fade, IconButton, Stack, Theme, useTheme } from "@mui/material";
+import { Box, Divider, Fade, IconButton, Stack, Theme, Tooltip, useTheme } from "@mui/material";
 import { ReactNode, useContext } from "react";
 import ChevronLeftDoubleIcon from "@/components/DataDisplay/Icons/ChevronLeftDoubleIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
@@ -97,20 +97,22 @@ const BottomNavLink = ({
 }) => (
   <Box sx={sx?.bottomLink}>
     <NavLinkItem component={NavLink} {...link}>
-      <Stack alignItems="center" spacing={1} direction="row">
-        {link?.icon && (
-          <Box component="span" sx={sx.iconWrapper}>
-            {link.icon}
-          </Box>
-        )}
-        {link?.label && (
-          <Fade in={!isCollapsed}>
-            <Box component="span" display="flex">
-              {link.label}
+      <Tooltip title={isCollapsed ? link?.label : ""} placement="right">
+        <Stack alignItems="center" spacing={1} direction="row">
+          {link?.icon && (
+            <Box component="span" sx={sx.iconWrapper}>
+              {link.icon}
             </Box>
-          </Fade>
-        )}
-      </Stack>
+          )}
+          {link?.label && (
+            <Fade in={!isCollapsed}>
+              <Box component="span" display="flex">
+                {link.label}
+              </Box>
+            </Fade>
+          )}
+        </Stack>
+      </Tooltip>
     </NavLinkItem>
   </Box>
 );

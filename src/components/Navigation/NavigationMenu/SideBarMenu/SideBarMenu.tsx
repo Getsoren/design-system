@@ -1,4 +1,4 @@
-import { Box, Chip, Collapse, Fade, List, ListItem, Stack, SvgIcon, Theme, Typography } from "@mui/material";
+import { Box, Chip, Collapse, Fade, List, ListItem, Stack, SvgIcon, Theme, Tooltip, Typography } from "@mui/material";
 import { isValidElement, KeyboardEvent, ReactElement, useContext, useState } from "react";
 import {
   NavigationGroupItem,
@@ -116,29 +116,31 @@ const SideBarNavRow = ({ item }: { item: ObjectNavigationItem }) => {
 
   return (
     <NavLinkItem url={url} component={NavLink} active={active} disabled={disabled} target={target} end={end} state={state}>
-      <Stack direction="row" component="span" spacing={1.5} width="100%" alignItems="center">
-        {icon ? (
-          <Box component="div" sx={{ ...styles.iconWrapper, position: "relative" }}>
-            {icon}
-            {isCollapsed && !!count && (
-              <Chip color={countColor || "warning"} size="small" label={count} variant="rounded" sx={chipCollapsedSx} />
-            )}
-          </Box>
-        ) : (
-          isCollapsed && (
+      <Tooltip title={isCollapsed ? label : ""} placement="right">
+        <Stack direction="row" component="span" spacing={1.5} width="100%" alignItems="center">
+          {icon ? (
             <Box component="div" sx={{ ...styles.iconWrapper, position: "relative" }}>
-              {typeof label === "string" ? label.charAt(0) : ""}
-              {!!count && <Chip color={countColor || "warning"} size="small" label={count} variant="rounded" sx={chipCollapsedSx} />}
+              {icon}
+              {isCollapsed && !!count && (
+                <Chip color={countColor || "warning"} size="small" label={count} variant="rounded" sx={chipCollapsedSx} />
+              )}
             </Box>
-          )
-        )}
-        <Fade in={!isCollapsed}>
-          <Stack direction="row" justifyContent="space-between" flex={1} whiteSpace="nowrap">
-            {label}
-            {!!count && <Chip color={countColor || "warning"} size="small" label={count} variant="rounded" />}
-          </Stack>
-        </Fade>
-      </Stack>
+          ) : (
+            isCollapsed && (
+              <Box component="div" sx={{ ...styles.iconWrapper, position: "relative" }}>
+                {typeof label === "string" ? label.charAt(0) : ""}
+                {!!count && <Chip color={countColor || "warning"} size="small" label={count} variant="rounded" sx={chipCollapsedSx} />}
+              </Box>
+            )
+          )}
+          <Fade in={!isCollapsed}>
+            <Stack direction="row" justifyContent="space-between" flex={1} whiteSpace="nowrap">
+              {label}
+              {!!count && <Chip color={countColor || "warning"} size="small" label={count} variant="rounded" />}
+            </Stack>
+          </Fade>
+        </Stack>
+      </Tooltip>
     </NavLinkItem>
   );
 };

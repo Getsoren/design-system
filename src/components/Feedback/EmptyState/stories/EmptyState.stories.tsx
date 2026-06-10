@@ -13,6 +13,12 @@ Basic.args = {
   description: "No data to display",
 };
 
+export const WithSubtitle = Template.bind({});
+WithSubtitle.args = {
+  description: "No drop-off point yet",
+  subtitle: "Add one to make deliveries more reliable on this worksite.",
+};
+
 export const WithAction = Template.bind({});
 WithAction.args = {
   actionLabel: "Go back",

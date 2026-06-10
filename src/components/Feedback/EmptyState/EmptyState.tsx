@@ -8,6 +8,8 @@ export interface EmptyStateProps<RootComponent extends ElementType = "button"> {
   icon?: ReactNode;
   /** Main message explaining the empty state */
   description?: ReactNode;
+  /** Secondary message displayed below the description */
+  subtitle?: ReactNode;
   /** Label of the action button. The button is only rendered when provided. */
   actionLabel?: ReactNode;
   /**
@@ -27,6 +29,7 @@ export interface EmptyStateProps<RootComponent extends ElementType = "button"> {
 const EmptyState = <RootComponent extends ElementType = "button">({
   icon,
   description,
+  subtitle,
   actionLabel,
   actionProps,
   children,
@@ -34,8 +37,13 @@ const EmptyState = <RootComponent extends ElementType = "button">({
   <Stack height="100%" alignItems="center" justifyContent="center" data-testid="empty-state">
     <Box mb={3}>{icon ?? <EmptyStateIcon />}</Box>
     {description && (
-      <Typography variant="h6" align="center" mb={4}>
+      <Typography variant="h6" align="center" mb={subtitle ? 1 : 4}>
         {description}
+      </Typography>
+    )}
+    {subtitle && (
+      <Typography variant="body2" align="center" color="text.secondary" mb={4}>
+        {subtitle}
       </Typography>
     )}
     {actionLabel && (

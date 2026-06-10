@@ -10,6 +10,13 @@ describe("Test <EmptyState/>", () => {
     expect(getByText("No data")).toBeInTheDocument();
   });
 
+  it("renders the subtitle below the description", () => {
+    const { getByText } = render(<EmptyState description="No data" subtitle="Add one to get started" />);
+
+    expect(getByText("No data")).toBeInTheDocument();
+    expect(getByText("Add one to get started")).toBeInTheDocument();
+  });
+
   it("renders a custom icon instead of the default illustration", () => {
     const { getByTestId } = render(<EmptyState icon={<span data-testid="custom-icon" />} />);
 

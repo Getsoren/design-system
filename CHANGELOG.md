@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.46.0](https://github.com/getsoren/design-system/compare/4.45.1...4.46.0) (2026-06-10)
+
+
+### Features
+
+* **EmptyState:** add subtitle prop for enhanced messaging ([a35b4e5](https://github.com/getsoren/design-system/commit/a35b4e5588df29932deffce15e1600262f5e60ef))
+
 ## [4.45.1](https://github.com/getsoren/design-system/compare/4.45.0...4.45.1) (2026-06-10)
 
 ## [4.45.0](https://github.com/getsoren/design-system/compare/4.44.0...4.45.0) (2026-06-10)

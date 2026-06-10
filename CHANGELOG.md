@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.44.0](https://github.com/getsoren/design-system/compare/4.43.1...4.44.0) (2026-06-10)
+
+
+### Features
+
+* **NavigationMenu:** persist sidebar collapsed state and add tooltips for collapsed items ([966db68](https://github.com/getsoren/design-system/commit/966db68b6e11a4057f3b3cbda737e84ad40f8248))
+
 ## [4.43.1](https://github.com/getsoren/design-system/compare/4.43.0...4.43.1) (2026-06-04)
 
 

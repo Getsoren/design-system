@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.45.0](https://github.com/getsoren/design-system/compare/4.44.0...4.45.0) (2026-06-10)
+
+
+### Features
+
+* **EmptyState:** add EmptyState component with customizable actions and icon ([260b3f6](https://github.com/getsoren/design-system/commit/260b3f689ff2e824dbd70da206467fa2bf916e22))
+
 ## [4.44.0](https://github.com/getsoren/design-system/compare/4.43.1...4.44.0) (2026-06-10)
 
 

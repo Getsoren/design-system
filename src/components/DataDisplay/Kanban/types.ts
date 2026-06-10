@@ -34,7 +34,7 @@ export const defaultKanbanChip: Record<string, KanbanChipFormat> = {
 /**
  * Props for configuring the empty state of the Kanban component.
  */
-export interface EmptyStateProps {
+export interface KanbanEmptyStateProps {
   title: string;
   description?: string;
   buttonText?: string;
@@ -151,5 +151,5 @@ export interface KanbanProps {
   /**
    * Optional empty state configuration.
    */
-  emptyState?: ReactElement | EmptyStateProps;
+  emptyState?: ReactElement | KanbanEmptyStateProps;
 }

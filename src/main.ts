@@ -40,6 +40,8 @@ export * from "@/components/Feedback/Dialog/DialogPopper";
 export { default as DialogPopper } from "@/components/Feedback/Dialog/DialogPopper";
 export * from "@/components/Feedback/Dialog/DialogValidation/DialogValidation";
 export { default as DialogValidation } from "@/components/Feedback/Dialog/DialogValidation/DialogValidation";
+export type { EmptyStateProps } from "@/components/Feedback/EmptyState/EmptyState";
+export { default as EmptyState } from "@/components/Feedback/EmptyState/EmptyState";
 export * from "@/components/Feedback/Lightbox";
 export { default as Lightbox } from "@/components/Feedback/Lightbox";
 export * from "@/components/Inputs/ActionAppBar";

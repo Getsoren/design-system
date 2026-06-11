@@ -13,9 +13,6 @@ interface FileViewerPros extends PropsWithChildren {
   width?: number | string;
   height?: number | string;
   sx?: SxProps;
-  widthLightbox?: number | string;
-  heightLightbox?: number | string;
-  sxLightbox?: SxProps;
   disableLightbox?: boolean;
   disableThumb?: boolean;
   open?: boolean;
@@ -31,9 +28,6 @@ const FileViewer = ({
   fileName,
   children,
   sx,
-  widthLightbox,
-  heightLightbox,
-  sxLightbox,
   disableLightbox,
   disableThumb,
   open,
@@ -170,35 +164,28 @@ const FileViewer = ({
       )}
 
       {/* Lightbox */}
-      {shouldDisplayLightbox && (
-        <Lightbox open={open !== undefined && (isPdf || isImage) ? open : internalOpen} onClose={close} src={src} title={fileName}>
-          <Box
-            component={isPdf ? "iframe" : "img"}
-            src={src || srcThumb || undefined}
-            width={widthLightbox}
-            height={heightLightbox}
-            sx={{
-              ...(isPdf
-                ? {
-                    border: 0,
-                    display: "block",
-                    height: "100vh",
-                    margin: "auto",
-                    width: {
-                      md: "50vw",
-                      xs: "100%",
-                    },
-                  }
-                : {
-                    border: 0,
-                    height: "100%",
-                    width: "100%",
-                  }),
-              ...sxLightbox,
-            }}
-          />
-        </Lightbox>
-      )}
+      {shouldDisplayLightbox &&
+        (isPdf ? (
+          <Lightbox open={open === undefined ? internalOpen : open} onClose={close} src={src} title={fileName}>
+            <Box
+              component="iframe"
+              src={src}
+              sx={{
+                border: 0,
+                display: "block",
+                height: "100vh",
+                margin: "auto",
+                width: {
+                  md: "50vw",
+                  xs: "100%",
+                },
+              }}
+            />
+          </Lightbox>
+        ) : (
+          // Images: the Lightbox renders the image itself, with its built-in loading spinner and fade-in
+          <Lightbox open={open === undefined ? internalOpen : open} onClose={close} src={src} title={fileName} />
+        ))}
 
       {children && (
         <Box

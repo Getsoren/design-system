@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.47.0](https://github.com/getsoren/design-system/compare/4.46.1...4.47.0) (2026-06-11)
+
+
+### Features
+
+* **FileViewer:** simplify lightbox implementation by removing unused props ([a7b6e18](https://github.com/getsoren/design-system/commit/a7b6e185e8aad23a803690711de079699de85712))
+
 ## [4.46.1](https://github.com/getsoren/design-system/compare/4.46.0...4.46.1) (2026-06-10)
 
 ## [4.46.0](https://github.com/getsoren/design-system/compare/4.45.1...4.46.0) (2026-06-10)

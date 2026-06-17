@@ -11,7 +11,7 @@ const options = [
 ];
 
 const optionsWithInfo = [
-  { id: "1", info: "This filter only keeps active items.", label: "Filter with info", value: "filter-1" },
+  { id: "1", info: "This filter only keeps active items.", label: "Filter with info !", value: "filter-1" },
   { id: "2", label: "Filter 2", value: "filter-2" },
   { id: "3", info: "Archived items are excluded from this filter.", label: "Filter 3", value: "filter-3" },
   { id: "4", label: "Filter 4", value: "filter-4" },

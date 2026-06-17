@@ -10,6 +10,13 @@ const options = [
   { id: "4", label: "Filter 4", value: "filter-4" },
 ];
 
+const optionsWithInfo = [
+  { id: "1", info: "This filter only keeps active items.", label: "Filter with info", value: "filter-1" },
+  { id: "2", label: "Filter 2", value: "filter-2" },
+  { id: "3", info: "Archived items are excluded from this filter.", label: "Filter 3", value: "filter-3" },
+  { id: "4", label: "Filter 4", value: "filter-4" },
+];
+
 const Template: StoryFn<typeof ChipFilter> = (args) => {
   const [valueSmall, setValueSmall] = useState<string>();
   const [valueMedium, setValueMedium] = useState<string>();
@@ -94,6 +101,35 @@ const MultipleTemplate: StoryFn<typeof ChipFilter> = (args) => {
   );
 };
 
+const WithInfoTemplate: StoryFn<typeof ChipFilter> = (args) => {
+  const [value, setValue] = useState<string>();
+  const [valueMultiple, setValueMultiple] = useState<string[]>([]);
+
+  return (
+    <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <ChipFilter
+        size="medium"
+        label="Single"
+        onChange={setValue}
+        value={value}
+        options={optionsWithInfo}
+        labelMenu="Make your choice"
+        disabled={args?.disabled}
+      />
+      <ChipFilter
+        multiple
+        size="medium"
+        label="Multiple"
+        onChange={setValueMultiple}
+        value={valueMultiple}
+        options={optionsWithInfo}
+        labelMenu="Select multiple options"
+        disabled={args?.disabled}
+      />
+    </Stack>
+  );
+};
+
 const ToggleTemplate: StoryFn<typeof ChipFilter> = () => {
   const [valueSmallToggle, setValueSmallToggle] = useState<boolean>(false);
   const [valueMediumToggle, setValueMediumToggle] = useState<boolean>(false);
@@ -132,6 +168,9 @@ MultipleDisabled.args = {
 
 export const Toggle = ToggleTemplate.bind({});
 Toggle.args = {};
+
+export const WithInfo = WithInfoTemplate.bind({});
+WithInfo.args = {};
 
 export const LabelOnlyAfterSelection = Template.bind({});
 LabelOnlyAfterSelection.args = {

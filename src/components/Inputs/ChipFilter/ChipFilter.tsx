@@ -1,7 +1,21 @@
-import { Button, Checkbox, Chip, ChipProps, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Radio, Stack } from "@mui/material";
+import {
+  Button,
+  Checkbox,
+  Chip,
+  ChipProps,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Radio,
+  Stack,
+  Tooltip,
+} from "@mui/material";
 import { MouseEvent, ReactNode, useEffect, useState } from "react";
 import ChevronIcon from "@/components/DataDisplay/Icons/ChevronIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
+import InfoIcon from "@/components/DataDisplay/Icons/InfoIcon";
 import useMenu from "@/hooks/useMenu";
 import useTranslation from "@/hooks/useTranslation";
 
@@ -11,6 +25,11 @@ type Option<T = OptionValue> = {
   id?: string | number;
   label: string;
   value: T;
+  /**
+   * Optional information text. When provided, an info icon is displayed next to the
+   * option label, showing this text in a tooltip on hover.
+   */
+  info?: string;
 };
 
 interface ChipFilterBaseProps<T = OptionValue> {
@@ -431,7 +450,14 @@ function ChipFilter<T = OptionValue>({
                     <Radio disableRipple checked={isSelected} sx={{ padding: 0 }} />
                   )}
                 </ListItemIcon>
-                <ListItemText sx={{ color: "text.secondary" }}>{option.label}</ListItemText>
+                <ListItemText sx={{ color: "text.secondary", flexGrow: 0 }}>{option.label}</ListItemText>
+                {option.info && (
+                  <Tooltip title={option.info}>
+                    <IconButton size="small" sx={{ color: "text.secondary", marginLeft: 0.5 }} onClick={(event) => event.stopPropagation()}>
+                      <InfoIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </MenuItem>
             );
           })}

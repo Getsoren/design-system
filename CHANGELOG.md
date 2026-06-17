@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.48.0](https://github.com/getsoren/design-system/compare/4.47.0...4.48.0) (2026-06-17)
+
+
+### Features
+
+* **ChipFilter:** add info tooltip for filter options and create InfoIcon component ([647529a](https://github.com/getsoren/design-system/commit/647529a880c0fe433debf15ae6197268a921375f))
+* **ChipFilter:** update filter label to include exclamation mark for emphasis ([2a8c7af](https://github.com/getsoren/design-system/commit/2a8c7af8ffabdd15c202dc40894daca340595ef6))
+
 ## [4.47.0](https://github.com/getsoren/design-system/compare/4.46.1...4.47.0) (2026-06-11)
 
 

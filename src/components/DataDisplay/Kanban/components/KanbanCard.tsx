@@ -241,7 +241,6 @@ const KanbanCard = memo(({ item, activeItemId, gutterSize, onClickItem, variant 
           "&:hover": {
             boxShadow: 4,
           },
-          background: "background.paper",
           border: `1px solid ${active ? palette.action.active : "transparent"}`,
           boxShadow: "0px 0 8px 0 rgba(0, 0, 0, 0.10), 0px 1px 1px 0px rgba(0, 0, 0, 0.04), 0px 1px 3px 0px rgba(0, 0, 0, 0.03)",
           cursor: "pointer",

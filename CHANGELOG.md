@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.50.0](https://github.com/getsoren/design-system/compare/4.49.0...4.50.0) (2026-07-03)
+
+
+### Features
+
+* **NavigationMenu:** add tag support for menu items and implement parseLocalDate utility function ([79cd918](https://github.com/getsoren/design-system/commit/79cd918572e3124807a9f43cc47b4548737bca12))
+
 ## [4.49.0](https://github.com/getsoren/design-system/compare/4.48.1...4.49.0) (2026-07-03)
 
 

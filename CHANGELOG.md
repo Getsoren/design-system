@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.51.0](https://github.com/getsoren/design-system/compare/4.50.0...4.51.0) (2026-07-03)
+
+
+### Features
+
+* **ChipFilter:** add dense menu support and options for menu header visibility ([c9f2bec](https://github.com/getsoren/design-system/commit/c9f2bec14eb75b0abd321979275f667afa934af6))
+
 ## [4.50.0](https://github.com/getsoren/design-system/compare/4.49.0...4.50.0) (2026-07-03)
 
 

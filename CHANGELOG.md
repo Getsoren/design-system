@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.49.0](https://github.com/getsoren/design-system/compare/4.48.1...4.49.0) (2026-07-03)
+
+
+### Features
+
+* **ChipFilter:** enhance delete icon functionality with wrapper component ([18d9047](https://github.com/getsoren/design-system/commit/18d90471618cbb783df15132af738f797787b232))
+* **PlanningTimeline:** add time scale labels in English and French ([da95203](https://github.com/getsoren/design-system/commit/da95203b89f13bec9a72fb8b22b08e65c4da4681))
+
 ## [4.48.1](https://github.com/getsoren/design-system/compare/4.48.0...4.48.1) (2026-07-01)
 
 ## [4.48.0](https://github.com/getsoren/design-system/compare/4.47.0...4.48.0) (2026-06-17)

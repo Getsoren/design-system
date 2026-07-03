@@ -9,6 +9,10 @@ export type ObjectNavigationItem = {
   label?: string;
   count?: number;
   countColor?: ChipProps["color"];
+  /** Small highlight chip rendered next to the label (e.g. "New"). Hidden when the sidebar is collapsed to the icon rail. */
+  tag?: string;
+  /** Color of the `tag` chip. @default "info" */
+  tagColor?: ChipProps["color"];
   icon?: ReactNode;
   active?: boolean;
   state?: any;

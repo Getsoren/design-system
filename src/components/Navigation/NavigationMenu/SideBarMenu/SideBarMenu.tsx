@@ -112,7 +112,7 @@ const isGroupItem = (item: NavigationItem): item is NavigationGroupItem =>
  */
 const SideBarNavRow = ({ item }: { item: ObjectNavigationItem }) => {
   const { NavLink, isCollapsed } = useContext(NavigationMenuContext);
-  const { count, countColor, url, label, icon, active, disabled, target, end, state } = item;
+  const { count, countColor, tag, tagColor, url, label, icon, active, disabled, target, end, state } = item;
 
   return (
     <NavLinkItem url={url} component={NavLink} active={active} disabled={disabled} target={target} end={end} state={state}>
@@ -135,7 +135,11 @@ const SideBarNavRow = ({ item }: { item: ObjectNavigationItem }) => {
           )}
           <Fade in={!isCollapsed}>
             <Stack direction="row" justifyContent="space-between" flex={1} whiteSpace="nowrap">
-              {label}
+              {/* `label` is a text node: margin-based Stack spacing skips it, so use flex gap instead. */}
+              <Stack direction="row" component="span" alignItems="center" sx={{ gap: 1 }}>
+                {label}
+                {tag && <Chip color={tagColor || "info"} size="small" label={tag} variant="rounded" />}
+              </Stack>
               {!!count && <Chip color={countColor || "warning"} size="small" label={count} variant="rounded" />}
             </Stack>
           </Fade>

@@ -6,7 +6,7 @@ import type {
   PlanningTimelineStatusColor,
   PlanningTimelineTask,
 } from "@/components/DataDisplay/PlanningTimeline/types";
-import { startOfDay, type TimeScale } from "@/components/DataDisplay/PlanningTimeline/utils/timeScale";
+import { parseLocalDate, startOfDay, type TimeScale } from "@/components/DataDisplay/PlanningTimeline/utils/timeScale";
 
 const MIN_BAR_WIDTH = 12;
 const BAR_VERTICAL_PADDING = 10;
@@ -111,7 +111,7 @@ const TaskBar = <T extends PlanningTimelineTask>({
   // Same-day incidents share a single segment; invalid dates and days outside the bar are dropped.
   const incidentDays = new Set<number>();
   task.incidents?.forEach((incident) => {
-    const day = new Date(incident.incidentDate);
+    const day = parseLocalDate(incident.incidentDate);
     if (!Number.isNaN(day.getTime())) {
       incidentDays.add(startOfDay(day).getTime());
     }

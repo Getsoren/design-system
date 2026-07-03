@@ -9,6 +9,7 @@ import {
   getTicks,
   MS_PER_DAY,
   PX_PER_DAY,
+  parseLocalDate,
   snapDateToDay,
   xToDate,
 } from "../utils/timeScale";
@@ -51,6 +52,21 @@ describe("addMonths", () => {
 
   it("crosses year boundaries backwards", () => {
     expect(addMonths(new Date(2026, 0, 15), -1).getTime()).toBe(new Date(2025, 11, 15).getTime());
+  });
+});
+
+describe("parseLocalDate", () => {
+  it("reads a date-only string as local midnight, whatever the timezone", () => {
+    expect(parseLocalDate("2026-07-01").getTime()).toBe(new Date(2026, 6, 1).getTime());
+  });
+
+  it("keeps ISO datetime strings, Date and timestamp inputs as-is", () => {
+    expect(parseLocalDate("2026-07-01T10:30:00.000Z").getTime()).toBe(new Date("2026-07-01T10:30:00.000Z").getTime());
+    expect(parseLocalDate(1234567890).getTime()).toBe(1234567890);
+  });
+
+  it("returns an invalid date for garbage input (dropped by the caller)", () => {
+    expect(Number.isNaN(parseLocalDate("not-a-date").getTime())).toBe(true);
   });
 });
 

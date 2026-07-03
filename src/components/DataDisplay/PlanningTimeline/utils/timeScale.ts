@@ -54,6 +54,19 @@ export const startOfDay = (date: Date | number): Date => {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 };
 
+/**
+ * Parse a date input, reading date-only strings ("2026-07-01") as LOCAL midnight — `new Date()`
+ * would read them as UTC midnight, which lands on the previous local day west of UTC.
+ */
+export const parseLocalDate = (value: string | number | Date): Date => {
+  const dateOnly = typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.exec(value);
+  if (dateOnly) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+  return new Date(value);
+};
+
 /** Last millisecond of the given day (23:59:59.999, local time). */
 export const endOfDay = (date: Date | number): Date => {
   const d = new Date(date);

@@ -46,6 +46,7 @@ const ITEMS = [
   },
   {
     label: "Lien 2",
+    tag: "New",
     url: "#",
   },
   {

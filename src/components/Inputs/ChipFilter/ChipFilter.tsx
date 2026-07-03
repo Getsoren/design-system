@@ -8,6 +8,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  MenuProps,
   Radio,
   Stack,
   Tooltip,
@@ -73,6 +74,21 @@ interface ChipFilterBaseProps<T = OptionValue> {
    * When false (default), changes require clicking "Apply" to be applied.
    */
   applyOnSelect?: boolean;
+  /**
+   * Hides the menu header row (the labelMenu title and its close button).
+   * Useful when the chip itself is the only expected way to toggle the menu.
+   */
+  hideMenuHeader?: boolean;
+  /**
+   * Compact menu rendering: dense menu items and smaller option labels,
+   * for tight containers (e.g. a menu nested inside a popover).
+   */
+  denseMenu?: boolean;
+  /**
+   * Props forwarded to the underlying MUI Menu (e.g. elevation, sx, slotProps).
+   * Passing slotProps replaces the default paper minWidth.
+   */
+  menuProps?: Partial<Omit<MenuProps, "open" | "anchorEl" | "onClose">>;
 }
 
 // Toggle mode interface (boolean) - inferred from presence of 'checked'
@@ -194,6 +210,9 @@ function ChipFilter<T = OptionValue>(props: ChipFilterMultipleProps<T>): ReactNo
  * @param multiple
  * @param size
  * @param applyOnSelect
+ * @param hideMenuHeader
+ * @param denseMenu
+ * @param menuProps
  * @constructor
  */
 // eslint-disable-next-line no-redeclare,react/function-component-definition
@@ -209,6 +228,9 @@ function ChipFilter<T = OptionValue>({
   labelMenu,
   labelOnlyAfterSelection,
   applyOnSelect,
+  hideMenuHeader,
+  denseMenu,
+  menuProps,
   separatorBetweenLabelAndOptionSelected = ":",
   multiple = false,
   size = "medium",
@@ -467,9 +489,6 @@ function ChipFilter<T = OptionValue>({
       {/* Menu */}
       {hasOptions && isArrayOfOptions && (
         <Menu
-          anchorEl={anchorMenu}
-          open={isMenuOpen}
-          onClose={closeMenu}
           slotProps={{
             paper: {
               sx: {
@@ -477,14 +496,20 @@ function ChipFilter<T = OptionValue>({
               },
             },
           }}
+          {...menuProps}
+          anchorEl={anchorMenu}
+          open={isMenuOpen}
+          onClose={closeMenu}
         >
           {/* label Menu & close icon */}
-          <Stack component="li" direction="row" paddingLeft={2} marginBottom={1}>
-            <ListItemText>{labelMenu}</ListItemText>
-            <IconButton onClick={closeMenu}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </Stack>
+          {!hideMenuHeader && (
+            <Stack component="li" direction="row" paddingLeft={2} marginBottom={1}>
+              <ListItemText>{labelMenu}</ListItemText>
+              <IconButton onClick={closeMenu}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+          )}
 
           {/* Options */}
           {(options as Option<T>[]).map((option, index) => {
@@ -492,7 +517,7 @@ function ChipFilter<T = OptionValue>({
             const isSelected = isOptionSelected(option.value);
 
             return (
-              <MenuItem key={key} onClick={() => handleOptionClick(option.value)}>
+              <MenuItem key={key} dense={denseMenu} onClick={() => handleOptionClick(option.value)}>
                 <ListItemIcon>
                   {multiple || isToggleMode ? (
                     <Checkbox disableRipple checked={isSelected} sx={{ padding: 0 }} />
@@ -500,7 +525,12 @@ function ChipFilter<T = OptionValue>({
                     <Radio disableRipple checked={isSelected} sx={{ padding: 0 }} />
                   )}
                 </ListItemIcon>
-                <ListItemText sx={{ color: "text.secondary", flexGrow: 0 }}>{option.label}</ListItemText>
+                <ListItemText
+                  slotProps={denseMenu ? { primary: { variant: "body2" } } : undefined}
+                  sx={{ color: "text.secondary", flexGrow: 0 }}
+                >
+                  {option.label}
+                </ListItemText>
                 {option.info && (
                   <Tooltip title={option.info}>
                     <IconButton size="small" sx={{ color: "text.secondary", marginLeft: 0.5 }} onClick={(event) => event.stopPropagation()}>

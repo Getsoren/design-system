@@ -130,6 +130,28 @@ const WithInfoTemplate: StoryFn<typeof ChipFilter> = (args) => {
   );
 };
 
+const DenseMenuTemplate: StoryFn<typeof ChipFilter> = () => {
+  const [value, setValue] = useState<string[]>([]);
+
+  return (
+    <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <ChipFilter
+        multiple
+        applyOnSelect
+        hideMenuHeader
+        denseMenu
+        size="small"
+        variant="outlined"
+        label="Dense menu"
+        onChange={setValue}
+        value={value}
+        options={options}
+        labelMenu="Dense menu"
+      />
+    </Stack>
+  );
+};
+
 const ToggleTemplate: StoryFn<typeof ChipFilter> = () => {
   const [valueSmallToggle, setValueSmallToggle] = useState<boolean>(false);
   const [valueMediumToggle, setValueMediumToggle] = useState<boolean>(false);
@@ -191,6 +213,9 @@ export const ApplyOnSelect = Template.bind({});
 ApplyOnSelect.args = {
   applyOnSelect: true,
 };
+
+export const DenseMenu = DenseMenuTemplate.bind({});
+DenseMenu.args = {};
 
 export default {
   component: ChipFilter,

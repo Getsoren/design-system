@@ -1,0 +1,59 @@
+import type { PlanningTimelineStatusColor, PlanningTimelineTask } from "@/components/DataDisplay/PlanningTimeline/types";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const daysFromNow = (days: number) => new Date(Date.now() + days * DAY_MS);
+
+interface GeneratorGroup {
+  name: string;
+  statusColor: PlanningTimelineStatusColor;
+  taskCount: number;
+  collapsed?: boolean;
+}
+
+/**
+ * Build demo rows: one collapsible "project" header per group, then its "task" bars spread around
+ * today. A few bars get an incident hatch or an overdue overrun so every visual state is visible.
+ */
+export const planningTimelineDataGenerator = (
+  groups: GeneratorGroup[] = [
+    { name: "To process", statusColor: "warning", taskCount: 3 },
+    { name: "In progress", statusColor: "success", taskCount: 4 },
+    { name: "Ended", statusColor: "default", taskCount: 2 },
+  ],
+): PlanningTimelineTask[] =>
+  groups.flatMap((group, groupIndex) => {
+    // Global machine number, continuous across groups (Excavator 1..n).
+    const offset = groups.slice(0, groupIndex).reduce((sum, { taskCount }) => sum + taskCount, 0);
+
+    const rows: PlanningTimelineTask[] = Array.from({ length: group.taskCount }, (_, i) => {
+      const start = daysFromNow(i * 4 - 6);
+      const end = daysFromNow(i * 4 + 4);
+      const overdue = group.statusColor === "success" && i === 0;
+      return {
+        end: overdue ? new Date() : end,
+        id: `${group.name}-${i}`,
+        incidents: i === 1 ? [{ incidentDate: daysFromNow(-2) }] : undefined,
+        name: `Excavator ${offset + i + 1}`,
+        overdue,
+        plannedEnd: overdue ? daysFromNow(-3) : undefined,
+        project: group.name,
+        start: overdue ? daysFromNow(-10) : start,
+        statusColor: group.statusColor,
+        type: "task",
+      };
+    });
+
+    const allDates = rows.flatMap((row) => [row.start.getTime(), row.end.getTime()]);
+    const header: PlanningTimelineTask = {
+      childCount: rows.length,
+      end: new Date(Math.max(...allDates)),
+      hideChildren: group.collapsed ?? false,
+      id: group.name,
+      name: group.name,
+      start: new Date(Math.min(...allDates)),
+      type: "project",
+    };
+
+    return [header, ...rows];
+  });

@@ -28,6 +28,8 @@ export * from "@/components/DataDisplay/ListItemCard";
 export { default as ListItemCard } from "@/components/DataDisplay/ListItemCard";
 export * from "@/components/DataDisplay/Logo";
 export { default as Logo } from "@/components/DataDisplay/Logo";
+export { default as PlanningTimeline } from "@/components/DataDisplay/PlanningTimeline/PlanningTimeline";
+export * from "@/components/DataDisplay/PlanningTimeline/types";
 export * from "@/components/DataDisplay/StatusIcon";
 export { default as StatusIcon } from "@/components/DataDisplay/StatusIcon";
 export * from "@/components/DataDisplay/TimeLine";

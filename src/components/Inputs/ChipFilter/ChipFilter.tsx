@@ -18,6 +18,7 @@ import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import InfoIcon from "@/components/DataDisplay/Icons/InfoIcon";
 import useMenu from "@/hooks/useMenu";
 import useTranslation from "@/hooks/useTranslation";
+import pxToRem from "@/utils/pxToRem";
 
 export type OptionValue = string | number;
 
@@ -150,6 +151,25 @@ export interface ChipFilterMultipleProps<T = OptionValue> extends ChipFilterBase
 }
 
 export type ChipFilterProps<T = OptionValue> = ChipFilterToggleProps | ChipFilterSingleProps<T> | ChipFilterMultipleProps<T>;
+
+/**
+ * MUI Chip clones its deleteIcon with a `.MuiChip-deleteIcon` className and an onClick handler.
+ * Both are intentionally ignored here: the className would override the color inherited from
+ * the chip, and the onClick would stop clicks from bubbling to the chip (which opens the menu).
+ */
+const DeleteIconWrapper = ({ children }: { children: ReactNode }) => (
+  <Stack
+    alignItems="center"
+    justifyContent="center"
+    sx={{
+      marginLeft: -0.5,
+      marginRight: 0.5,
+      position: "relative",
+    }}
+  >
+    {children}
+  </Stack>
+);
 
 // Overloaded function signatures
 function ChipFilter(props: ChipFilterToggleProps): ReactNode;
@@ -399,14 +419,44 @@ function ChipFilter<T = OptionValue>({
         variant={variant}
         deleteIcon={
           hasOptions && isArrayOfOptions ? (
-            <ChevronIcon
-              fontSize="small"
-              sx={{
-                marginLeft: -0.5,
-                marginRight: 0.5,
-                transform: isMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
-              }}
-            />
+            <DeleteIconWrapper>
+              <ChevronIcon
+                fontSize="small"
+                sx={{
+                  transform: isMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "opacity 0.2s ease-in-out",
+                  ...(hasValue && {
+                    ".MuiChip-root:hover &": {
+                      opacity: 0,
+                    },
+                  }),
+                }}
+              />
+              {hasValue && (
+                <Stack
+                  alignItems="center"
+                  justifyContent="center"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleReset();
+                  }}
+                  sx={{
+                    ".MuiChip-root:hover &": {
+                      opacity: 1,
+                    },
+                    color: "text.contrast",
+                    left: "50%",
+                    opacity: 0,
+                    position: "absolute",
+                    top: "50%",
+                    transform: "translate(-50%, -50%)",
+                    transition: "opacity 0.2s ease-in-out",
+                  }}
+                >
+                  <CloseIcon sx={{ fontSize: pxToRem(16) }} />
+                </Stack>
+              )}
+            </DeleteIconWrapper>
           ) : undefined
         }
         onClick={handleClickChip}

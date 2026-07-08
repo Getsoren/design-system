@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.52.1](https://github.com/getsoren/design-system/compare/4.52.0...4.52.1) (2026-07-08)
+
+
+### Bug Fixes
+
+* **Button:** add hover styles and contrast color option for outlined variant ([1369a44](https://github.com/getsoren/design-system/commit/1369a4475e6603a31afddaf6e03f0c5d4b39f314))
+
 ## [4.52.0](https://github.com/getsoren/design-system/compare/4.51.0...4.52.0) (2026-07-08)
 
 

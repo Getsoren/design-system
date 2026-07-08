@@ -457,6 +457,24 @@ const commonThemeOptions: MuiThemeOptions = {
           },
         },
         {
+          props: { color: "contrast", variant: "outlined" },
+          style: ({ theme }) => {
+            const hoverOverlay = alpha(theme.palette.text.primary, theme.palette.action.hoverOpacity);
+
+            return {
+              "&:hover": {
+                backgroundColor: theme.palette.grey.A100,
+                backgroundImage: `linear-gradient(${hoverOverlay}, ${hoverOverlay})`,
+                borderColor: theme.palette.text.disabled,
+              },
+              backgroundColor: theme.palette.grey.A100,
+              // Same subtle border as outlined primary.
+              borderColor: theme.palette.divider,
+              color: theme.palette.text.primary,
+            };
+          },
+        },
+        {
           props: { variant: "link" },
           style: ({ theme, ownerState }: { theme: MuiTheme; ownerState?: ButtonProps } & ComponentsPropsList["MuiButton"]) => {
             const color =

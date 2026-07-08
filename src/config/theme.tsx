@@ -417,6 +417,8 @@ const commonThemeOptions: MuiThemeOptions = {
             fontSize: pxToRem(13),
             letterSpacing: -0.3,
             minHeight: 40,
+            paddingLeft: "20px",
+            paddingRight: "20px",
           },
         },
         {

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.53.0](https://github.com/getsoren/design-system/compare/4.52.1...4.53.0) (2026-07-08)
+
+
+### Features
+
+* **theme:** add padding to button styles for improved layout ([f506969](https://github.com/getsoren/design-system/commit/f506969462e66e8502be73f7e9236e1270c5401f))
+
 ## [4.52.1](https://github.com/getsoren/design-system/compare/4.52.0...4.52.1) (2026-07-08)
 
 

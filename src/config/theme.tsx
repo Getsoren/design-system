@@ -47,6 +47,9 @@ declare module "@mui/material/Autocomplete" {
 }
 
 declare module "@mui/material/Button" {
+  interface ButtonPropsColorOverrides {
+    contrast: true;
+  }
   interface ButtonPropsVariantOverrides {
     dashed: true;
     "dashed-rounded": true;
@@ -439,10 +442,27 @@ const commonThemeOptions: MuiThemeOptions = {
           }),
         },
         {
+          props: { color: "contrast", variant: "contained" },
+          style: ({ theme }) => {
+            const hoverOverlay = alpha(theme.palette.text.primary, theme.palette.action.hoverOpacity);
+
+            return {
+              "&:hover": {
+                backgroundColor: theme.palette.grey.A100,
+                backgroundImage: `linear-gradient(${hoverOverlay}, ${hoverOverlay})`,
+              },
+              backgroundColor: theme.palette.grey.A100,
+              color: theme.palette.text.primary,
+            };
+          },
+        },
+        {
           props: { variant: "link" },
           style: ({ theme, ownerState }: { theme: MuiTheme; ownerState?: ButtonProps } & ComponentsPropsList["MuiButton"]) => {
             const color =
-              ownerState?.color === "inherit" ? theme.palette.text.primary : theme.palette?.[ownerState?.color || "primary"]?.main;
+              ownerState?.color === "inherit" || ownerState?.color === "contrast"
+                ? theme.palette.text.primary
+                : theme.palette?.[ownerState?.color || "primary"]?.main;
 
             return {
               "&:hover": {

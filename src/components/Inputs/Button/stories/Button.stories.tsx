@@ -54,6 +54,9 @@ const Template: StoryFn<typeof Button> = (args) => (
     <Button size="medium" color="warning" {...args}>
       Medium warning
     </Button>
+    <Button size="medium" color="contrast" {...args}>
+      Medium contrast
+    </Button>
     <Button size="large" {...args}>
       Large
     </Button>

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.54.0](https://github.com/getsoren/design-system/compare/4.53.1...4.54.0) (2026-07-15)
+
+
+### Features
+
+* **PlanningTimeline:** enhance timeline with multiple bars per resource and customizable group/resource cells ([3933dbe](https://github.com/getsoren/design-system/commit/3933dbe0f866e38c971d1fd872d132d01c655d61))
+
 ## [4.53.1](https://github.com/getsoren/design-system/compare/4.53.0...4.53.1) (2026-07-13)
 
 ## [4.53.0](https://github.com/getsoren/design-system/compare/4.52.1...4.53.0) (2026-07-08)

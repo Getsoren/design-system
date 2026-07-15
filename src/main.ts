@@ -68,6 +68,8 @@ export * from "@/components/Inputs/TextFieldPassword";
 export { default as TextFieldPassword } from "@/components/Inputs/TextFieldPassword";
 export * from "@/components/Layout/Backoffice";
 export { default as Backoffice } from "@/components/Layout/Backoffice";
+export { default as CollapsingHeader } from "@/components/Layout/CollapsingHeader/CollapsingHeader";
+export * from "@/components/Layout/CollapsingHeader/types";
 export * from "@/components/Navigation/NavigationMenu";
 export { default as NavigationMenu } from "@/components/Navigation/NavigationMenu";
 export * from "@/components/Navigation/TabPanel";

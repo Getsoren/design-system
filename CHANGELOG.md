@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.55.0](https://github.com/getsoren/design-system/compare/4.54.0...4.55.0) (2026-07-15)
+
+
+### Features
+
+* **CollapsingHeader:** add new component with sticky behavior and customizable titles ([d93478c](https://github.com/getsoren/design-system/commit/d93478c2d73b7518cd86ec86015cbbbf63d2036f))
+
 ## [4.54.0](https://github.com/getsoren/design-system/compare/4.53.1...4.54.0) (2026-07-15)
 
 

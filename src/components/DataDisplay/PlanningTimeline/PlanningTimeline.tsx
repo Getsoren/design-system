@@ -1,6 +1,7 @@
 import { Box, IconButton, Skeleton, Stack, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mui/material";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import ChevronIcon from "@/components/DataDisplay/Icons/ChevronIcon";
 import KeyboardArrowLeftRoundedIcon from "@/components/DataDisplay/Icons/KeyboardArrowLeftRoundedIcon";
 import KeyboardArrowRightRoundedIcon from "@/components/DataDisplay/Icons/KeyboardArrowRightRoundedIcon";
 import KeyboardDoubleArrowLeftRoundedIcon from "@/components/DataDisplay/Icons/KeyboardDoubleArrowLeftRoundedIcon";
@@ -8,9 +9,13 @@ import KeyboardDoubleArrowRightRoundedIcon from "@/components/DataDisplay/Icons/
 import TaskBar from "@/components/DataDisplay/PlanningTimeline/components/TaskBar";
 import TimelineHeader from "@/components/DataDisplay/PlanningTimeline/components/TimelineHeader";
 import type {
+  PlanningTimelineGroup,
+  PlanningTimelineGroupContext,
   PlanningTimelineLabels,
   PlanningTimelineLocalStorageKeys,
   PlanningTimelineProps,
+  PlanningTimelineResource,
+  PlanningTimelineResourceContext,
   PlanningTimelineTask,
 } from "@/components/DataDisplay/PlanningTimeline/types";
 import {
@@ -24,9 +29,7 @@ import useTranslation from "@/hooks/useTranslation";
 import getBackgroundImageElevation from "@/utils/getBackgroundImageElevation";
 
 const HEADER_HEIGHT = 56;
-const DEFAULT_LOCAL_STORAGE_KEYS: PlanningTimelineLocalStorageKeys = {
-  viewMode: "soren-planning-timeline-view-mode",
-};
+const DEFAULT_LOCAL_STORAGE_KEYS: PlanningTimelineLocalStorageKeys = { viewMode: "soren-planning-timeline-view-mode" };
 const VIEW_MODES: ViewMode[] = ["day", "week", "month", "year"];
 
 /** Read the persisted view mode; anything invalid (or an unavailable storage) is ignored. */
@@ -40,24 +43,33 @@ const getStoredViewMode = (storageKey: string): ViewMode | null => {
   }
 };
 
-const PlanningTimeline = <T extends PlanningTimelineTask>({
+const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTimelineResource, T extends PlanningTimelineTask>({
+  groups,
+  resources,
   tasks,
   isLoading,
-  onClick,
+  onTaskClick,
+  onResourceClick,
+  onGroupClick,
   onBarResize,
-  renderRow,
+  renderGroup,
+  renderResource,
   renderBar,
   renderTooltip,
   isTaskSelected,
   recenterKey,
+  toolbarActions,
   sidebarTitle,
   locale,
   labels,
-  defaultViewMode = "day",
   localStorageKeys,
+  defaultViewMode = "day",
   sidebarWidth = 300,
   rowHeight = 56,
-}: PlanningTimelineProps<T>) => {
+}: PlanningTimelineProps<G, R, T>) => {
+  // One virtualized line of the grid: a group header, or a resource carrying its task bars.
+  type DisplayItem = { key: string } & ({ type: "group"; group: G; childCount: number } | { type: "resource"; resource: R; tasks: T[] });
+
   // Declared before the useState below — its lazy initializer runs synchronously and reads this key.
   const viewModeStorageKey = localStorageKeys?.viewMode ?? DEFAULT_LOCAL_STORAGE_KEYS.viewMode;
   const [viewMode, setViewMode] = useState<ViewMode>(() => getStoredViewMode(viewModeStorageKey) ?? defaultViewMode);
@@ -69,26 +81,71 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
   const lastModeRef = useRef(viewMode);
   const lastRecenterKeyRef = useRef(recenterKey);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const allGroups = useMemo(() => groups ?? [], [groups]);
+  const allResources = useMemo(() => resources ?? [], [resources]);
   const allTasks = useMemo(() => tasks ?? [], [tasks]);
   const rowBorderColor = palette.mode === "dark" ? palette.grey[800] : palette.divider;
-
   const label = useCallback((key: keyof PlanningTimelineLabels) => labels?.[key] ?? t(key), [labels, t]);
 
-  // Collapsed group headers hide their task rows. Range is built from ALL tasks so the axis stays
-  // stable when collapsing/expanding.
-  const visibleTasks = useMemo(() => {
-    const collapsed = new Set(allTasks.filter((task) => task.type === "project" && task.hideChildren).map((task) => task.id));
-    return allTasks.filter((task) => !(task.type === "task" && task.project && collapsed.has(task.project)));
-  }, [allTasks]);
+  /**
+   * Flatten groups/resources/tasks into the virtualized display list: resources follow the `groups`
+   * array order (ungrouped resources — no `groupId` or an unknown one — come first), a collapsed
+   * group hides its resources, and each resource item carries its tasks in `tasks` array order.
+   */
+  const items = useMemo(() => {
+    const tasksByResource = new Map<string, T[]>();
+    allTasks.forEach((task) => {
+      const list = tasksByResource.get(task.resourceId);
+      if (list) {
+        list.push(task);
+      } else {
+        tasksByResource.set(task.resourceId, [task]);
+      }
+    });
 
+    const groupIds = new Set(allGroups.map((group) => group.id));
+    const resourcesByGroup = new Map<string, R[]>();
+    const ungroupedResources: R[] = [];
+    allResources.forEach((resource) => {
+      if (resource.groupId == null || !groupIds.has(resource.groupId)) {
+        ungroupedResources.push(resource);
+        return;
+      }
+      const list = resourcesByGroup.get(resource.groupId);
+      if (list) {
+        list.push(resource);
+      } else {
+        resourcesByGroup.set(resource.groupId, [resource]);
+      }
+    });
+
+    const toResourceItem = (resource: R): DisplayItem => ({
+      key: `resource:${resource.id}`,
+      resource,
+      tasks: tasksByResource.get(resource.id) ?? [],
+      type: "resource",
+    });
+
+    const list: DisplayItem[] = ungroupedResources.map(toResourceItem);
+    allGroups.forEach((group) => {
+      const groupResources = resourcesByGroup.get(group.id) ?? [];
+      list.push({ childCount: group.childCount ?? groupResources.length, group, key: `group:${group.id}`, type: "group" });
+      if (!group.collapsed) {
+        list.push(...groupResources.map(toResourceItem));
+      }
+    });
+    return list;
+  }, [allGroups, allResources, allTasks]);
+
+  // Range is built from ALL tasks so the axis stays stable when collapsing/expanding groups.
   const scale = useMemo(() => createTimeScale(allTasks, viewMode, locale), [allTasks, viewMode, locale]);
   const visibleSidebarWidth = sidebarCollapsed ? 0 : sidebarWidth;
 
   const rowVirtualizer = useVirtualizer({
-    count: visibleTasks.length,
+    count: items.length,
     estimateSize: () => rowHeight,
     // Stable keys let the virtualizer (and React) reuse row elements instead of remounting them.
-    getItemKey: (index) => visibleTasks[index].id,
+    getItemKey: (index) => items[index].key,
     getScrollElement: () => scrollRef.current,
     // Rows are fixed-height and cheap — a generous overscan (~20 rows ≈ 2 viewports) keeps fast
     // scrolling from outrunning the window and flashing blank rows.
@@ -97,12 +154,14 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
 
   const scrollToDate = useCallback(
     (date: Date) => {
-      const el = scrollRef.current;
-      if (!el) {
+      const element = scrollRef.current;
+
+      if (!element) {
         return;
       }
-      const visibleTimelineWidth = el.clientWidth - visibleSidebarWidth;
-      el.scrollLeft = Math.max(0, scale.dateToX(date) - visibleTimelineWidth / 2);
+
+      const visibleTimelineWidth = element.clientWidth - visibleSidebarWidth;
+      element.scrollLeft = Math.max(0, scale.dateToX(date) - visibleTimelineWidth / 2);
     },
     [scale, visibleSidebarWidth],
   );
@@ -125,28 +184,56 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
     scrollToDate(next);
   };
 
-  const onJump = useCallback((task: T) => onClick?.(task), [onClick]);
+  const onJumpResource = useCallback((resource: R) => onResourceClick?.(resource), [onResourceClick]);
+  const onJumpGroup = useCallback((group: G) => onGroupClick?.(group), [onGroupClick]);
 
-  const renderRowContent = useCallback(
-    (task: T, context: { onJump: (task: T) => void; selected: boolean; sidebarCollapsed: boolean }) => {
-      if (renderRow) {
-        return renderRow(task, context);
+  const renderGroupContent = useCallback(
+    (group: G, context: PlanningTimelineGroupContext<G>) => {
+      if (renderGroup) {
+        return renderGroup(group, context);
       }
-      // Default cell: just the row name, clickable like the bar.
+      // Default header cell: the group name, its resource count, and a collapse chevron stuck to the
+      // right edge. The whole cell is clickable — the button click bubbles up to the same `onJump`
+      // (collapse toggle).
       return (
-        <Stack justifyContent="center" onClick={() => context.onJump(task)} sx={{ cursor: "pointer", height: "100%", px: 2 }}>
-          <Typography noWrap variant="body2" sx={{ fontWeight: task.type === "project" ? typography.fontWeightMedium : undefined }}>
-            {task.name}
-            {task.type === "project" && task.childCount != null && (
-              <Typography component="span" variant="caption" sx={{ color: palette.text.secondary, ml: 0.5 }}>
-                {task.childCount}
-              </Typography>
-            )}
+        <Stack
+          alignItems="center"
+          direction="row"
+          justifyContent="space-between"
+          spacing={0.5}
+          onClick={() => context.onJump(group)}
+          sx={{ cursor: "pointer", height: "100%", pl: 2, pr: 1 }}
+        >
+          <Typography noWrap variant="body2" sx={{ fontWeight: typography.fontWeightMedium }}>
+            {group.name}
+            <Typography component="span" variant="caption" sx={{ color: palette.text.secondary, ml: 0.5 }}>
+              {context.childCount}
+            </Typography>
+          </Typography>
+          <IconButton size="small">
+            <ChevronIcon sx={{ transform: group.collapsed ? "rotate(-90deg)" : "none", transition: "transform 0.15s" }} />
+          </IconButton>
+        </Stack>
+      );
+    },
+    [renderGroup, typography.fontWeightMedium, palette.text.secondary],
+  );
+
+  const renderResourceContent = useCallback(
+    (resource: R, context: PlanningTimelineResourceContext<R, T>) => {
+      if (renderResource) {
+        return renderResource(resource, context);
+      }
+      // Default cell: just the resource name, clickable like the bars.
+      return (
+        <Stack justifyContent="center" onClick={() => context.onJump(resource)} sx={{ cursor: "pointer", height: "100%", px: 2 }}>
+          <Typography noWrap variant="body2">
+            {resource.name}
           </Typography>
         </Stack>
       );
     },
-    [renderRow, typography.fontWeightMedium, palette.text.secondary],
+    [renderResource],
   );
 
   const renderBarContent = useCallback(
@@ -154,7 +241,7 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
       if (renderBar) {
         return renderBar(task, context);
       }
-      // Default bar content: the task name, only when the sidebar doesn't already show it.
+      // Default bar content: the task name, only when the sidebar doesn't already show the resource name.
       if (!context.sidebarCollapsed) {
         return null;
       }
@@ -256,20 +343,23 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
           </Button>
         </Stack>
 
-        <ToggleButtonGroup exclusive value={viewMode} size="small" onChange={handleViewModeChange}>
-          <ToggleButton value="day" sx={{ textTransform: "capitalize" }}>
-            {label("day")}
-          </ToggleButton>
-          <ToggleButton value="week" sx={{ textTransform: "capitalize" }}>
-            {label("week")}
-          </ToggleButton>
-          <ToggleButton value="month" sx={{ textTransform: "capitalize" }}>
-            {label("month")}
-          </ToggleButton>
-          <ToggleButton value="year" sx={{ textTransform: "capitalize" }}>
-            {label("year")}
-          </ToggleButton>
-        </ToggleButtonGroup>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          {toolbarActions}
+          <ToggleButtonGroup exclusive value={viewMode} size="small" onChange={handleViewModeChange}>
+            <ToggleButton value="day" sx={{ textTransform: "capitalize" }}>
+              {label("day")}
+            </ToggleButton>
+            <ToggleButton value="week" sx={{ textTransform: "capitalize" }}>
+              {label("week")}
+            </ToggleButton>
+            <ToggleButton value="month" sx={{ textTransform: "capitalize" }}>
+              {label("month")}
+            </ToggleButton>
+            <ToggleButton value="year" sx={{ textTransform: "capitalize" }}>
+              {label("year")}
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
       </Stack>
 
       {/* Scrollable grid (vertical = virtualized rows, horizontal = timeline) */}
@@ -338,13 +428,17 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
             )}
 
             {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const task = visibleTasks[virtualRow.index];
-              const isProject = task.type === "project";
-              const selected = !isProject && (isTaskSelected?.(task) ?? false);
+              const item = items[virtualRow.index];
+              const isGroup = item.type === "group";
+              const selected = item.type === "resource" && item.tasks.some((task) => isTaskSelected?.(task) ?? false);
+              const sidebarCell =
+                item.type === "group"
+                  ? renderGroupContent(item.group, { childCount: item.childCount, onJump: onJumpGroup, sidebarCollapsed })
+                  : renderResourceContent(item.resource, { onJump: onJumpResource, selected, sidebarCollapsed, tasks: item.tasks });
 
               return (
                 <Box
-                  key={task.id}
+                  key={item.key}
                   sx={{
                     display: "flex",
                     height: rowHeight,
@@ -370,7 +464,7 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
                         zIndex: 2,
                       }}
                     >
-                      {renderRowContent(task, { onJump, selected, sidebarCollapsed })}
+                      {sidebarCell}
                     </Box>
                   )}
 
@@ -381,7 +475,7 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
                       position: "relative",
                       // Collapsed sidebar → the group header row spans the full track width with the same
                       // surface as the header cell (which stays sticky on top of it, seamlessly).
-                      ...(isProject &&
+                      ...(isGroup &&
                         (sidebarCollapsed
                           ? { backgroundColor: palette.background.paper, backgroundImage: getBackgroundImageElevation(1) }
                           : { backgroundColor: palette.action.hover })),
@@ -389,25 +483,25 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
                     }}
                   >
                     {/* Group header pinned to the left when the sidebar is collapsed. */}
-                    {isProject && sidebarCollapsed && (
-                      <Box sx={{ height: "100%", left: 0, maxWidth: sidebarWidth, position: "sticky", zIndex: 2 }}>
-                        {renderRowContent(task, { onJump, selected, sidebarCollapsed })}
-                      </Box>
+                    {isGroup && sidebarCollapsed && (
+                      <Box sx={{ height: "100%", left: 0, maxWidth: sidebarWidth, position: "sticky", zIndex: 2 }}>{sidebarCell}</Box>
                     )}
 
-                    {!isProject && (
-                      <TaskBar
-                        task={task}
-                        scale={scale}
-                        rowHeight={rowHeight}
-                        sidebarCollapsed={sidebarCollapsed}
-                        selected={selected}
-                        onClick={onClick}
-                        onBarResize={onBarResize}
-                        renderBar={renderBarContent}
-                        renderTooltip={renderTooltip}
-                      />
-                    )}
+                    {item.type === "resource" &&
+                      item.tasks.map((task) => (
+                        <TaskBar
+                          key={task.id}
+                          task={task}
+                          scale={scale}
+                          rowHeight={rowHeight}
+                          sidebarCollapsed={sidebarCollapsed}
+                          selected={isTaskSelected?.(task) ?? false}
+                          onClick={onTaskClick}
+                          onBarResize={onBarResize}
+                          renderBar={renderBarContent}
+                          renderTooltip={renderTooltip}
+                        />
+                      ))}
                   </Box>
                 </Box>
               );
@@ -415,7 +509,7 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
           </Box>
         </Box>
 
-        {!isLoading && visibleTasks.length === 0 && (
+        {!isLoading && items.length === 0 && (
           <Stack alignItems="center" justifyContent="center" sx={{ inset: 0, position: "absolute" }}>
             <Typography color="textSecondary" sx={{ fontWeight: typography.fontWeightMedium }}>
               {label("noResult")}

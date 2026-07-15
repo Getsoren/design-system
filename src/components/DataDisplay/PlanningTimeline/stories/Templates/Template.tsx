@@ -2,21 +2,26 @@ import { Stack } from "@mui/material";
 import type { StoryFn } from "@storybook/react-vite";
 import { useState } from "react";
 import PlanningTimeline from "@/components/DataDisplay/PlanningTimeline/PlanningTimeline";
-import type { PlanningTimelineTask } from "@/components/DataDisplay/PlanningTimeline/types";
+import type {
+  PlanningTimelineGroup,
+  PlanningTimelineResource,
+  PlanningTimelineTask,
+} from "@/components/DataDisplay/PlanningTimeline/types";
 
 /** Stateful wrapper: group headers collapse/expand on click, like a real consumer would wire it. */
-const Template: StoryFn<typeof PlanningTimeline<PlanningTimelineTask>> = ({ tasks: initialTasks, ...args }) => {
-  const [tasks, setTasks] = useState(initialTasks);
+const Template: StoryFn<typeof PlanningTimeline<PlanningTimelineGroup, PlanningTimelineResource, PlanningTimelineTask>> = ({
+  groups: initialGroups,
+  ...args
+}) => {
+  const [groups, setGroups] = useState(initialGroups);
 
-  const handleClick = (task: PlanningTimelineTask) => {
-    if (task.type === "project") {
-      setTasks((prev) => prev?.map((row) => (row.id === task.id ? { ...row, hideChildren: !row.hideChildren } : row)));
-    }
+  const handleGroupClick = (group: PlanningTimelineGroup) => {
+    setGroups((prev) => prev?.map((item) => (item.id === group.id ? { ...item, collapsed: !item.collapsed } : item)));
   };
 
   return (
     <Stack height="90vh" minHeight={0}>
-      <PlanningTimeline {...args} tasks={tasks} onClick={handleClick} />
+      <PlanningTimeline {...args} groups={groups} onGroupClick={handleGroupClick} />
     </Stack>
   );
 };

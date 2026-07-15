@@ -14,7 +14,7 @@ const RESIZE_HANDLE_WIDTH = 10;
 
 interface TaskBarProps<T extends PlanningTimelineTask> {
   /**
-   * The task row this bar represents — its start/end drive the bar geometry, its statusColor the
+   * The task this bar represents — its start/end drive the bar geometry, its statusColor the
    * hue, and its overdue/plannedEnd/incidents the hatched overlays.
    */
   task: T;

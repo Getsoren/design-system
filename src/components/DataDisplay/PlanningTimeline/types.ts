@@ -3,65 +3,143 @@ import type { ViewMode } from "@/components/DataDisplay/PlanningTimeline/utils/t
 
 export type PlanningTimelineViewMode = ViewMode;
 
-export type PlanningTimelineTaskType = "task" | "project";
-
-/** MUI palette color driving a bar's hue; "default" renders muted (grey). */
+/**
+ * MUI palette color driving a bar's hue; "default" renders muted (grey).
+ */
 export type PlanningTimelineStatusColor = "default" | "error" | "info" | "success" | "warning";
 
-/** An incident (e.g. a breakdown) rendered as a hatched day-wide segment on the bar. */
+/**
+ * An incident (e.g. a breakdown) rendered as a hatched day-wide segment on the bar.
+ */
 export interface PlanningTimelineIncident {
   incidentDate: string | Date;
 }
 
 /**
- * A timeline row. A "project" row is a group header (collapsible), a "task" row is a bar on the
- * time axis. Extend this interface to attach your own domain data and get it back, typed, in every
- * render prop and callback.
+ * A collapsible section header grouping resources (e.g. an equipment status). Extend this interface
+ * to attach your own domain data and get it back, typed, in `renderGroup` and `onGroupClick`.
  */
-export interface PlanningTimelineTask {
+export interface PlanningTimelineGroup {
   id: string;
-  type: PlanningTimelineTaskType;
   name: string;
-  start: Date;
-  end: Date;
-  /** For project rows: whether its children rows are collapsed. */
-  hideChildren?: boolean;
-  /** For task rows: id of the parent project (group) row. */
-  project?: string;
-  /** Incidents rendered as red hatched day-wide segments on the bar. */
-  incidents?: PlanningTimelineIncident[];
-  /** Original planned end (before any overdue extension of `end`). */
-  plannedEnd?: Date;
-  /** Task past its planned end — the segment `plannedEnd` → `end` is hatched in warning. */
-  overdue?: boolean;
-  /** MUI palette color of the bar. @default "default" */
-  statusColor?: PlanningTimelineStatusColor;
-  /** For project (group header) rows: number of task rows in the group. */
+  /**
+   * Whether the group's resources are hidden. Toggle it from `onGroupClick` to make headers collapsible.
+   */
+  collapsed?: boolean;
+  /**
+   * Count shown next to the name. Defaults to the number of resources in the group (override e.g. when paginating).
+   */
   childCount?: number;
-  /** For project rows: the group's data is being fetched. */
+  /**
+   * The group's data is being fetched.
+   */
   loading?: boolean;
 }
 
-/** Context given to `renderRow` for a left-column cell. */
-export interface PlanningTimelineRowContext<T extends PlanningTimelineTask = PlanningTimelineTask> {
-  /** Forwarded `onClick` — call it to make the whole cell clickable like the bar. */
-  onJump: (task: T) => void;
-  selected: boolean;
-  sidebarCollapsed: boolean;
+/**
+ * A timeline resource (a left-column cell and its horizontal track), e.g. one equipment. A resource
+ * carries zero or more task bars — a resource without any task renders an empty track (e.g. an idle
+ * equipment). Extend this interface to attach your own domain data and get it back, typed, in
+ * `renderResource` and `onResourceClick`.
+ */
+export interface PlanningTimelineResource {
+  id: string;
+  name: string;
+  /**
+   * Id of the `groups` entry this resource belongs to; omit for an ungrouped top-level resource.
+   */
+  groupId?: string;
 }
 
-/** Context given to `renderBar` for a bar's inner content. */
+/**
+ * A bar on a resource's track, e.g. one booking. Bars paint in array order (later tasks above
+ * earlier ones when they overlap). Extend this interface to attach your own domain data and get it
+ * back, typed, in every render prop and callback.
+ */
+export interface PlanningTimelineTask {
+  id: string;
+  /**
+   * Id of the `resources` entry this bar is drawn on.
+   */
+  resourceId: string;
+  name: string;
+  start: Date;
+  end: Date;
+  /**
+   * Incidents rendered as red hatched day-wide segments on the bar.
+   */
+  incidents?: PlanningTimelineIncident[];
+  /**
+   * Original planned end (before any overdue extension of `end`).
+   */
+  plannedEnd?: Date;
+  /**
+   * Task past its planned end — the segment `plannedEnd` → `end` is hatched in warning.
+   */
+  overdue?: boolean;
+  /**
+   * MUI palette color of the bar. @default "default"
+   */
+  statusColor?: PlanningTimelineStatusColor;
+}
+
+/**
+ * Context given to `renderGroup` for a group header cell.
+ */
+export interface PlanningTimelineGroupContext<G extends PlanningTimelineGroup = PlanningTimelineGroup> {
+  /**
+   * Forwarded `onGroupClick` — call it to make the whole header clickable (e.g. a collapse toggle).
+   */
+  onJump: (group: G) => void;
+  sidebarCollapsed: boolean;
+  /**
+   * `group.childCount` when set, otherwise the number of resources in the group.
+   */
+  childCount: number;
+}
+
+/**
+ * Context given to `renderResource` for a left-column resource cell.
+ */
+export interface PlanningTimelineResourceContext<
+  R extends PlanningTimelineResource = PlanningTimelineResource,
+  T extends PlanningTimelineTask = PlanningTimelineTask,
+> {
+  /**
+   * Forwarded `onResourceClick` — call it to make the whole cell clickable like the bars.
+   */
+  onJump: (resource: R) => void;
+  /**
+   * True when one of the resource's tasks is selected (`isTaskSelected`).
+   */
+  selected: boolean;
+  sidebarCollapsed: boolean;
+  /**
+   * The resource's tasks (its bars), e.g. to summarize them in the cell.
+   */
+  tasks: T[];
+}
+
+/**
+ * Context given to `renderBar` for a bar's inner content.
+ */
 export interface PlanningTimelineBarContext {
   sidebarCollapsed: boolean;
 }
 
-/** localStorage keys used to persist the timeline UI preferences. */
+/**
+ * localStorage keys used to persist the timeline UI preferences.
+ */
 export interface PlanningTimelineLocalStorageKeys {
-  /** Key storing the selected view mode. @default "soren-planning-timeline-view-mode" */
+  /**
+   * Key storing the selected view mode. @default "soren-planning-timeline-view-mode"
+   */
   viewMode: string;
 }
 
-/** Built-in UI strings; each falls back to the design-system locale (en/fr) when not overridden. */
+/**
+ * Built-in UI strings; each falls back to the design-system locale (en/fr) when not overridden.
+ */
 export interface PlanningTimelineLabels {
   day: string;
   week: string;
@@ -71,29 +149,83 @@ export interface PlanningTimelineLabels {
   noResult: string;
 }
 
-export interface PlanningTimelineProps<T extends PlanningTimelineTask = PlanningTimelineTask> {
+export interface PlanningTimelineProps<
+  G extends PlanningTimelineGroup = PlanningTimelineGroup,
+  R extends PlanningTimelineResource = PlanningTimelineResource,
+  T extends PlanningTimelineTask = PlanningTimelineTask,
+> {
+  /**
+   * Collapsible section headers; resources reference them via `groupId`. Omit for a flat list of resources.
+   */
+  groups?: G[];
+  /**
+   * The timeline resources (left-column cells); tasks reference them via `resourceId`.
+   */
+  resources?: R[];
+  /**
+   * The bars; each is drawn on the resource matching its `resourceId`.
+   */
   tasks?: T[];
+  /**
+   * Whether the timeline is loading data — shows a skeleton and disables interactions.
+   */
   isLoading?: boolean;
-  /** Click a bar — e.g. open the row's detail view. */
-  onClick?: (task: T) => void;
-  /** Drag the right edge of a bar — extend the task to `newEnd`. Omit to disable resizing. */
+  /**
+   * Click a bar — e.g. open the task's detail view.
+   */
+  onTaskClick?: (task: T) => void;
+  /**
+   * Click a resource's left-column cell.
+   */
+  onResourceClick?: (resource: R) => void;
+  /**
+   * Click a group header — e.g. toggle its `collapsed` flag.
+   */
+  onGroupClick?: (group: G) => void;
+  /**
+   * Drag the right edge of a bar — extend the task to `newEnd`. Omit to disable resizing.
+   */
   onBarResize?: (task: T, newEnd: Date) => void;
-  /** Left-column cell renderer (group header or task row). Defaults to the task name. */
-  renderRow?: (task: T, context: PlanningTimelineRowContext<T>) => ReactNode;
-  /** Inner content of a bar. Defaults to the task name. */
+  /**
+   * Group header cell renderer. Defaults to the group name, its resource count and a collapse chevron.
+   */
+  renderGroup?: (group: G, context: PlanningTimelineGroupContext<G>) => ReactNode;
+  /**
+   * Left-column resource cell renderer. Defaults to the resource name.
+   */
+  renderResource?: (resource: R, context: PlanningTimelineResourceContext<R, T>) => ReactNode;
+  /**
+   * Inner content of a bar. Defaults to the task name.
+   */
   renderBar?: (task: T, context: PlanningTimelineBarContext) => ReactNode;
   renderTooltip?: (task: T) => ReactNode;
-  /** Whether a task row is the currently selected one (e.g. its detail view is open). */
+  /**
+   * Whether a task is the currently selected one (e.g. its detail view is open).
+   */
   isTaskSelected?: (task: T) => boolean;
-  /** Opaque value that changes when filters change — the timeline re-centres on today when it does. */
+  /**
+   * Opaque value that changes when filters change — the timeline re-centres on today when it does.
+   */
   recenterKey?: string;
-  /** Title of the left (frozen) column, also used as the collapse button tooltip. */
+  /**
+   * Extra content rendered in the toolbar, just left of the view-mode toggle (e.g. a grouping switch).
+   */
+  toolbarActions?: ReactNode;
+  /**
+   * Title of the left (frozen) column, also used as the collapse button tooltip.
+   */
   sidebarTitle?: string;
-  /** BCP 47 locale for the axis and toolbar date labels (e.g. "fr"). @default "en" */
+  /**
+   * BCP 47 locale for the axis and toolbar date labels (e.g. "fr"). @default "en"
+   */
   locale?: string;
-  /** Override the built-in labels (e.g. to plug the host app's i18n). */
+  /**
+   * Override the built-in labels (e.g. to plug the host app's i18n).
+   */
   labels?: Partial<PlanningTimelineLabels>;
-  /** Initial zoom level, when none is persisted yet. @default "day" */
+  /**
+   * Initial zoom level, when none is persisted yet. @default "day"
+   */
   defaultViewMode?: PlanningTimelineViewMode;
   /**
    * localStorage keys used to persist UI preferences. Override them to namespace the keys per
@@ -101,8 +233,12 @@ export interface PlanningTimelineProps<T extends PlanningTimelineTask = Planning
    * @default { viewMode: "soren-planning-timeline-view-mode" }
    */
   localStorageKeys?: Partial<PlanningTimelineLocalStorageKeys>;
-  /** Width (px) of the left column. @default 300 */
+  /**
+   * Width (px) of the left column. @default 300
+   */
   sidebarWidth?: number;
-  /** Height (px) of every row. @default 56 */
+  /**
+   * Height (px) of every row (group headers and resources alike). @default 56
+   */
   rowHeight?: number;
 }

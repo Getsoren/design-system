@@ -1,4 +1,4 @@
-import { Paper, Typography } from "@mui/material";
+import { Paper, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import type { Meta } from "@storybook/react-vite";
 import Template from "@/components/DataDisplay/PlanningTimeline/stories/Templates/Template";
 import { planningTimelineDataGenerator } from "@/components/DataDisplay/PlanningTimeline/stories/utils/planningTimelineDataGenerator";
@@ -40,6 +40,31 @@ FrenchLabels.args = {
   locale: "fr",
   sidebarTitle: "Équipement",
   tasks: planningTimelineDataGenerator(),
+};
+
+export const MultipleBarsPerRow = Template.bind({});
+MultipleBarsPerRow.args = {
+  sidebarTitle: "Equipment",
+  tasks: planningTimelineDataGenerator([
+    { barsPerRow: 3, name: "Rented", statusColor: "success", taskCount: 3 },
+    { barsPerRow: 2, name: "Available soon", statusColor: "info", taskCount: 2 },
+  ]),
+};
+
+export const WithToolbarActions = Template.bind({});
+WithToolbarActions.args = {
+  sidebarTitle: "Equipment",
+  tasks: planningTimelineDataGenerator(),
+  toolbarActions: (
+    <ToggleButtonGroup exclusive size="small" value="status">
+      <ToggleButton value="status" sx={{ textTransform: "none" }}>
+        Status
+      </ToggleButton>
+      <ToggleButton value="category" sx={{ textTransform: "none" }}>
+        Category
+      </ToggleButton>
+    </ToggleButtonGroup>
+  ),
 };
 
 export const CollapsedGroup = Template.bind({});

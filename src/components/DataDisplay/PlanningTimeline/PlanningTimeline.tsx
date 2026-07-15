@@ -50,6 +50,7 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
   renderTooltip,
   isTaskSelected,
   recenterKey,
+  toolbarActions,
   sidebarTitle,
   locale,
   labels,
@@ -81,14 +82,37 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
     return allTasks.filter((task) => !(task.type === "task" && task.project && collapsed.has(task.project)));
   }, [allTasks]);
 
+  // Visual rows: a project header is always its own row; task rows sharing the same `rowId` (within
+  // the same project group) are merged into a single row carrying one bar per task. A merged row sits
+  // where its first task appears and keeps that first task as its sidebar-cell representative.
+  const { rows: visibleRows, keys: rowKeys } = useMemo(() => {
+    const rows: T[][] = [];
+    const keys: string[] = [];
+    const rowIndexByKey = new Map<string, number>();
+    visibleTasks.forEach((task) => {
+      const mergeKey = task.type === "task" && task.rowId != null ? `row:${task.project ?? ""}::${task.rowId}` : null;
+      if (mergeKey !== null) {
+        const existingIndex = rowIndexByKey.get(mergeKey);
+        if (existingIndex !== undefined) {
+          rows[existingIndex].push(task);
+          return;
+        }
+        rowIndexByKey.set(mergeKey, rows.length);
+      }
+      keys.push(mergeKey ?? task.id);
+      rows.push([task]);
+    });
+    return { keys, rows };
+  }, [visibleTasks]);
+
   const scale = useMemo(() => createTimeScale(allTasks, viewMode, locale), [allTasks, viewMode, locale]);
   const visibleSidebarWidth = sidebarCollapsed ? 0 : sidebarWidth;
 
   const rowVirtualizer = useVirtualizer({
-    count: visibleTasks.length,
+    count: visibleRows.length,
     estimateSize: () => rowHeight,
     // Stable keys let the virtualizer (and React) reuse row elements instead of remounting them.
-    getItemKey: (index) => visibleTasks[index].id,
+    getItemKey: (index) => rowKeys[index],
     getScrollElement: () => scrollRef.current,
     // Rows are fixed-height and cheap — a generous overscan (~20 rows ≈ 2 viewports) keeps fast
     // scrolling from outrunning the window and flashing blank rows.
@@ -256,20 +280,23 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
           </Button>
         </Stack>
 
-        <ToggleButtonGroup exclusive value={viewMode} size="small" onChange={handleViewModeChange}>
-          <ToggleButton value="day" sx={{ textTransform: "capitalize" }}>
-            {label("day")}
-          </ToggleButton>
-          <ToggleButton value="week" sx={{ textTransform: "capitalize" }}>
-            {label("week")}
-          </ToggleButton>
-          <ToggleButton value="month" sx={{ textTransform: "capitalize" }}>
-            {label("month")}
-          </ToggleButton>
-          <ToggleButton value="year" sx={{ textTransform: "capitalize" }}>
-            {label("year")}
-          </ToggleButton>
-        </ToggleButtonGroup>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          {toolbarActions}
+          <ToggleButtonGroup exclusive value={viewMode} size="small" onChange={handleViewModeChange}>
+            <ToggleButton value="day" sx={{ textTransform: "capitalize" }}>
+              {label("day")}
+            </ToggleButton>
+            <ToggleButton value="week" sx={{ textTransform: "capitalize" }}>
+              {label("week")}
+            </ToggleButton>
+            <ToggleButton value="month" sx={{ textTransform: "capitalize" }}>
+              {label("month")}
+            </ToggleButton>
+            <ToggleButton value="year" sx={{ textTransform: "capitalize" }}>
+              {label("year")}
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
       </Stack>
 
       {/* Scrollable grid (vertical = virtualized rows, horizontal = timeline) */}
@@ -338,13 +365,16 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
             )}
 
             {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const task = visibleTasks[virtualRow.index];
-              const isProject = task.type === "project";
-              const selected = !isProject && (isTaskSelected?.(task) ?? false);
+              const row = visibleRows[virtualRow.index];
+              // The first task is the row's representative: it renders the sidebar cell and drives
+              // the project checks (a merged multi-bar row is always made of task rows only).
+              const rowHead = row[0];
+              const isProject = rowHead.type === "project";
+              const rowSelected = !isProject && row.some((task) => isTaskSelected?.(task) ?? false);
 
               return (
                 <Box
-                  key={task.id}
+                  key={rowKeys[virtualRow.index]}
                   sx={{
                     display: "flex",
                     height: rowHeight,
@@ -370,7 +400,7 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
                         zIndex: 2,
                       }}
                     >
-                      {renderRowContent(task, { onJump, selected, sidebarCollapsed })}
+                      {renderRowContent(rowHead, { onJump, selected: rowSelected, sidebarCollapsed })}
                     </Box>
                   )}
 
@@ -385,29 +415,33 @@ const PlanningTimeline = <T extends PlanningTimelineTask>({
                         (sidebarCollapsed
                           ? { backgroundColor: palette.background.paper, backgroundImage: getBackgroundImageElevation(1) }
                           : { backgroundColor: palette.action.hover })),
-                      ...(selected && { backgroundColor: palette.action.selected }),
+                      ...(rowSelected && { backgroundColor: palette.action.selected }),
                     }}
                   >
                     {/* Group header pinned to the left when the sidebar is collapsed. */}
                     {isProject && sidebarCollapsed && (
                       <Box sx={{ height: "100%", left: 0, maxWidth: sidebarWidth, position: "sticky", zIndex: 2 }}>
-                        {renderRowContent(task, { onJump, selected, sidebarCollapsed })}
+                        {renderRowContent(rowHead, { onJump, selected: rowSelected, sidebarCollapsed })}
                       </Box>
                     )}
 
-                    {!isProject && (
-                      <TaskBar
-                        task={task}
-                        scale={scale}
-                        rowHeight={rowHeight}
-                        sidebarCollapsed={sidebarCollapsed}
-                        selected={selected}
-                        onClick={onClick}
-                        onBarResize={onBarResize}
-                        renderBar={renderBarContent}
-                        renderTooltip={renderTooltip}
-                      />
-                    )}
+                    {!isProject &&
+                      row
+                        .filter((task) => !task.hideBar)
+                        .map((task) => (
+                          <TaskBar
+                            key={task.id}
+                            task={task}
+                            scale={scale}
+                            rowHeight={rowHeight}
+                            sidebarCollapsed={sidebarCollapsed}
+                            selected={isTaskSelected?.(task) ?? false}
+                            onClick={onClick}
+                            onBarResize={onBarResize}
+                            renderBar={renderBarContent}
+                            renderTooltip={renderTooltip}
+                          />
+                        ))}
                   </Box>
                 </Box>
               );

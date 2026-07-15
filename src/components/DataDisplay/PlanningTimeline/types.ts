@@ -28,6 +28,18 @@ export interface PlanningTimelineTask {
   hideChildren?: boolean;
   /** For task rows: id of the parent project (group) row. */
   project?: string;
+  /**
+   * For task rows: tasks sharing the same `rowId` (within the same `project` group) are laid out on
+   * one single row, each keeping its own bar — e.g. every booking of one equipment on one line. The
+   * left-column cell is rendered from the row's first task; bars paint in array order (later tasks
+   * above earlier ones when they overlap). Omit to keep the default one-bar-per-row layout.
+   */
+  rowId?: string;
+  /**
+   * For task rows: render the row without its bar. Use it as a placeholder to show an empty row —
+   * e.g. an idle equipment with no booking. Its dates only feed the time axis range.
+   */
+  hideBar?: boolean;
   /** Incidents rendered as red hatched day-wide segments on the bar. */
   incidents?: PlanningTimelineIncident[];
   /** Original planned end (before any overdue extension of `end`). */
@@ -87,6 +99,8 @@ export interface PlanningTimelineProps<T extends PlanningTimelineTask = Planning
   isTaskSelected?: (task: T) => boolean;
   /** Opaque value that changes when filters change — the timeline re-centres on today when it does. */
   recenterKey?: string;
+  /** Extra content rendered in the toolbar, just left of the view-mode toggle (e.g. a grouping switch). */
+  toolbarActions?: ReactNode;
   /** Title of the left (frozen) column, also used as the collapse button tooltip. */
   sidebarTitle?: string;
   /** BCP 47 locale for the axis and toolbar date labels (e.g. "fr"). @default "en" */

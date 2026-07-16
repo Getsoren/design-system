@@ -178,18 +178,7 @@ const TimelineEvent = ({ event, labels }: TimelineEventProps) => {
           static rows stay a plain box (no hover, no ripple, not focusable). */}
       <Box sx={{ flex: 1, minWidth: 0, ml: "2px" }}>
         {event.onClick ? (
-          <ListItemButton
-            disableGutters
-            onClick={event.onClick}
-            sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
-              },
-              backgroundColor: "transparent",
-              cursor: "pointer",
-              ...rowSx,
-            }}
-          >
+          <ListItemButton disableGutters onClick={event.onClick} sx={rowSx}>
             {row}
           </ListItemButton>
         ) : (

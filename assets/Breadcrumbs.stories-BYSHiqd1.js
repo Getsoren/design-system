@@ -1,0 +1,17 @@
+import{i as e}from"./preload-helper-xPQekRTU.js";import{Ki as t,Lr as n,Pr as r,Qi as i,ai as a,c as o,l as s,m as c,mn as l,s as u,vi as d}from"./iframe-KIu7hbaN.js";var f,p=e((()=>{c(),u(),f=e=>o(r,{...e});try{f.displayName=`Breadcrumbs`,f.__docgenInfo={description:``,displayName:`Breadcrumbs`,filePath:`/home/runner/work/design-system/design-system/src/components/Navigation/Breadcrumbs/stories/Breadcrumbs.tsx`,methods:[],props:{component:{defaultValue:null,declarations:[{fileName:`design-system/node_modules/@mui/material/esm/Breadcrumbs/Breadcrumbs.d.ts`,name:`TypeLiteral`}],description:``,name:`component`,required:!1,tags:{},type:{name:`ElementType<any, keyof IntrinsicElements>`}}},tags:{}}}catch{}})),m,h,g,_,v,y,b,x,S,C;e((()=>{c(),p(),u(),m=e=>{e.preventDefault(),console.info(`You clicked a breadcrumb.`)},h=e=>o(n,{onClick:m,display:`flex`,alignItems:`center`,justifyContent:`center`,height:`100%`,children:s(f,{"aria-label":`breadcrumb`,...e,children:[o(l,{underline:`hover`,color:`inherit`,href:`/`,children:`Tracktor`}),o(l,{underline:`hover`,color:`inherit`,href:`/material-ui/getting-started/installation/`,children:`Catalog`}),o(d,{color:`text.primary`,children:`Bulldozer`})]})}),g=t(a)(({theme:e})=>{let t=e.palette.mode===`light`?e.palette.grey[100]:e.palette.grey[800];return{"&:active":{backgroundColor:i(t,.12),boxShadow:e.shadows[1]},"&:hover, &:focus":{backgroundColor:i(t,.06)},backgroundColor:t,color:e.palette.text.primary,fontWeight:e.typography.fontWeightRegular,height:e.spacing(3)}}),_=e=>o(n,{onClick:m,display:`flex`,alignItems:`center`,justifyContent:`center`,height:`100%`,children:s(f,{"aria-label":`breadcrumb`,...e,children:[o(g,{component:`a`,href:`#`,label:`Home`}),o(g,{component:`a`,href:`#`,label:`Catalog`}),o(g,{label:`Accessories`,onDelete:m})]})}),v=h.bind({}),v.args={},y=v.bind({}),y.args={separator:`>`},b=v.bind({}),b.args={maxItems:1},x=_.bind({}),x.args={},S={component:f,title:`Components/Navigation/Breadcrumbs`},v.parameters={...v.parameters,docs:{...v.parameters?.docs,source:{originalSource:`args => <Box onClick={handleClick} display="flex" alignItems="center" justifyContent="center" height="100%">
+    <Breadcrumbs aria-label="breadcrumb" {...args}>
+      <Link underline="hover" color="inherit" href="/">
+        Tracktor
+      </Link>
+      <Link underline="hover" color="inherit" href="/material-ui/getting-started/installation/">
+        Catalog
+      </Link>
+      <Typography color="text.primary">Bulldozer</Typography>
+    </Breadcrumbs>
+  </Box>`,...v.parameters?.docs?.source}}},y.parameters={...y.parameters,docs:{...y.parameters?.docs,source:{originalSource:`Template.bind({})`,...y.parameters?.docs?.source}}},b.parameters={...b.parameters,docs:{...b.parameters?.docs,source:{originalSource:`Template.bind({})`,...b.parameters?.docs?.source}}},x.parameters={...x.parameters,docs:{...x.parameters?.docs,source:{originalSource:`args => <Box onClick={handleClick} display="flex" alignItems="center" justifyContent="center" height="100%">
+    <Breadcrumbs aria-label="breadcrumb" {...args}>
+      <StyledBreadcrumb component="a" href="#" label="Home" />
+      <StyledBreadcrumb component="a" href="#" label="Catalog" />
+      <StyledBreadcrumb label="Accessories" onDelete={handleClick} />
+    </Breadcrumbs>
+  </Box>`,...x.parameters?.docs?.source}}},C=[`Basic`,`CustomSeparator`,`Collapsed`,`Custom`]}))();export{v as Basic,b as Collapsed,x as Custom,y as CustomSeparator,C as __namedExportsOrder,S as default};

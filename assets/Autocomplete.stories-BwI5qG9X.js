@@ -1,0 +1,27 @@
+import{i as e}from"./preload-helper-xPQekRTU.js";import{S as t,at as n,c as r,l as i,m as a,s as o,ti as s}from"./iframe-KIu7hbaN.js";var c,l=e((()=>{a(),o(),c=e=>r(s,{...e});try{c.displayName=`Autocomplete`,c.__docgenInfo={description:``,displayName:`Autocomplete`,filePath:`/home/runner/work/design-system/design-system/src/components/Inputs/Autocomplete/stories/Autocomplete.tsx`,methods:[],props:{ref:{defaultValue:null,declarations:[{fileName:`design-system/node_modules/@mui/material/esm/internal/index.d.ts`,name:`TypeLiteral`}],description:``,name:`ref`,required:!1,tags:{},type:{name:`Ref<unknown>`}},slots:{defaultValue:{value:`{}`},declarations:[{fileName:`design-system/node_modules/@mui/material/esm/utils/types.d.ts`,name:`TypeLiteral`}],description:`The components used for each slot inside.`,name:`slots`,required:!1,tags:{default:`{}`},type:{name:`Partial<AutocompleteSlots>`}},slotProps:{defaultValue:{value:`{}`},declarations:[{fileName:`design-system/node_modules/@mui/material/esm/utils/types.d.ts`,name:`TypeLiteral`}],description:`The props used for each slot inside.`,name:`slotProps`,required:!1,tags:{default:`{}`},type:{name:`{ root?: SlotProps<"div", {}, AutocompleteOwnerState<any, any, any, any, "div">>; chip?: SlotProps<ElementType<Partial<ChipProps<"div">>, keyof IntrinsicElements>, {}, AutocompleteOwnerState<...>>; ... 4 more ...; popupIndicator?: SlotProps<...> | undefined; } | undefined`}}},tags:{}}}catch{}})),u,d,f,p,m,h;e((()=>{a(),l(),o(),u=[{label:`The Shawshank Redemption`,year:1994},{label:`The Godfather`,year:1972},{label:`The Godfather: Part II`,year:1974},{label:`The Dark Knight`,year:2008},{label:`12 Angry Men`,year:1957},{label:`Schindler's List`,year:1993},{label:`Pulp Fiction`,year:1994}],d=e=>{let a=e?.multiple?u.slice(0,2):u[0];return i(n,{direction:`row`,spacing:2,alignItems:`center`,justifyContent:`center`,height:`100%`,children:[r(c,{...e,disablePortal:!0,defaultValue:a,id:`combo-box-demo`,options:u,sx:{width:300},renderInput:e=>r(t,{...e,label:`Movie (xSmall)`}),size:`xSmall`,isOptionEqualToValue:(e,t)=>e.label===t.label}),r(c,{...e,disablePortal:!0,defaultValue:a,id:`combo-box-demo`,options:u,sx:{width:300},renderInput:e=>r(t,{...e,label:`Movie (small)`}),size:`small`,isOptionEqualToValue:(e,t)=>e.label===t.label}),r(c,{...e,disablePortal:!0,defaultValue:a,id:`combo-box-demo`,options:u,sx:{width:300},renderInput:e=>r(t,{...e,label:`Movie (medium)`}),isOptionEqualToValue:(e,t)=>e.label===t.label})]})},f=d.bind({}),f.args={},p=d.bind({}),p.args={multiple:!0},m={component:c,title:`Components/Inputs/Autocomplete`},f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`args => {
+  const defaultValuesWithContext = args?.multiple ? topFilms.slice(0, 2) : topFilms[0];
+  return <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <Autocomplete {...args} disablePortal defaultValue={defaultValuesWithContext} id="combo-box-demo" options={topFilms} sx={{
+      width: 300
+    }} renderInput={params => <TextField {...params} label="Movie (xSmall)" />} size="xSmall" isOptionEqualToValue={(option, value) => option.label === value.label} />
+      <Autocomplete {...args} disablePortal defaultValue={defaultValuesWithContext} id="combo-box-demo" options={topFilms} sx={{
+      width: 300
+    }} renderInput={params => <TextField {...params} label="Movie (small)" />} size="small" isOptionEqualToValue={(option, value) => option.label === value.label} />
+      <Autocomplete {...args} disablePortal defaultValue={defaultValuesWithContext} id="combo-box-demo" options={topFilms} sx={{
+      width: 300
+    }} renderInput={params => <TextField {...params} label="Movie (medium)" />} isOptionEqualToValue={(option, value) => option.label === value.label} />
+    </Stack>;
+}`,...f.parameters?.docs?.source}}},p.parameters={...p.parameters,docs:{...p.parameters?.docs,source:{originalSource:`args => {
+  const defaultValuesWithContext = args?.multiple ? topFilms.slice(0, 2) : topFilms[0];
+  return <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <Autocomplete {...args} disablePortal defaultValue={defaultValuesWithContext} id="combo-box-demo" options={topFilms} sx={{
+      width: 300
+    }} renderInput={params => <TextField {...params} label="Movie (xSmall)" />} size="xSmall" isOptionEqualToValue={(option, value) => option.label === value.label} />
+      <Autocomplete {...args} disablePortal defaultValue={defaultValuesWithContext} id="combo-box-demo" options={topFilms} sx={{
+      width: 300
+    }} renderInput={params => <TextField {...params} label="Movie (small)" />} size="small" isOptionEqualToValue={(option, value) => option.label === value.label} />
+      <Autocomplete {...args} disablePortal defaultValue={defaultValuesWithContext} id="combo-box-demo" options={topFilms} sx={{
+      width: 300
+    }} renderInput={params => <TextField {...params} label="Movie (medium)" />} isOptionEqualToValue={(option, value) => option.label === value.label} />
+    </Stack>;
+}`,...p.parameters?.docs?.source}}},h=[`ComboBox`,`ComboBoxMultiple`]}))();export{f as ComboBox,p as ComboBoxMultiple,h as __namedExportsOrder,m as default};

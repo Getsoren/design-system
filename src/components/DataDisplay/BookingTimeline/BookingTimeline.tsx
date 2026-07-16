@@ -27,10 +27,10 @@ const BookingTimeline = ({
   end,
   delivery,
   retrieval,
-  events = [],
   isLoading,
   emptyMessage,
   labels,
+  events = [],
   "data-test": dataTest,
   "data-testid": dataTestId,
 }: BookingTimelineProps) => {

@@ -11,6 +11,7 @@ import KeyboardArrowRightRoundedIcon from "@/components/DataDisplay/Icons/Keyboa
 /** Single-line event name revealing the full text in a tooltip, only when ellipsised. */
 const EventName = ({ text, children }: { text: string; children: ReactNode }) => {
   const [tooltip, setTooltip] = useState("");
+
   return (
     <Tooltip title={tooltip}>
       <Box
@@ -34,6 +35,7 @@ const PhotoPile = ({ photos }: { photos: NonNullable<BookingTimelineEvent["photo
     {photos.slice(0, 3).map((photo, index) => {
       const extra = photos.length - 3;
       const isLast = index === Math.min(photos.length, 3) - 1;
+
       return (
         <Box
           key={photo.src}
@@ -53,13 +55,18 @@ const PhotoPile = ({ photos }: { photos: NonNullable<BookingTimelineEvent["photo
             component="img"
             src={photo.src}
             alt={photo.name}
-            sx={{ display: "block", height: "100%", objectFit: "cover", width: "100%" }}
+            sx={{
+              display: "block",
+              height: "100%",
+              objectFit: "cover",
+              width: "100%",
+            }}
           />
           {isLast && extra > 0 && (
             <Box
               sx={{
                 alignItems: "center",
-                bgcolor: "rgba(0, 0, 0, 0.55)",
+                backgroundColor: "rgba(0, 0, 0, 0.55)",
                 color: "#fff",
                 display: "flex",
                 fontSize: 9,
@@ -126,9 +133,11 @@ const TimelineEvent = ({ event, labels }: TimelineEventProps) => {
           ) : (
             <Box
               sx={{
-                "& svg": { fontSize: 16 },
+                "& svg": {
+                  fontSize: 16,
+                },
                 alignItems: "center",
-                bgcolor: "grey.50",
+                backgroundColor: "grey.50",
                 border: "1px solid",
                 borderColor: "grey.300",
                 borderRadius: "50%",
@@ -153,9 +162,11 @@ const TimelineEvent = ({ event, labels }: TimelineEventProps) => {
           disableGutters
           onClick={event.onClick}
           sx={{
-            "&:hover": { bgcolor: "action.hover" },
+            "&:hover": {
+              backgroundColor: "action.hover",
+            },
             alignItems: "stretch",
-            bgcolor: "transparent",
+            backgroundColor: "transparent",
             borderRadius: "8px",
             cursor: event.onClick ? "pointer" : "default",
             flexDirection: "column",

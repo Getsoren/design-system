@@ -21,7 +21,7 @@ const AnchorNode = ({ glyph, reached }: { glyph: ReactNode; reached: boolean }) 
       sx={{
         "& svg": { fontSize: 15 },
         alignItems: "center",
-        bgcolor: reached ? "secondary.main" : "transparent",
+        backgroundColor: reached ? "secondary.main" : "transparent",
         border: reached ? undefined : "2px solid",
         borderColor: reached ? undefined : "text.secondary",
         borderRadius: "50%",
@@ -39,7 +39,6 @@ const AnchorNode = ({ glyph, reached }: { glyph: ReactNode; reached: boolean }) 
 
 interface TimelineAnchorProps {
   anchor: BookingTimelineAnchor;
-  /** Icon rendered inside the node. */
   glyph: ReactNode;
   railVariant: "top" | "mid" | "bottom";
 }

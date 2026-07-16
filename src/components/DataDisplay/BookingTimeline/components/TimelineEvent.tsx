@@ -1,4 +1,4 @@
-import { Box, ListItemButton, Stack, Tooltip, Typography } from "@mui/material";
+import { AvatarGroup, Box, ListItemButton, Avatar as MuiAvatar, Stack, Tooltip, Typography } from "@mui/material";
 import { MouseEvent, ReactNode, useState } from "react";
 import Avatar from "@/components/DataDisplay/Avatar";
 import { RailSegment } from "@/components/DataDisplay/BookingTimeline/components/Rail";
@@ -29,61 +29,33 @@ const EventName = ({ text, children }: { text: string; children: ReactNode }) =>
   );
 };
 
-/** Stacked photo thumbnails (up to three), the last one overlaid with the remaining count. */
+/** Stacked photo thumbnails: up to three slots, the last one becoming a "+N" surplus
+ * counter when there are more (AvatarGroup semantics). */
 const PhotoPile = ({ photos }: { photos: NonNullable<BookingTimelineEvent["photos"]> }) => (
-  <Stack direction="row" alignItems="center" sx={{ flexShrink: 0 }}>
-    {photos.slice(0, 3).map((photo, index) => {
-      const extra = photos.length - 3;
-      const isLast = index === Math.min(photos.length, 3) - 1;
-
-      return (
-        <Box
-          // The same photo can legitimately appear twice — the index keeps keys unique.
-          key={`${photo.src}-${index}`}
-          sx={{
-            border: "1.5px solid",
-            borderColor: "background.paper",
-            borderRadius: "6px",
-            height: 22,
-            ml: index === 0 ? 0 : "-9px",
-            overflow: "hidden",
-            position: "relative",
-            width: 22,
-            zIndex: 3 - index,
-          }}
-        >
-          <Box
-            component="img"
-            src={photo.src}
-            alt={photo.name ?? ""}
-            sx={{
-              display: "block",
-              height: "100%",
-              objectFit: "cover",
-              width: "100%",
-            }}
-          />
-          {isLast && extra > 0 && (
-            <Box
-              sx={{
-                alignItems: "center",
-                backgroundColor: "rgba(0, 0, 0, 0.55)",
-                color: "#fff",
-                display: "flex",
-                fontSize: 9,
-                fontWeight: 600,
-                inset: 0,
-                justifyContent: "center",
-                position: "absolute",
-              }}
-            >
-              +{extra}
-            </Box>
-          )}
-        </Box>
-      );
-    })}
-  </Stack>
+  <AvatarGroup
+    max={3}
+    total={photos.length}
+    spacing={9}
+    sx={{
+      "& .MuiAvatar-root": {
+        backgroundColor: "rgba(0, 0, 0, 0.55)",
+        border: "1.5px solid",
+        borderColor: "background.paper",
+        borderRadius: "6px",
+        color: "#fff",
+        fontSize: 9,
+        fontWeight: 600,
+        height: 22,
+        width: 22,
+      },
+      flexShrink: 0,
+    }}
+  >
+    {photos.slice(0, 3).map((photo, index) => (
+      // The same photo can legitimately appear twice — the index keeps keys unique.
+      <MuiAvatar key={`${photo.src}-${index}`} alt={photo.name ?? ""} src={photo.src} variant="rounded" />
+    ))}
+  </AvatarGroup>
 );
 
 interface TimelineEventProps {

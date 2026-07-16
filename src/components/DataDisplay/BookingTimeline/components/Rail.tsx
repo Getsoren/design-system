@@ -2,7 +2,7 @@ import { Box, Theme } from "@mui/material";
 import { RAIL_X } from "@/components/DataDisplay/BookingTimeline/constants";
 
 const railSx = (theme: Theme) => ({
-  bgcolor: theme.palette.grey[300],
+  backgroundColor: theme.palette.grey[300],
   left: RAIL_X - 0.5,
   position: "absolute" as const,
   width: "1px",

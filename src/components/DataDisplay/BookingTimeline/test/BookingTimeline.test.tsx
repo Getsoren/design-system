@@ -61,16 +61,21 @@ describe("Test <BookingTimeline/>", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it("renders rows without `onClick` as static content, not buttons", () => {
+    const { queryByRole } = render(<BookingTimeline events={[event()]} />);
+    expect(queryByRole("button")).not.toBeInTheDocument();
+  });
+
   it("renders the end call to action content", () => {
     const { getByText } = render(<BookingTimeline end={{ content: <button type="button">Extend</button>, title: "Friday 14 June" }} />);
     expect(getByText("Extend")).toBeInTheDocument();
   });
 
-  it("stacks at most three photo thumbnails and overlays the remaining count", () => {
+  it("stacks the photo thumbnails in three slots, the last one showing the surplus count", () => {
     const photos = Array.from({ length: 5 }, (_, i) => ({ name: `photo-${i}`, src: `https://example.com/${i}.jpg` }));
     const { getAllByRole, getByText } = render(<BookingTimeline events={[event({ photos })]} />);
-    expect(getAllByRole("img")).toHaveLength(3);
-    expect(getByText("+2")).toBeInTheDocument();
+    expect(getAllByRole("img")).toHaveLength(2);
+    expect(getByText("+3")).toBeInTheDocument();
   });
 
   it("shows the empty message when there is nothing to display", () => {

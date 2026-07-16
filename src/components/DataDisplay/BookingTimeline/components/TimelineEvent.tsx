@@ -34,7 +34,6 @@ const EventName = ({ text, children }: { text: string; children: ReactNode }) =>
 const PhotoPile = ({ photos }: { photos: NonNullable<BookingTimelineEvent["photos"]> }) => (
   <AvatarGroup
     max={3}
-    total={photos.length}
     spacing={9}
     sx={{
       "& .MuiAvatar-root": {
@@ -42,16 +41,19 @@ const PhotoPile = ({ photos }: { photos: NonNullable<BookingTimelineEvent["photo
         border: "1.5px solid",
         borderColor: "background.paper",
         borderRadius: "6px",
+        boxSizing: "border-box",
         color: "#fff",
         fontSize: 9,
         fontWeight: 600,
         height: 22,
         width: 22,
       },
+      alignItems: "center",
       flexShrink: 0,
+      height: 20,
     }}
   >
-    {photos.slice(0, 3).map((photo, index) => (
+    {photos.map((photo, index) => (
       // The same photo can legitimately appear twice — the index keeps keys unique.
       <MuiAvatar key={`${photo.src}-${index}`} alt={photo.name ?? ""} src={photo.src} variant="rounded" />
     ))}
@@ -113,7 +115,7 @@ const TimelineEvent = ({ event, labels }: TimelineEventProps) => {
   } as const;
 
   return (
-    <Box sx={{ display: "flex", position: "relative", pr: 0.5 }}>
+    <Box component="li" sx={{ display: "flex", listStyle: "none", position: "relative", pr: 0.5 }}>
       <RailSegment variant="mid" gap={EVENT_NODE_GAP} />
       {/* Circular event node, centred in the rail gap (transparent around the disc so it
           blends with any background) */}

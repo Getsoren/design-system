@@ -61,6 +61,12 @@ describe("Test <BookingTimeline/>", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it("renders the events as an ordered list of items", () => {
+    const { getAllByRole, getByRole } = render(<BookingTimeline events={[event(), event({ key: "second" })]} />);
+    expect(getByRole("list")).toBeInTheDocument();
+    expect(getAllByRole("listitem")).toHaveLength(2);
+  });
+
   it("renders rows without `onClick` as static content, not buttons", () => {
     const { queryByRole } = render(<BookingTimeline events={[event()]} />);
     expect(queryByRole("button")).not.toBeInTheDocument();

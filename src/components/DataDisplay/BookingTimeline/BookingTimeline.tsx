@@ -1,4 +1,4 @@
-import { Box, Skeleton, Stack, Typography } from "@mui/material";
+import { Box, List, Skeleton, Stack, Typography } from "@mui/material";
 import { useCallback } from "react";
 import { RailSpacer } from "@/components/DataDisplay/BookingTimeline/components/Rail";
 import TimelineAnchor from "@/components/DataDisplay/BookingTimeline/components/TimelineAnchor";
@@ -74,9 +74,14 @@ const BookingTimeline = ({
       )}
       {start && events.length > 0 && <RailSpacer height={12} />}
 
-      {events.map((event) => (
-        <TimelineEvent key={event.key} event={event} labels={eventLabels} />
-      ))}
+      {events.length > 0 && (
+        // Real (chronologically ordered) list semantics; each TimelineEvent renders as an li.
+        <List component="ol" disablePadding>
+          {events.map((event) => (
+            <TimelineEvent key={event.key} event={event} labels={eventLabels} />
+          ))}
+        </List>
+      )}
 
       {end && events.length > 0 && <RailSpacer height={12} />}
       {end && (

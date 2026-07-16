@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.56.0](https://github.com/getsoren/design-system/compare/4.55.0...4.56.0) (2026-07-16)
+
+
+### Features
+
+* **BookingTimeline:** add rental timeline component (rail, bookends, event rows) ([faec204](https://github.com/getsoren/design-system/commit/faec2040c713ec888d1f4af96065b4551560d322))
+* **CollapsingHeader:** add new component with sticky behavior and customizable titles ([b0222f9](https://github.com/getsoren/design-system/commit/b0222f9925c3f0629856683d064fcf610bd9bbc2))
+* improvement ([6d51a9a](https://github.com/getsoren/design-system/commit/6d51a9a0cfe7f9339ea15b82bffa42660da72807))
+* improvement ([bc2f0ce](https://github.com/getsoren/design-system/commit/bc2f0ced4dda2343933a7a790f44844749f231a2))
+* improvement ([218c591](https://github.com/getsoren/design-system/commit/218c59193dc056ebfba5b4e55be12808cc081a63))
+
 ## [4.55.0](https://github.com/getsoren/design-system/compare/4.54.0...4.55.0) (2026-07-15)
 
 

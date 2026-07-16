@@ -74,19 +74,19 @@ const Template: StoryFn<typeof BookingTimeline> = (args) => (
 /** Delivery on the start day and retrieval on the end day — folded into the Start / End anchors. */
 export const SameDayDeliveryAndRetrieval = Template.bind({});
 SameDayDeliveryAndRetrieval.args = {
-  end: { eyebrow: "Fin", title: "Vendredi 14 juin", titleSuffix: "(Reprise 8h - 12h)" },
+  end: { overline: "Fin", title: "Vendredi 14 juin", titleSuffix: "(Reprise 8h - 12h)" },
   events,
-  start: { eyebrow: "Début", reached: true, title: "Lundi 3 juin", titleSuffix: "(Livraison 8h - 12h)" },
+  start: { overline: "Début", reached: true, title: "Lundi 3 juin", titleSuffix: "(Livraison 8h - 12h)" },
 };
 
 /** Delivery / retrieval on their own days — promoted to their own bookends around Start / End. */
 export const SeparateDeliveryAndRetrieval = Template.bind({});
 SeparateDeliveryAndRetrieval.args = {
-  delivery: { eyebrow: "Livraison", reached: true, title: "Samedi 1er juin", titleSuffix: "entre 8h et 12h" },
-  end: { eyebrow: "Fin", title: "Vendredi 14 juin" },
+  delivery: { overline: "Livraison", reached: true, title: "Samedi 1er juin", titleSuffix: "entre 8h et 12h" },
+  end: { overline: "Fin", title: "Vendredi 14 juin" },
   events,
-  retrieval: { eyebrow: "Reprise", title: "Lundi 17 juin", titleSuffix: "entre 8h et 12h" },
-  start: { eyebrow: "Début", reached: true, title: "Lundi 3 juin" },
+  retrieval: { overline: "Reprise", title: "Lundi 17 juin", titleSuffix: "entre 8h et 12h" },
+  start: { overline: "Début", reached: true, title: "Lundi 3 juin" },
 };
 
 /** Overdue end date: warning title + call to action slot under the End anchor. */
@@ -105,12 +105,12 @@ OverdueEnd.args = {
         </Box>
       </Typography>
     ),
-    eyebrow: "Fin",
+    overline: "Fin",
     title: "Vendredi 14 juin",
     warning: true,
   },
   events,
-  start: { eyebrow: "Début", reached: true, title: "Lundi 3 juin", titleSuffix: "(Livraison 8h - 12h)" },
+  start: { overline: "Début", reached: true, title: "Lundi 3 juin", titleSuffix: "(Livraison 8h - 12h)" },
 };
 
 export const Loading = Template.bind({});

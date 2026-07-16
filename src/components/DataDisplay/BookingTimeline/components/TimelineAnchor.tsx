@@ -43,7 +43,7 @@ interface TimelineAnchorProps {
   railVariant: "top" | "mid" | "bottom";
 }
 
-/** Début / Fin / Livraison / Reprise bookend on the rail: node + eyebrow + title (+ content). */
+/** Début / Fin / Livraison / Reprise bookend on the rail: node + overline + title (+ content). */
 const TimelineAnchor = ({ anchor, glyph, railVariant }: TimelineAnchorProps) => (
   <Stack direction="row" alignItems="flex-start" sx={{ position: "relative", py: 1.25 }}>
     <RailSegment variant={railVariant} gap={ANCHOR_NODE_GAP} />
@@ -53,7 +53,7 @@ const TimelineAnchor = ({ anchor, glyph, railVariant }: TimelineAnchorProps) => 
       </Box>
     </Box>
     <Box sx={{ pl: `${CARD_GAP}px` }}>
-      {anchor.eyebrow && (
+      {anchor.overline && (
         <Typography
           variant="caption"
           sx={{
@@ -65,7 +65,7 @@ const TimelineAnchor = ({ anchor, glyph, railVariant }: TimelineAnchorProps) => 
             textTransform: "uppercase",
           }}
         >
-          {anchor.eyebrow}
+          {anchor.overline}
         </Typography>
       )}
       <Typography variant="subtitle2" fontWeight={500} sx={anchor.warning ? { color: "warning.dark" } : undefined}>

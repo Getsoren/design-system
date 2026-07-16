@@ -14,8 +14,8 @@ describe("Test <BookingTimeline/>", () => {
   it("renders the anchors and the events", () => {
     const { getByText } = render(
       <BookingTimeline
-        start={{ eyebrow: "Start", reached: true, title: "Monday 3 June", titleSuffix: "(Delivery 8am - 12pm)" }}
-        end={{ eyebrow: "End", title: "Friday 14 June" }}
+        start={{ overline: "Start", reached: true, title: "Monday 3 June", titleSuffix: "(Delivery 8am - 12pm)" }}
+        end={{ overline: "End", title: "Friday 14 June" }}
         events={[event({ date: "5 June" })]}
       />,
     );
@@ -30,10 +30,10 @@ describe("Test <BookingTimeline/>", () => {
   it("renders the delivery and retrieval bookends when provided", () => {
     const { getByText } = render(
       <BookingTimeline
-        delivery={{ eyebrow: "Delivery", reached: true, title: "Saturday 1 June" }}
-        start={{ eyebrow: "Start", reached: true, title: "Monday 3 June" }}
-        end={{ eyebrow: "End", title: "Friday 14 June" }}
-        retrieval={{ eyebrow: "Retrieval", title: "Monday 17 June" }}
+        delivery={{ overline: "Delivery", reached: true, title: "Saturday 1 June" }}
+        start={{ overline: "Start", reached: true, title: "Monday 3 June" }}
+        end={{ overline: "End", title: "Friday 14 June" }}
+        retrieval={{ overline: "Retrieval", title: "Monday 17 June" }}
       />,
     );
     expect(getByText("Delivery")).toBeInTheDocument();

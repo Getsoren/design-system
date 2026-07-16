@@ -12,8 +12,8 @@ export interface BookingTimelineLabels {
 
 /** Début / Fin / Livraison / Reprise milestone on the rail. */
 export interface BookingTimelineAnchor {
-  /** Small uppercase grey kicker above the title (e.g. "Début"). */
-  eyebrow?: string;
+  /** Small uppercase grey overline above the title (e.g. "Début"). */
+  overline?: string;
   /** Main line — typically the formatted date (e.g. "Lundi 3 juin"). */
   title: string;
   /** Smaller muted text inline after the title (e.g. "(Livraison 8h - 12h)"). */

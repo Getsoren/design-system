@@ -8,6 +8,8 @@ export { default as Avatar } from "@/components/DataDisplay/Avatar";
 export type { AvatarProps } from "@/components/DataDisplay/Avatar/Avatar";
 export * from "@/components/DataDisplay/AvatarAppBar";
 export { default as AvatarAppBar } from "@/components/DataDisplay/AvatarAppBar";
+export * from "@/components/DataDisplay/BookingTimeline";
+export { default as BookingTimeline } from "@/components/DataDisplay/BookingTimeline";
 export * from "@/components/DataDisplay/Chat/Chat";
 export { default as Chat } from "@/components/DataDisplay/Chat/Chat";
 export { default as ChatConversationDetail } from "@/components/DataDisplay/Chat/components/ChatConversationDetail";

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.56.2](https://github.com/getsoren/design-system/compare/4.56.1...4.56.2) (2026-07-16)
+
+
+### Bug Fixes
+
+* booking timeline ([988f4dc](https://github.com/getsoren/design-system/commit/988f4dc60ea25bc78a6cf43fc82aa2a5ad98bc83))
+* booking timeline ([c920ab2](https://github.com/getsoren/design-system/commit/c920ab2d0aa41601d60b748477a8be0ff395c664))
+* booking timeline ([65af490](https://github.com/getsoren/design-system/commit/65af490960f8dee7bd0704f0148e61a8be9ca90a))
+* booking timeline ([515dac2](https://github.com/getsoren/design-system/commit/515dac2e88bdc1dae2d7458f035943180752908a))
+
 ## [4.56.1](https://github.com/getsoren/design-system/compare/4.56.0...4.56.1) (2026-07-16)
 
 

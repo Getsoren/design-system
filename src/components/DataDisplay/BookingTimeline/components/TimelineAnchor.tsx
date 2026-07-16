@@ -22,7 +22,7 @@ const AnchorNode = ({ glyph, reached }: { glyph: ReactNode; reached: boolean }) 
         "& svg": { fontSize: 15 },
         alignItems: "center",
         backgroundColor: reached ? "secondary.main" : "transparent",
-        border: reached ? undefined : "2px solid",
+        border: reached ? undefined : "1px solid",
         borderColor: reached ? undefined : "text.secondary",
         borderRadius: "50%",
         color: reached ? "#fff" : "text.secondary",

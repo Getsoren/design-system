@@ -19,7 +19,7 @@ import useTranslation from "@/hooks/useTranslation";
  * Purely presentational — dates and labels arrive formatted; the host app adapts its data.
  * The arrival / departure arrows belong to Delivery / Retrieval: when those bookends are
  * absent (delivery on the start day / retrieval on the end day, folded into the start / end
- * anchors) the anchors keep the arrows, otherwise the start shows a play glyph and the end
+ * anchors) the anchors keep the arrows, otherwise the start shows a play icon and the end
  * a finish flag.
  */
 const BookingTimeline = ({
@@ -62,13 +62,13 @@ const BookingTimeline = ({
 
   return (
     <Box sx={{ position: "relative" }} data-test={dataTest} data-testid={dataTestId}>
-      {delivery && <TimelineAnchor anchor={delivery} glyph={<ArrowForwardRoundedIcon fontSize="inherit" />} railVariant="top" />}
+      {delivery && <TimelineAnchor anchor={delivery} icon={<ArrowForwardRoundedIcon fontSize="inherit" />} railVariant="top" />}
       {delivery && <RailSpacer height={12} />}
 
       {start && (
         <TimelineAnchor
           anchor={start}
-          glyph={delivery ? <PlayArrowRoundedIcon fontSize="inherit" /> : <ArrowForwardRoundedIcon fontSize="inherit" />}
+          icon={delivery ? <PlayArrowRoundedIcon fontSize="inherit" /> : <ArrowForwardRoundedIcon fontSize="inherit" />}
           railVariant={delivery ? "mid" : "top"}
         />
       )}
@@ -82,12 +82,12 @@ const BookingTimeline = ({
       {end && (
         <TimelineAnchor
           anchor={end}
-          glyph={retrieval ? <SportsScoreIcon fontSize="inherit" /> : <ArrowBackRoundedIcon fontSize="inherit" />}
+          icon={retrieval ? <SportsScoreIcon fontSize="inherit" /> : <ArrowBackRoundedIcon fontSize="inherit" />}
           railVariant={retrieval ? "mid" : "bottom"}
         />
       )}
 
-      {retrieval && <TimelineAnchor anchor={retrieval} glyph={<ArrowBackRoundedIcon fontSize="inherit" />} railVariant="bottom" />}
+      {retrieval && <TimelineAnchor anchor={retrieval} icon={<ArrowBackRoundedIcon fontSize="inherit" />} railVariant="bottom" />}
     </Box>
   );
 };

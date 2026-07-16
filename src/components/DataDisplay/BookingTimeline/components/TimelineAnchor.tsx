@@ -7,7 +7,7 @@ import { BookingTimelineAnchor } from "@/components/DataDisplay/BookingTimeline/
 /** Anchor node — a filled teal disc (milestone reached) or a hollow grey ring (still to come).
  * The NODE_SIZE wrapper matches the rail gap so the line never touches the circle; everything
  * around the disc stays transparent to blend with any background. */
-const AnchorNode = ({ glyph, reached }: { glyph: ReactNode; reached: boolean }) => (
+const AnchorNode = ({ icon, reached }: { icon: ReactNode; reached: boolean }) => (
   <Box
     sx={{
       alignItems: "center",
@@ -32,24 +32,24 @@ const AnchorNode = ({ glyph, reached }: { glyph: ReactNode; reached: boolean }) 
         width: 22,
       }}
     >
-      {glyph}
+      {icon}
     </Box>
   </Box>
 );
 
 interface TimelineAnchorProps {
   anchor: BookingTimelineAnchor;
-  glyph: ReactNode;
+  icon: ReactNode;
   railVariant: "top" | "mid" | "bottom";
 }
 
 /** Début / Fin / Livraison / Reprise bookend on the rail: node + overline + title (+ content). */
-const TimelineAnchor = ({ anchor, glyph, railVariant }: TimelineAnchorProps) => (
+const TimelineAnchor = ({ anchor, icon, railVariant }: TimelineAnchorProps) => (
   <Stack direction="row" alignItems="flex-start" sx={{ position: "relative", py: 1.25 }}>
     <RailSegment variant={railVariant} gap={ANCHOR_NODE_GAP} />
     <Box sx={{ display: "flex", flexShrink: 0, justifyContent: "center", width: ANCHOR_COL }}>
       <Box sx={{ display: "flex", mt: "1px", zIndex: 1 }}>
-        <AnchorNode glyph={glyph} reached={!!anchor.reached} />
+        <AnchorNode icon={icon} reached={!!anchor.reached} />
       </Box>
     </Box>
     <Box sx={{ pl: `${CARD_GAP}px` }}>

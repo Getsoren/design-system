@@ -2,7 +2,7 @@ import { Box, Theme } from "@mui/material";
 import { RAIL_X } from "@/components/DataDisplay/BookingTimeline/constants";
 
 const railSx = (theme: Theme) => ({
-  backgroundColor: theme.palette.grey[300],
+  backgroundColor: theme.palette.divider,
   left: RAIL_X - 0.5,
   position: "absolute" as const,
   width: "1px",
@@ -11,8 +11,6 @@ const railSx = (theme: Theme) => ({
 
 interface RailSegmentProps {
   variant: "top" | "mid" | "bottom";
-  /** Vertical bounds of the node within the row: the rail leaves a real gap there instead of
-   * being masked, so it renders correctly on any background colour. */
   gap: readonly [number, number];
 }
 

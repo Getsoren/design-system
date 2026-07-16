@@ -38,7 +38,8 @@ const PhotoPile = ({ photos }: { photos: NonNullable<BookingTimelineEvent["photo
 
       return (
         <Box
-          key={photo.src}
+          // The same photo can legitimately appear twice — the index keeps keys unique.
+          key={`${photo.src}-${index}`}
           sx={{
             border: "1.5px solid",
             borderColor: "background.paper",
@@ -54,7 +55,7 @@ const PhotoPile = ({ photos }: { photos: NonNullable<BookingTimelineEvent["photo
           <Box
             component="img"
             src={photo.src}
-            alt={photo.name}
+            alt={photo.name ?? ""}
             sx={{
               display: "block",
               height: "100%",
@@ -93,6 +94,51 @@ interface TimelineEventProps {
 /** Event row: status / icon node on the rail + one-line card (name, photos, avatar, date, chevron). */
 const TimelineEvent = ({ event, labels }: TimelineEventProps) => {
   const statusLabel = event.status === "closed" ? labels.closed : labels.open;
+
+  const row = (
+    <Stack direction="row" alignItems="flex-start" spacing={1} sx={{ width: "100%" }}>
+      {/* Left: event name */}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <EventName text={event.labelText}>{event.label}</EventName>
+      </Box>
+
+      {/* Right: photo pile + declarant avatar + date, all in a fixed-width cluster so the
+          avatars stay vertically aligned across rows. Details surface on hover. */}
+      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ flexShrink: 0, mt: "1px" }}>
+        {event.photos && event.photos.length > 0 && <PhotoPile photos={event.photos} />}
+        {(event.user || event.date) && (
+          <Tooltip title={event.tooltip ?? ""}>
+            <Stack direction="row" alignItems="center" spacing={0.75}>
+              {event.user && (
+                <Avatar size="small" src={event.user.avatar ?? undefined} sx={{ flexShrink: 0, fontSize: 9, height: 18, width: 18 }}>
+                  {event.user.initials}
+                </Avatar>
+              )}
+              {event.date && (
+                <Typography variant="caption" noWrap sx={{ color: "text.disabled", flexShrink: 0, textAlign: "right", width: "46px" }}>
+                  {event.date}
+                </Typography>
+              )}
+            </Stack>
+          </Tooltip>
+        )}
+        <KeyboardArrowRightRoundedIcon
+          fontSize="small"
+          sx={{ color: "text.disabled", flexShrink: 0, visibility: event.onClick ? "visible" : "hidden" }}
+        />
+      </Stack>
+    </Stack>
+  );
+
+  const rowSx = {
+    alignItems: "stretch",
+    borderRadius: "8px",
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+    p: "10px",
+    width: "100%",
+  } as const;
 
   return (
     <Box sx={{ display: "flex", position: "relative", pr: 0.5 }}>
@@ -155,63 +201,28 @@ const TimelineEvent = ({ event, labels }: TimelineEventProps) => {
         </Box>
       </Box>
 
-      {/* Clickable/hoverable event card. 2px + the 10px inner padding = CARD_GAP,
-          so the event text starts on the same column as the anchor labels. */}
+      {/* Event card. 2px + the 10px inner padding = CARD_GAP, so the event text starts on
+          the same column as the anchor labels. Only clickable rows render as a button —
+          static rows stay a plain box (no hover, no ripple, not focusable). */}
       <Box sx={{ flex: 1, minWidth: 0, ml: "2px" }}>
-        <ListItemButton
-          disableGutters
-          onClick={event.onClick}
-          sx={{
-            "&:hover": {
-              backgroundColor: "action.hover",
-            },
-            alignItems: "stretch",
-            backgroundColor: "transparent",
-            borderRadius: "8px",
-            cursor: event.onClick ? "pointer" : "default",
-            flexDirection: "column",
-            minWidth: 0,
-            p: "10px",
-            width: "100%",
-          }}
-        >
-          <Stack direction="row" alignItems="flex-start" spacing={1} sx={{ width: "100%" }}>
-            {/* Left: event name */}
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <EventName text={event.labelText}>{event.label}</EventName>
-            </Box>
-
-            {/* Right: photo pile + declarant avatar + date, all in a fixed-width cluster so the
-                avatars stay vertically aligned across rows. Details surface on hover. */}
-            <Stack direction="row" alignItems="center" spacing={0.75} sx={{ flexShrink: 0, mt: "1px" }}>
-              {event.photos && event.photos.length > 0 && <PhotoPile photos={event.photos} />}
-              {(event.user || event.date) && (
-                <Tooltip title={event.tooltip ?? ""}>
-                  <Stack direction="row" alignItems="center" spacing={0.75}>
-                    {event.user && (
-                      <Avatar size="small" src={event.user.avatar ?? undefined} sx={{ flexShrink: 0, fontSize: 9, height: 18, width: 18 }}>
-                        {event.user.initials}
-                      </Avatar>
-                    )}
-                    {event.date && (
-                      <Typography
-                        variant="caption"
-                        noWrap
-                        sx={{ color: "text.disabled", flexShrink: 0, textAlign: "right", width: "46px" }}
-                      >
-                        {event.date}
-                      </Typography>
-                    )}
-                  </Stack>
-                </Tooltip>
-              )}
-              <KeyboardArrowRightRoundedIcon
-                fontSize="small"
-                sx={{ color: "text.disabled", flexShrink: 0, visibility: event.onClick ? "visible" : "hidden" }}
-              />
-            </Stack>
-          </Stack>
-        </ListItemButton>
+        {event.onClick ? (
+          <ListItemButton
+            disableGutters
+            onClick={event.onClick}
+            sx={{
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
+              backgroundColor: "transparent",
+              cursor: "pointer",
+              ...rowSx,
+            }}
+          >
+            {row}
+          </ListItemButton>
+        ) : (
+          <Box sx={rowSx}>{row}</Box>
+        )}
       </Box>
     </Box>
   );

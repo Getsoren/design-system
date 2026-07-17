@@ -111,7 +111,6 @@ export interface ChatMessageBubbleProps {
   avatarSrcResolver?: (src?: string | null) => string | undefined;
   renderAfterBubble?: (urls: string[]) => ReactNode;
   formatTime?: (date: string) => string;
-  /** Hide the author avatar on received messages (e.g. single-author AI assistant chat) */
   hideAvatar?: boolean;
 }
 

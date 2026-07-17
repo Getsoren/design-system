@@ -99,9 +99,12 @@ const ChatMessageInput = ({ onSend, labels, autoFocusKey, isSending, defaultMess
           </Button>
         </Stack>
       </Stack>
-      <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={0.5}>
-        {labels?.enterToSend ?? "Enter to Send"}
-      </Typography>
+      {/* Pass an empty string to hide the hint entirely (undefined keeps the default) */}
+      {labels?.enterToSend !== "" && (
+        <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={0.5}>
+          {labels?.enterToSend ?? "Enter to Send"}
+        </Typography>
+      )}
     </Box>
   );
 };

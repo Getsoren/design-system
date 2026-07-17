@@ -81,7 +81,15 @@ const Bubble = ({ children, isOwn }: BubbleProps) => (
   </Paper>
 );
 
-const ChatMessageBubble = ({ isOwn, message, participants, avatarSrcResolver, renderAfterBubble, formatTime }: ChatMessageBubbleProps) => {
+const ChatMessageBubble = ({
+  isOwn,
+  message,
+  participants,
+  avatarSrcResolver,
+  renderAfterBubble,
+  formatTime,
+  hideAvatar,
+}: ChatMessageBubbleProps) => {
   const formattedTime = (formatTime ?? defaultFormatTime)(message.createdAt);
   const urls = extractUrls(message.body);
 
@@ -105,21 +113,23 @@ const ChatMessageBubble = ({ isOwn, message, participants, avatarSrcResolver, re
 
   return (
     <Stack direction="row" spacing={1.5} alignItems="flex-start">
-      <Avatar
-        src={avatarSrcResolver?.(author?.avatar)}
-        sx={{
-          backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
-          fontSize: 12,
-          height: 28,
-          mt: 0.5,
-          width: 28,
-        }}
-      >
-        {getInitials(
-          author ? { firstName: author.firstName, lastName: author.lastName } : { fullName: String(message.authorId).slice(0, 2) },
-          true,
-        )}
-      </Avatar>
+      {!hideAvatar && (
+        <Avatar
+          src={avatarSrcResolver?.(author?.avatar)}
+          sx={{
+            backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
+            fontSize: 12,
+            height: 28,
+            mt: 0.5,
+            width: 28,
+          }}
+        >
+          {getInitials(
+            author ? { firstName: author.firstName, lastName: author.lastName } : { fullName: String(message.authorId).slice(0, 2) },
+            true,
+          )}
+        </Avatar>
+      )}
       <Stack spacing={0.5} sx={{ maxWidth: "70%" }}>
         <Bubble>
           <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>

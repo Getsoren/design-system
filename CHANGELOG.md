@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.58.0](https://github.com/getsoren/design-system/compare/4.57.0...4.58.0) (2026-07-21)
+
+
+### Features
+
+* ai assistant panel component ([0fbb172](https://github.com/getsoren/design-system/commit/0fbb1724bd15b9ef32d3d19cb0a71c6fd8b23c0e))
+* chat add new prop hideAvatar ([ea85874](https://github.com/getsoren/design-system/commit/ea85874a311d3922eddb28ceb10a5804364df2bd))
+
 ## [4.57.0](https://github.com/getsoren/design-system/compare/4.56.2...4.57.0) (2026-07-17)
 
 

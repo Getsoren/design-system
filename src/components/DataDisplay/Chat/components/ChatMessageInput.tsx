@@ -9,7 +9,15 @@ import Button from "@/components/Inputs/Button";
 
 const RADIUS = 15;
 
-const ChatMessageInput = ({ onSend, labels, autoFocusKey, isSending, defaultMessage, maxLength = 10000 }: ChatMessageInputProps) => {
+const ChatMessageInput = ({
+  onSend,
+  labels,
+  autoFocusKey,
+  isSending,
+  defaultMessage,
+  maxLength = 10000,
+  startActions,
+}: ChatMessageInputProps) => {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -89,7 +97,9 @@ const ChatMessageInput = ({ onSend, labels, autoFocusKey, isSending, defaultMess
           padding: 1,
         }}
       >
-        <Stack direction="row" spacing={1} />
+        <Stack direction="row" alignItems="center" spacing={1}>
+          {startActions}
+        </Stack>
         <Stack direction="row" alignItems="center" spacing={1}>
           <Typography variant="caption" color="text.secondary">
             {message.length}/{maxLength}

@@ -125,5 +125,5 @@ Empty.args = {
 
 export default {
   component: BookingTimeline,
-  title: "Components/DataDisplay/BookingTimeline",
+  title: "Components/Data Display/BookingTimeline",
 } as Meta<typeof BookingTimeline>;

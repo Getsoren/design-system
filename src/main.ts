@@ -1,6 +1,8 @@
 // MUI
 export * from "@mui/material";
 export * from "@mui/material/transitions";
+export { default as AiAssistant } from "@/components/DataDisplay/AiAssistant/AiAssistant";
+export * from "@/components/DataDisplay/AiAssistant/types";
 export * from "@/components/DataDisplay/ArticleImage";
 export { default as ArticleImage } from "@/components/DataDisplay/ArticleImage";
 export * from "@/components/DataDisplay/Avatar";
@@ -17,11 +19,13 @@ export { default as ChatConversationList } from "@/components/DataDisplay/Chat/c
 export { default as ChatMessageBubble } from "@/components/DataDisplay/Chat/components/ChatMessageBubble";
 export { default as ChatMessageInput } from "@/components/DataDisplay/Chat/components/ChatMessageInput";
 export { default as ChatParticipantDialog } from "@/components/DataDisplay/Chat/components/ChatParticipantDialog";
+export { default as ChatVoiceRecorder } from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
 export * from "@/components/DataDisplay/Chat/types";
 export * from "@/components/DataDisplay/Chip";
 export { default as Chip } from "@/components/DataDisplay/Chip";
 export * from "@/components/DataDisplay/FileViewer";
 export { default as FileViewer } from "@/components/DataDisplay/FileViewer";
+export { default as AiSparkIcon } from "@/components/DataDisplay/Icons/AiSparkIcon";
 export * from "@/components/DataDisplay/Kanban/Kanban";
 export { default as Kanban } from "@/components/DataDisplay/Kanban/Kanban";
 export * from "@/components/DataDisplay/ListAvatar";

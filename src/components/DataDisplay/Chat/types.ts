@@ -121,6 +121,27 @@ export interface ChatMessageInputProps {
   isSending?: boolean;
   defaultMessage?: string;
   maxLength?: number;
+  /** Rendered on the left of the bottom bar, facing the send button (e.g. ChatVoiceRecorder) */
+  startActions?: ReactNode;
+}
+
+export interface ChatVoiceRecorderLabels {
+  record?: string;
+  cancel?: string;
+  send?: string;
+}
+
+export interface ChatVoiceRecorderProps {
+  /** Receives the recorded audio once the user validates the take */
+  onRecorded: (audio: Blob) => void;
+  /** Typically a denied microphone permission */
+  onError?: (error: unknown) => void;
+  /** The caller is consuming the recording (upload/transcription): spinner on the mic, new take blocked */
+  isProcessing?: boolean;
+  disabled?: boolean;
+  /** Hard stop: past this duration the take is validated automatically (default 2 min) */
+  maxDurationMs?: number;
+  labels?: ChatVoiceRecorderLabels;
 }
 
 export interface ChatParticipantDialogProps {

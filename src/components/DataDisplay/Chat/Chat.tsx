@@ -5,6 +5,7 @@ import ChatConversationList from "@/components/DataDisplay/Chat/components/ChatC
 import ChatMessageBubble from "@/components/DataDisplay/Chat/components/ChatMessageBubble";
 import ChatMessageInput from "@/components/DataDisplay/Chat/components/ChatMessageInput";
 import ChatParticipantDialog from "@/components/DataDisplay/Chat/components/ChatParticipantDialog";
+import ChatVoiceRecorder from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
 
 interface ChatProps {
   children: ReactNode;
@@ -29,6 +30,7 @@ type ChatComponent = FC<ChatProps> & {
   MessageBubble: typeof ChatMessageBubble;
   MessageInput: typeof ChatMessageInput;
   ParticipantDialog: typeof ChatParticipantDialog;
+  VoiceRecorder: typeof ChatVoiceRecorder;
 };
 
 const Chat: ChatComponent = Object.assign(
@@ -44,6 +46,7 @@ const Chat: ChatComponent = Object.assign(
     MessageBubble: ChatMessageBubble,
     MessageInput: ChatMessageInput,
     ParticipantDialog: ChatParticipantDialog,
+    VoiceRecorder: ChatVoiceRecorder,
   },
 );
 

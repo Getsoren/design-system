@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.59.0](https://github.com/getsoren/design-system/compare/4.58.0...4.59.0) (2026-07-22)
+
+
+### Features
+
+* add autoSubmitOnSilence for ChatVoiceRecorder and more options ([b979fa1](https://github.com/getsoren/design-system/commit/b979fa192175796aa903c413b23cdc86cf7cfa5e))
+
 ## [4.58.0](https://github.com/getsoren/design-system/compare/4.57.0...4.58.0) (2026-07-21)
 
 

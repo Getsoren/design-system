@@ -132,15 +132,39 @@ export interface ChatVoiceRecorderLabels {
 }
 
 export interface ChatVoiceRecorderProps {
-  /** Receives the recorded audio once the user validates the take */
+  /**
+   * Receives the recorded audio once the user validates the take
+   */
   onRecorded: (audio: Blob) => void;
-  /** Typically a denied microphone permission */
+  /**
+   * Typically a denied microphone permission
+   */
   onError?: (error: unknown) => void;
-  /** The caller is consuming the recording (upload/transcription): spinner on the mic, new take blocked */
+  /**
+   * The caller is consuming the recording (upload/transcription): spinner on the mic, new take blocked
+   */
   isProcessing?: boolean;
+  /**
+   * Disables the mic button (e.g. the chat is busy sending) — no recording can be started
+   */
   disabled?: boolean;
-  /** Hard stop: past this duration the take is validated automatically (default 2 min) */
+  /**
+   * Hard stop: past this duration the take is validated automatically (default 2 min)
+   */
   maxDurationMs?: number;
+  /**
+   * Enables Siri-style auto-send: once the user has started speaking, the take is validated automatically
+   * after a trailing silence. Opt-in (default false) so a shared consumer never auto-sends by surprise.
+   */
+  autoSubmitOnSilence?: boolean;
+  /**
+   * Trailing silence, in ms, before the take is auto-validated when `autoSubmitOnSilence` is on (default
+   * 2500). The timer only arms after the first speech is detected, so a slow start never cuts the user off.
+   */
+  silenceTimeoutMs?: number;
+  /**
+   * Translated strings for the tooltips (record / cancel / send) — falls back to English defaults
+   */
   labels?: ChatVoiceRecorderLabels;
 }
 

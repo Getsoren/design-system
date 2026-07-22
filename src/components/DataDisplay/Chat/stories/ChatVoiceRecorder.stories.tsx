@@ -5,6 +5,7 @@ import ChatVoiceRecorder from "@/components/DataDisplay/Chat/components/ChatVoic
 
 const meta: Meta<typeof ChatVoiceRecorder> = {
   component: ChatVoiceRecorder,
+  parameters: { layout: "centered" },
   title: "Components/Data Display/ChatVoiceRecorder",
 };
 
@@ -28,8 +29,8 @@ export const Default: StoryFn<typeof ChatVoiceRecorder> = () => {
   };
 
   return (
-    <Stack spacing={2} width={360}>
-      <Paper variant="outlined" sx={{ alignItems: "center", display: "flex", gap: 1, padding: 1 }}>
+    <Stack spacing={2} width={360} height="100%" justifyContent="center">
+      <Paper variant="outlined" sx={{ alignItems: "center", display: "flex", gap: 1, paddingX: 2, paddingY: 1 }}>
         <Typography variant="body2" color="text.secondary" flex={1}>
           Écrire un message…
         </Typography>

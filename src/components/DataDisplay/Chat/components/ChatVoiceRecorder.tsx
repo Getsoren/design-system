@@ -9,6 +9,9 @@ import CheckIcon from "@/components/DataDisplay/Icons/CheckIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import MicIcon from "@/components/DataDisplay/Icons/MicIcon";
 
+// Normalized RMS (0..1) above which the mic input counts as speech rather than ambient/room noise
+const SPEECH_RMS_THRESHOLD = 0.02;
+
 /** First recording mime the browser supports (Safari records mp4, everyone else webm/opus) */
 const pickMimeType = (): string | undefined =>
   ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find(
@@ -27,10 +30,12 @@ const formatElapsed = (seconds: number): string =>
 export const ChatVoiceRecorder = ({
   onRecorded,
   onError,
+  labels,
   isProcessing = false,
   disabled = false,
+  autoSubmitOnSilence = false,
   maxDurationMs = 120_000,
-  labels,
+  silenceTimeoutMs = 2_500,
 }: ChatVoiceRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -39,8 +44,22 @@ export const ChatVoiceRecorder = ({
   const chunksRef = useRef<Blob[]>([]);
   // Read by the recorder's onstop: cancel discards the take instead of emitting it
   const discardRef = useRef(false);
+  // Web Audio graph used only for silence detection (Siri-style auto-send)
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const silenceFrameRef = useRef<number | null>(null);
+
+  const stopSilenceMonitor = () => {
+    if (silenceFrameRef.current !== null) {
+      cancelAnimationFrame(silenceFrameRef.current);
+      silenceFrameRef.current = null;
+    }
+    // AudioContext.close() is async and can reject if already closed — ignore, the stream is torn down anyway
+    audioContextRef.current?.close().catch(() => {});
+    audioContextRef.current = null;
+  };
 
   const releaseStream = () => {
+    stopSilenceMonitor();
     streamRef.current?.getTracks().forEach((track) => {
       track.stop();
     });
@@ -52,6 +71,50 @@ export const ChatVoiceRecorder = ({
   const stop = (discard: boolean) => {
     discardRef.current = discard;
     recorderRef.current?.stop();
+  };
+
+  /**
+   * Watches the mic level and auto-validates the take after `silenceTimeoutMs` of trailing silence —
+   * but only once the user has actually started speaking, so a slow start is never cut off.
+   */
+  const monitorSilence = (stream: MediaStream) => {
+    const AudioContextCtor =
+      window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+
+    if (!(autoSubmitOnSilence && silenceTimeoutMs && AudioContextCtor)) {
+      return;
+    }
+
+    const audioContext = new AudioContextCtor();
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    audioContext.createMediaStreamSource(stream).connect(analyser);
+    audioContextRef.current = audioContext;
+
+    const samples = new Uint8Array(analyser.fftSize);
+    let hasSpoken = false;
+    let lastSoundAt = performance.now();
+
+    const tick = () => {
+      analyser.getByteTimeDomainData(samples);
+      // RMS of the waveform centered on 128 (silence) → normalized 0..1 loudness
+      const rms = Math.sqrt(samples.reduce((sum, value) => sum + (value - 128) ** 2, 0) / samples.length) / 128;
+      const now = performance.now();
+
+      if (rms > SPEECH_RMS_THRESHOLD) {
+        hasSpoken = true;
+        lastSoundAt = now;
+      }
+
+      if (hasSpoken && now - lastSoundAt >= silenceTimeoutMs) {
+        stop(false);
+        return;
+      }
+
+      silenceFrameRef.current = requestAnimationFrame(tick);
+    };
+
+    silenceFrameRef.current = requestAnimationFrame(tick);
   };
 
   const start = async () => {
@@ -80,6 +143,7 @@ export const ChatVoiceRecorder = ({
       streamRef.current = stream;
       recorderRef.current = recorder;
       recorder.start();
+      monitorSilence(stream);
       setElapsedSeconds(0);
       setIsRecording(true);
     } catch (error) {

@@ -30,7 +30,7 @@ const TemplateColor: StoryFn<typeof Chip> = (args) => (
       <Chip variant="outlined" label="outlined success" color="success" {...args} onClick={() => {}} />
       <Chip variant="outlined" label="outlined warning" color="warning" {...args} onClick={() => {}} />
       <Chip variant="outlined" label="outlined error" color="error" {...args} onClick={() => {}} />
-      <Chip variant="outlined" label="outlined error" color="active" {...args} onClick={() => {}} />
+      <Chip variant="outlined" label="outlined active" color="active" {...args} onClick={() => {}} />
     </Stack>
 
     <Stack spacing={1}>
@@ -41,7 +41,7 @@ const TemplateColor: StoryFn<typeof Chip> = (args) => (
       <Chip variant="rounded" label="rounded success" color="success" {...args} onClick={() => {}} />
       <Chip variant="rounded" label="rounded warning" color="warning" {...args} onClick={() => {}} />
       <Chip variant="rounded" label="rounded error" color="error" {...args} onClick={() => {}} />
-      <Chip variant="rounded" label="rounded error" color="active" {...args} onClick={() => {}} />
+      <Chip variant="rounded" label="rounded active" color="active" {...args} onClick={() => {}} />
     </Stack>
 
     <Stack spacing={1}>
@@ -52,7 +52,7 @@ const TemplateColor: StoryFn<typeof Chip> = (args) => (
       <Chip label="success" color="success" {...args} onClick={() => {}} />
       <Chip label="warning" color="warning" {...args} onClick={() => {}} />
       <Chip label="error" color="error" {...args} onClick={() => {}} />
-      <Chip label="error" color="active" {...args} onClick={() => {}} />
+      <Chip label="active" color="active" {...args} onClick={() => {}} />
     </Stack>
 
     <Stack spacing={1}>
@@ -63,7 +63,7 @@ const TemplateColor: StoryFn<typeof Chip> = (args) => (
       <Chip variant="outlined-rounded" label="outlined-rounded success" color="success" {...args} onClick={() => {}} />
       <Chip variant="outlined-rounded" label="outlined-rounded warning" color="warning" {...args} onClick={() => {}} />
       <Chip variant="outlined-rounded" label="outlined-rounded error" color="error" {...args} onClick={() => {}} />
-      <Chip variant="outlined-rounded" label="outlined-rounded error" color="active" {...args} onClick={() => {}} />
+      <Chip variant="outlined-rounded" label="outlined-rounded active" color="active" {...args} onClick={() => {}} />
     </Stack>
   </Stack>
 );

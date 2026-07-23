@@ -1,6 +1,6 @@
 import { Alert, Chip, Stack, Typography } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import AiAssistant from "@/components/DataDisplay/AiAssistant/AiAssistant";
 import Chat from "@/components/DataDisplay/Chat/Chat";
 import type { ChatMessage } from "@/components/DataDisplay/Chat/types";
@@ -19,6 +19,48 @@ export default meta;
  * Chat.VoiceRecorder) and agentic logic.
  */
 const PARTICIPANTS = [{ avatar: null, firstName: "Nova", lastName: "", userId: "assistant" }];
+
+export const Default: StoryFn = () => {
+  const [open, setOpen] = useState(true);
+  const [status, setStatus] = useState<"approved" | "declined" | "pending">("pending");
+
+  return (
+    <>
+      <AiAssistant.Fab open={open} onClick={() => setOpen((prev) => !prev)} tooltip="Nova - Assistant IA" />
+      <AiAssistant.Panel open={open} isBusy={status === "pending"}>
+        <AiAssistant.Header title="Nova" subtitle="Assistant IA" onClose={() => setOpen(false)} />
+        <Stack flex={1} minHeight={0}>
+          <Chat height="100%">
+            <Stack flex={1} minHeight={0} padding={2} spacing={1} sx={{ overflowY: "auto" }}>
+              <Alert severity="info" icon={false}>
+                Le fil (bulles, saisie, vocal) vient des composants Chat.* — ici on montre les blocs propres à l&apos;assistant.
+              </Alert>
+              <AiAssistant.ConfirmationCard
+                heading="Action à confirmer"
+                summary="Créer une conversation avec Xavier Bove"
+                status={status}
+                onAccept={() => setStatus("approved")}
+                onDecline={() => setStatus("declined")}
+                labels={{ accept: "Accepter", decline: "Annuler" }}
+              />
+              <Stack direction="row" alignItems="center" spacing={1} paddingY={1}>
+                <AiAssistant.ThinkingOrb />
+                <Chip size="small" variant="outlined" label="Recherche dans l'application…" />
+              </Stack>
+              <Typography variant="caption" color="text.secondary">
+                L&apos;aura du panneau pulse tant que status=pending (isBusy). Un envoi réarme la carte de confirmation.
+              </Typography>
+            </Stack>
+            <Chat.MessageInput
+              onSend={() => setStatus("pending")}
+              labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message..." }}
+            />
+          </Chat>
+        </Stack>
+      </AiAssistant.Panel>
+    </>
+  );
+};
 
 /**
  * The whole thing wired the way a host app does it — including VOICE input:
@@ -102,44 +144,59 @@ export const WithVoiceInput: StoryFn = () => {
   );
 };
 
-export const Default: StoryFn = () => {
+/** Panel scaffolding shared by the EmptyState stories — the thread area is the only thing they vary */
+const EmptyStatePanel = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(true);
-  const [status, setStatus] = useState<"approved" | "declined" | "pending">("pending");
 
   return (
     <>
       <AiAssistant.Fab open={open} onClick={() => setOpen((prev) => !prev)} tooltip="Nova - Assistant IA" />
-      <AiAssistant.Panel open={open} isBusy={status === "pending"}>
+      <AiAssistant.Panel open={open}>
         <AiAssistant.Header title="Nova" subtitle="Assistant IA" onClose={() => setOpen(false)} />
         <Stack flex={1} minHeight={0}>
           <Chat height="100%">
             <Stack flex={1} minHeight={0} padding={2} spacing={1} sx={{ overflowY: "auto" }}>
-              <Alert severity="info" icon={false}>
-                Le fil (bulles, saisie, vocal) vient des composants Chat.* — ici on montre les blocs propres à l&apos;assistant.
-              </Alert>
-              <AiAssistant.ConfirmationCard
-                heading="Action à confirmer"
-                summary="Créer une conversation avec Xavier Bove"
-                status={status}
-                onAccept={() => setStatus("approved")}
-                onDecline={() => setStatus("declined")}
-                labels={{ accept: "Accepter", decline: "Annuler" }}
-              />
-              <Stack direction="row" alignItems="center" spacing={1} paddingY={1}>
-                <AiAssistant.ThinkingOrb />
-                <Chip size="small" variant="outlined" label="Recherche dans l'application…" />
-              </Stack>
-              <Typography variant="caption" color="text.secondary">
-                L&apos;aura du panneau pulse tant que status=pending (isBusy). Un envoi réarme la carte de confirmation.
-              </Typography>
+              {children}
             </Stack>
             <Chat.MessageInput
-              onSend={() => setStatus("pending")}
+              onSend={() => undefined}
               labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message..." }}
             />
           </Chat>
         </Stack>
       </AiAssistant.Panel>
     </>
+  );
+};
+
+/** The empty-thread invitation in its real context — rendered in place of the message list content. */
+export const EmptyState: StoryFn = () => (
+  <EmptyStatePanel>
+    <AiAssistant.EmptyState message="Je suis Nova, votre assistant. Commandes, planning, chantiers, messagerie… demandez-moi !" />
+  </EmptyStatePanel>
+);
+
+/**
+ * The `children` slot hosting quick-action pills — how a host app offers entry points
+ * (guided tour, canned prompts) before the first message. Anything centered fits.
+ */
+export const EmptyStateWithQuickActions: StoryFn = () => {
+  const [picked, setPicked] = useState<string | null>(null);
+
+  return (
+    <EmptyStatePanel>
+      <AiAssistant.EmptyState message="Je suis Nova, votre assistant. Commandes, planning, chantiers, messagerie… demandez-moi !">
+        <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1} justifyContent="center">
+          {["Découvrir l'application", "Mes commandes en cours", "Mes events ouverts"].map((label) => (
+            <Chip key={label} size="small" variant="outlined" label={label} onClick={() => setPicked(label)} />
+          ))}
+        </Stack>
+        {picked && (
+          <Typography variant="caption" color="text.secondary">
+            Pin cliqué : {picked}
+          </Typography>
+        )}
+      </AiAssistant.EmptyState>
+    </EmptyStatePanel>
   );
 };

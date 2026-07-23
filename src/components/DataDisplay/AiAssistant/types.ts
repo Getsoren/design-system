@@ -29,6 +29,8 @@ export interface AiAssistantHeaderProps {
 export interface AiAssistantEmptyStateProps {
   /** Invitation shown while the thread is empty (e.g. "I'm Atlas, ask me anything…") */
   message: string;
+  /** Rendered centered under the invitation — quick actions, suggestion pills… */
+  children?: ReactNode;
 }
 
 export interface AiAssistantThinkingOrbProps {

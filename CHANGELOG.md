@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.60.0](https://github.com/getsoren/design-system/compare/4.59.0...4.60.0) (2026-07-23)
+
+
+### Features
+
+* add custom render for AiAssistant.EmptyState ([107f203](https://github.com/getsoren/design-system/commit/107f2034b90833308164a6f1b14216950b6fad34))
+
 ## [4.59.0](https://github.com/getsoren/design-system/compare/4.58.0...4.59.0) (2026-07-22)
 
 

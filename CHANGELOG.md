@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.60.1](https://github.com/getsoren/design-system/compare/4.60.0...4.60.1) (2026-07-24)
+
+
+### Bug Fixes
+
+* collapse menu with group make lag ([ec553b6](https://github.com/getsoren/design-system/commit/ec553b6b602b39b0b74d1fa382dab0268c317474))
+* storie [no ci] ([1929ca5](https://github.com/getsoren/design-system/commit/1929ca5917d7e01e0ed9d9caaa9a5ad1b6e85739))
+
 ## [4.60.0](https://github.com/getsoren/design-system/compare/4.59.0...4.60.0) (2026-07-23)
 
 

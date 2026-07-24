@@ -1,17 +1,9 @@
 import { Box, Chip, Collapse, Fade, List, ListItem, Stack, SvgIcon, Theme, Tooltip, Typography } from "@mui/material";
-import { isValidElement, KeyboardEvent, ReactElement, useContext, useState } from "react";
-import {
-  NavigationGroupItem,
-  NavigationItem,
-  NavigationMenuContext,
-  NavLinkProps,
-  ObjectNavigationItem,
-} from "@/components/Navigation/NavigationMenu";
+import { isValidElement, KeyboardEvent, useContext, useState } from "react";
+import { NavigationGroupItem, NavigationItem, NavigationMenuContext, ObjectNavigationItem } from "@/components/Navigation/NavigationMenu";
 import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem";
 
 export interface SideBarMenuProps {
-  NavLink?: (props: NavLinkProps) => ReactElement | null;
-  translate?: (str: string) => string;
   items?: NavigationItem[];
 }
 
@@ -84,7 +76,9 @@ const styles = {
   },
 };
 
-const chipCollapsedSx = { position: "absolute", right: -20, top: -12 };
+// The chip is absolutely positioned inside the 24px icon wrapper: shrink-to-fit width plus MUI's default
+// `max-width: 100%` would clamp it to 24px and ellipsize the label, so let it size to its content.
+const chipCollapsedSx = { maxWidth: "none", position: "absolute", right: -20, top: -12, width: "max-content" };
 
 const ChevronIcon = ({ expanded }: { expanded: boolean }) => (
   <SvgIcon
@@ -178,12 +172,13 @@ const SideBarMenuGroup = ({ group }: { group: NavigationGroupItem }) => {
 
   return (
     <Box component="li" sx={styles.groupItem}>
-      {!isCollapsed && (
+      {/* Animate the header height when the sidebar collapses so items below slide smoothly instead of jumping. */}
+      <Collapse in={!isCollapsed}>
         <Box
           component="div"
-          role={collapsible ? "button" : undefined}
-          tabIndex={collapsible ? 0 : undefined}
-          aria-expanded={collapsible ? expanded : undefined}
+          role={collapsible && !isCollapsed ? "button" : undefined}
+          tabIndex={collapsible && !isCollapsed ? 0 : undefined}
+          aria-expanded={collapsible && !isCollapsed ? expanded : undefined}
           onClick={toggle}
           onKeyDown={handleKeyDown}
           sx={{ ...styles.groupHeader, cursor: collapsible ? "pointer" : "default" }}
@@ -193,7 +188,7 @@ const SideBarMenuGroup = ({ group }: { group: NavigationGroupItem }) => {
           </Typography>
           {collapsible && <ChevronIcon expanded={expanded} />}
         </Box>
-      )}
+      </Collapse>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List disablePadding component="ul">
           {visibleItems.map((child, index) => (
@@ -207,8 +202,8 @@ const SideBarMenuGroup = ({ group }: { group: NavigationGroupItem }) => {
   );
 };
 
-const SideBarMenu = ({ items, ...props }: SideBarMenuProps) => {
-  const { NavLink = props.NavLink, isMobile } = useContext(NavigationMenuContext);
+const SideBarMenu = ({ items }: SideBarMenuProps) => {
+  const { isMobile } = useContext(NavigationMenuContext);
 
   return (
     <Box px={2} component="nav">

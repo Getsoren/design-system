@@ -1,5 +1,6 @@
 export default {
   apply: "Apply",
+  clear: "Clear",
   clickToUpload: "Click to upload",
   close: "Close",
   closed: "Closed",

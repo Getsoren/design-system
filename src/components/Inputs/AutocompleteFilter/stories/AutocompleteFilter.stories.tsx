@@ -89,6 +89,45 @@ const TemplateUniqueSelection: StoryFn<typeof AutocompleteFilter> = (args) => {
   );
 };
 
+const statuses = [
+  { id: "1", label: "En cours", value: "ongoing" },
+  { id: "2", label: "Confirmée", value: "confirmed" },
+  { id: "3", label: "Livrée", value: "delivered" },
+  { id: "4", label: "Annulée", value: "cancelled" },
+];
+
+const TemplateChipFilterBar: StoryFn<typeof AutocompleteFilter> = (args) => {
+  const [status, setStatus] = useState<AutocompleteFilterOption[]>([statuses[0]]);
+  const [users, setUsers] = useState<AutocompleteFilterOption[]>([data[0], data[1], data[2]]);
+  const [empty, setEmpty] = useState<AutocompleteFilterOption[]>([]);
+
+  return (
+    <Stack direction="row" spacing={1.5} alignItems="center" height="100%" flexWrap="wrap" useFlexGap>
+      <AutocompleteFilter
+        {...args}
+        label="Statut"
+        onChange={(_: SyntheticEvent, value: AutocompleteFilterOption[]) => setStatus(value)}
+        options={statuses}
+        value={status}
+      />
+      <AutocompleteFilter
+        {...args}
+        label="Utilisateurs"
+        onChange={(_: SyntheticEvent, value: AutocompleteFilterOption[]) => setUsers(value)}
+        options={data}
+        value={users}
+      />
+      <AutocompleteFilter
+        {...args}
+        label="Chantier"
+        onChange={(_: SyntheticEvent, value: AutocompleteFilterOption[]) => setEmpty(value)}
+        options={data}
+        value={empty}
+      />
+    </Stack>
+  );
+};
+
 const TemplateChip: StoryFn<typeof AutocompleteFilter> = (args) => {
   const [selectedOptionsXSmall, setSelectedOptionsXSmall] = useState<AutocompleteFilterOption[]>([]);
   const [selectedOptionsSmall, setSelectedOptionsSmall] = useState<AutocompleteFilterOption[]>([]);
@@ -220,8 +259,14 @@ UniqueSelection.args = {
 
 export const ChipVariant = TemplateChip.bind({});
 ChipVariant.args = {
+  label: "Utilisateurs",
   options: data,
-  placeholder: "Search",
+  variant: "chip",
+};
+
+export const ChipVariantFilterBar = TemplateChipFilterBar.bind({});
+ChipVariantFilterBar.args = {
+  size: "medium",
   variant: "chip",
 };
 

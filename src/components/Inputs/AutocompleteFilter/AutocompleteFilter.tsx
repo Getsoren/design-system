@@ -24,7 +24,6 @@ import {
   Tooltip,
   TooltipProps,
   Typography,
-  useTheme,
 } from "@mui/material";
 import type { AutocompleteChangeDetails, AutocompleteChangeReason } from "@mui/material/useAutocomplete";
 import {
@@ -97,12 +96,6 @@ export interface AutocompleteFilterProps<
    *  @default placeholder
    */
   label?: string;
-  /**
-   *  If true, collapses the selection into a summary: one value is spelled out ("Label : value"),
-   *  several collapse to a count badge, and the label stays visible as placeholder otherwise
-   *  @default false
-   */
-  summary?: boolean;
   /**
    *  If true, the checkbox is disabled
    *  @default false
@@ -234,14 +227,15 @@ const getSummary = (value: string | AutocompleteFilterOption | AutocompleteFilte
   return { count: 0, text: label ? `${label} : ${texts[0]}` : texts[0] };
 };
 
-const SummaryCount = ({ children }: { children: number }) => (
+const SummaryCount = ({ children, inverted }: { children: number; inverted?: boolean }) => (
   <Box
     component="span"
     sx={{
       alignItems: "center",
-      backgroundColor: "text.primary",
+      // Inverted on the chip variant, whose selected background is already dark
+      backgroundColor: inverted ? "grey.100" : "primary.main",
       borderRadius: 99,
-      color: "text.contrast",
+      color: inverted ? "text.primary" : "primary.contrastText",
       display: "inline-flex",
       flexShrink: 0,
       fontSize: pxToRem(11),
@@ -269,24 +263,29 @@ const getFinalValue = (value: string | AutocompleteFilterOption | AutocompleteFi
 };
 
 const Count = (variant?: "standard" | "chip" | "filled") => {
-  const { palette } = useTheme();
-  const color = palette.mode === "light" ? "default" : "primary";
   const isChipVariant = variant === "chip";
 
   return function RenderCount(more: number) {
     return (
       <Badge
         badgeContent={`+${more}`}
-        color={color}
         sx={{
           "& .MuiBadge-badge": {
-            ...(isChipVariant && {
-              backgroundColor: "grey.100",
-              color: "text.primary",
-              // Slightly shorter than the badge's 20px default so it never touches the chip's edges
-              height: 16,
-              minWidth: 16,
-            }),
+            ...(isChipVariant
+              ? {
+                  // Inverted on the chip variant, whose selected background is already dark
+                  backgroundColor: "grey.100",
+                  color: "text.primary",
+                  // Slightly shorter than the badge's 20px default so it never touches the chip's edges
+                  height: 16,
+                  minWidth: 16,
+                }
+              : {
+                  // Same primary pill as the summary count and the filter icon badge,
+                  // so every count in the filter bar reads the same
+                  backgroundColor: "primary.main",
+                  color: "primary.contrastText",
+                }),
             position: "relative",
             transform: "none",
           },
@@ -438,7 +437,6 @@ const AutocompleteFilter = <
     disableCheckbox,
     placeholder,
     label,
-    summary,
     localeText,
     disableReset,
     disableSelectAll,
@@ -456,13 +454,13 @@ const AutocompleteFilter = <
     renderValue,
     width,
     sx,
+    slotProps,
+    tooltip,
+    tooltipProps,
     size = "small",
     disableCloseOnSelect = true,
     multiple = true,
     options = [],
-    slotProps,
-    tooltip,
-    tooltipProps,
     ...props
   }: AutocompleteFilterProps<Multiple, DisableClearable, FreeSolo, ChipComponent, Value> & { inputValue?: string },
   ref: Ref<HTMLDivElement>,
@@ -475,9 +473,10 @@ const AutocompleteFilter = <
   const isFilledVariant = variant === "filled";
   const hasValue = Array.isArray(value) ? !!value.length : value !== undefined && value !== null;
   const finalValue = getFinalValue(value, multiple);
-  const withSummary = !!summary;
   const summaryLabel = label ?? placeholder;
+  const withSummary = !!summaryLabel;
   const isSearching = internalOpen && !!finalInputValue;
+  const isClearable = (!!finalInputValue || hasValue) && !disableClearable;
   const showsSummary = withSummary && hasValue && !isSearching;
   const showsLabelInPlaceholder = withSummary && !showsSummary;
 
@@ -619,8 +618,10 @@ const AutocompleteFilter = <
 
               const { count, text } = getSummary(selectedValue as AutocompleteFilterOption[], summaryLabel);
 
+              // No left margin: the summary sits where the placeholder label sits,
+              // the field keeps the same indent with or without a selection
               return (
-                <Box component="span" sx={{ alignItems: "center", display: "inline-flex", marginLeft: 1, minWidth: 0 }}>
+                <Box component="span" sx={{ alignItems: "center", display: "inline-flex", minWidth: 0 }}>
                   <Typography
                     component="span"
                     overflow="hidden"
@@ -630,29 +631,51 @@ const AutocompleteFilter = <
                   >
                     {text}
                   </Typography>
-                  {count > 1 && <SummaryCount>{count}</SummaryCount>}
+                  {count > 1 && <SummaryCount inverted={isChipVariant}>{count}</SummaryCount>}
                 </Box>
               );
             }
           : multiple
             ? (selectedValue, getItemProps, ownerState) => {
-                if (Array.isArray(selectedValue)) {
-                  return selectedValue.map((option, index) => {
-                    if (ownerState?.focused) {
-                      return null;
-                    }
-
-                    const { key } = getItemProps({ index }) as ItemPropsWithKey;
-
-                    return (
-                      <Typography key={key} marginX={1} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
-                        {typeof option === "object" && "label" in option && option?.label ? option.label : option.toString()}
-                      </Typography>
-                    );
-                  });
+                if (!Array.isArray(selectedValue) || !selectedValue.length) {
+                  return null;
                 }
 
-                return null;
+                // Hide the values only while the user is typing, so the input has room for the search text
+                if (isSearching) {
+                  return null;
+                }
+
+                const optionLabel = (option: AutocompleteFilterOption<Value> | string) =>
+                  typeof option === "object" && "label" in option && option?.label ? option.label : option.toString();
+
+                // MUI only collapses the tags to limitTags + "+N" when the field is blurred.
+                // Collapse them ourselves while it is focused, so the selection stays
+                // visible — and live — while the menu is open, in the same shape as closed.
+                if (ownerState?.focused) {
+                  const [first, ...more] = selectedValue;
+                  const { key } = getItemProps({ index: 0 }) as ItemPropsWithKey;
+
+                  return (
+                    <>
+                      {/* minWidth 0 so the value ellipsises instead of pushing the input (and its caret) out of the field */}
+                      <Typography key={key} marginRight={1} minWidth={0} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
+                        {optionLabel(first)}
+                      </Typography>
+                      {more.length > 0 && Count(variant)(more.length)}
+                    </>
+                  );
+                }
+
+                return selectedValue.map((option, index) => {
+                  const { key } = getItemProps({ index }) as ItemPropsWithKey;
+
+                  return (
+                    <Typography key={key} marginRight={1} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
+                      {optionLabel(option)}
+                    </Typography>
+                  );
+                });
               }
             : undefined)
       }
@@ -672,15 +695,14 @@ const AutocompleteFilter = <
 
         const getAdornmentElement = () => {
           if (isFilledVariant) {
-            const isClearable = (finalInputValue || hasValue) && !disableClearable;
-
             return (
               <InputAdornment
                 position="end"
                 sx={{
                   color: "text.primary",
                   position: "absolute",
-                  right: 6,
+                  // Mirrors the left padding, a touch more air on the tallest size
+                  right: size === "medium" ? "8px" : "6px",
                 }}
               >
                 {isClearable ? (
@@ -742,7 +764,7 @@ const AutocompleteFilter = <
                   transition: "transform 0.2s ease-in-out",
                 }}
               >
-                {(finalInputValue || hasValue) && !disableClearable && (
+                {isClearable && (
                   <IconButton
                     size="small"
                     onClick={(e) => {
@@ -789,12 +811,11 @@ const AutocompleteFilter = <
                   sx={{
                     cursor: "pointer",
                     transition: "opacity 0.2s ease-in-out",
-                    ...((finalInputValue || hasValue) &&
-                      !disableClearable && {
-                        ".MuiTextField-root:hover &": {
-                          opacity: 0,
-                        },
-                      }),
+                    ...(isClearable && {
+                      ".MuiTextField-root:hover &": {
+                        opacity: 0,
+                      },
+                    }),
                   }}
                 />
               </InputAdornment>
@@ -846,8 +867,20 @@ const AutocompleteFilter = <
             sx={{
               "& .MuiInputBase-root .MuiInputBase-input": {
                 flex: !(multiple && (internalOpen || finalInputValue)) || internalOpen ? 1 : 0,
-                minWidth: 0,
+                // Breathing room between the summary/count and the caret
+                ...(internalOpen && hasValue && { marginLeft: 0.75 }),
+                // Keep the placeholder label from being clipped by the min-width floor.
+                // Once open, keep enough width for the blinking text caret: squeezed
+                // to zero by the summary, nothing shows the field accepts typing.
+                minWidth: showsLabelInPlaceholder ? "max-content" : internalOpen ? 24 : 0,
               },
+              // Keep the input on the summary line instead of wrapping the filter
+              // to two rows — the chip and filled variants do it in their blocks
+              ...(!(isChipVariant || isFilledVariant) && {
+                "& .MuiInputBase-root": {
+                  flexWrap: "nowrap",
+                },
+              }),
               ...(isChipVariant && {
                 "& .MuiInputBase-root": {
                   backgroundColor: hasValue ? "text.primary" : "grey.100",
@@ -856,6 +889,8 @@ const AutocompleteFilter = <
                   fieldset: {
                     borderColor: "transparent !important",
                   },
+                  // Keep the input on the summary line instead of wrapping the filter to two rows
+                  flexWrap: "nowrap",
                   fontSize: getChipStyle(size).fontSize,
                   height: getChipStyle(size).height,
                   input: {
@@ -901,10 +936,9 @@ const AutocompleteFilter = <
                       color: "text.primary",
                       opacity: 1,
                     },
-                    cursor: "pointer",
+                    // A text cursor while open, so the field reads as an input
+                    cursor: internalOpen ? "text" : "pointer",
                     padding: "0 !important",
-                    // Keep the placeholder label from being clipped once it passes the 90px floor
-                    ...(showsLabelInPlaceholder && { minWidth: "max-content !important" }),
                   },
                   maxWidth: FILLED_MAX_WIDTH,
                   minWidth: 90,
@@ -912,9 +946,10 @@ const AutocompleteFilter = <
                     fontSize: getFilledStyle(size).fontSize,
                     margin: 0,
                   },
-                  // MUI gives sizeSmall a 6px padding while medium and the custom xSmall get 9px — align all three
-                  paddingLeft: "9px !important",
-                  paddingRight: "30px !important",
+                  // MUI gives sizeSmall a 6px padding while medium and the custom xSmall get 9px —
+                  // align the three, with a touch more air on the tallest size
+                  paddingLeft: size === "medium" ? "11px !important" : "9px !important",
+                  paddingRight: size === "medium" ? "32px !important" : "30px !important",
                   paddingY: "0 !important",
                 },
               }),

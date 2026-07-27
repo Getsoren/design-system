@@ -89,6 +89,48 @@ const TemplateUniqueSelection: StoryFn<typeof AutocompleteFilter> = (args) => {
   );
 };
 
+const statuses = [
+  { id: "1", label: "En cours", value: "ongoing" },
+  { id: "2", label: "Confirmée", value: "confirmed" },
+  { id: "3", label: "Livrée", value: "delivered" },
+  { id: "4", label: "Annulée", value: "cancelled" },
+];
+
+const TemplateFilled: StoryFn<typeof AutocompleteFilter> = (args) => {
+  const [status, setStatus] = useState<AutocompleteFilterOption[]>([statuses[0]]);
+  const [users, setUsers] = useState<AutocompleteFilterOption[]>([data[0], data[1], data[2]]);
+  const [empty, setEmpty] = useState<AutocompleteFilterOption[]>([]);
+
+  return (
+    <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <AutocompleteFilter
+        {...args}
+        size="xSmall"
+        label="Statut"
+        onChange={(_: SyntheticEvent, value: AutocompleteFilterOption[]) => setStatus(value)}
+        options={statuses}
+        value={status}
+      />
+      <AutocompleteFilter
+        {...args}
+        size="small"
+        label="Utilisateurs"
+        onChange={(_: SyntheticEvent, value: AutocompleteFilterOption[]) => setUsers(value)}
+        options={data}
+        value={users}
+      />
+      <AutocompleteFilter
+        {...args}
+        size="medium"
+        label="Chantier"
+        onChange={(_: SyntheticEvent, value: AutocompleteFilterOption[]) => setEmpty(value)}
+        options={data}
+        value={empty}
+      />
+    </Stack>
+  );
+};
+
 const TemplateChip: StoryFn<typeof AutocompleteFilter> = (args) => {
   const [selectedOptionsXSmall, setSelectedOptionsXSmall] = useState<AutocompleteFilterOption[]>([]);
   const [selectedOptionsSmall, setSelectedOptionsSmall] = useState<AutocompleteFilterOption[]>([]);
@@ -223,6 +265,11 @@ ChipVariant.args = {
   options: data,
   placeholder: "Search",
   variant: "chip",
+};
+
+export const FilledVariant = TemplateFilled.bind({});
+FilledVariant.args = {
+  variant: "filled",
 };
 
 export const WithTooltip = TemplateTooltip.bind({});

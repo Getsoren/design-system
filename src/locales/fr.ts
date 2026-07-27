@@ -1,5 +1,6 @@
 export default {
   apply: "Appliquer",
+  clear: "Effacer",
   clickToUpload: "Cliquez pour télécharger",
   close: "Fermer",
   closed: "Clôturé",

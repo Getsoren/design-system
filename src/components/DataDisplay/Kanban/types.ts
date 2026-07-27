@@ -104,7 +104,7 @@ export interface KanbanProps {
   /**
    * Variant for the chip column.
    */
-  chipColumVariant?: "filled" | "outlined";
+  chipColumVariant?: ChipProps["variant"];
   /**
    * If true, the Kanban column will display a dot indicator in the chip.
    */

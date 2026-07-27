@@ -3,6 +3,7 @@ import {
   AutocompleteValue,
   Avatar,
   Badge,
+  Box,
   Button,
   Checkbox,
   ChipTypeMap,
@@ -19,6 +20,7 @@ import {
   Paper,
   PaperProps,
   TextField,
+  Theme,
   Tooltip,
   TooltipProps,
   Typography,
@@ -71,7 +73,7 @@ export interface AutocompleteFilterProps<
   /**
    * Variant of the Autocomplete
    */
-  variant?: "standard" | "chip";
+  variant?: "standard" | "chip" | "filled";
   /**
    * Width of the Autocomplete
    */
@@ -90,6 +92,17 @@ export interface AutocompleteFilterProps<
    *  Placeholder
    */
   placeholder?: string;
+  /**
+   *  Name of the filtered dimension, kept visible in the summary once a value is selected
+   *  @default placeholder
+   */
+  label?: string;
+  /**
+   *  If true, collapses the selection into a summary: one value is spelled out ("Label : value"),
+   *  several collapse to a count badge, and the label stays visible as placeholder otherwise
+   *  @default false
+   */
+  summary?: boolean;
   /**
    *  If true, the checkbox is disabled
    *  @default false
@@ -147,6 +160,12 @@ export interface AutocompleteFilterProps<
 
 const checkboxStyle = { padding: 0, paddingRight: 1 };
 
+/** Widest a filled filter may get before its summary ellipsises */
+const FILLED_MAX_WIDTH = 260;
+
+/** A flat colour as a background layer, so rest and hover tints can stack */
+const overlay = (color: string) => `linear-gradient(${color}, ${color})`;
+
 const getChipStyle = (size: "xSmall" | "small" | "medium") => {
   if (size === "xSmall") {
     return {
@@ -168,6 +187,77 @@ const getChipStyle = (size: "xSmall" | "small" | "medium") => {
   };
 };
 
+const getFilledStyle = (size: "xSmall" | "small" | "medium") => {
+  if (size === "xSmall") {
+    return {
+      fontSize: pxToRem(12),
+      height: 26,
+    };
+  }
+
+  if (size === "small") {
+    return {
+      fontSize: pxToRem(13),
+      height: 32,
+    };
+  }
+
+  // small and medium share the font size on purpose (a small Button CTA is 13px), only the height differs
+  return {
+    fontSize: pxToRem(13),
+    height: 40,
+  };
+};
+
+const getOptionText = (option: AutocompleteFilterOption | string) => {
+  if (typeof option === "string") {
+    return option;
+  }
+
+  return typeof option?.label === "string" ? option.label : "";
+};
+
+/** Summary shown inside the filter once it holds a value: one value is spelled out, several collapse to a count */
+const getSummary = (value: string | AutocompleteFilterOption | AutocompleteFilterOption[] | null | undefined, label?: string) => {
+  const selected = Array.isArray(value) ? value : [value];
+  const texts = selected.filter(Boolean).map((option) => getOptionText(option as AutocompleteFilterOption | string));
+
+  if (!texts.length) {
+    return { count: 0, text: label || "" };
+  }
+
+  if (texts.length > 1) {
+    return { count: texts.length, text: label || "" };
+  }
+
+  // U+202F (narrow no-break space) before the colon, per French typography.
+  return { count: 0, text: label ? `${label} : ${texts[0]}` : texts[0] };
+};
+
+const SummaryCount = ({ children }: { children: number }) => (
+  <Box
+    component="span"
+    sx={{
+      alignItems: "center",
+      backgroundColor: "text.primary",
+      borderRadius: 99,
+      color: "text.contrast",
+      display: "inline-flex",
+      flexShrink: 0,
+      fontSize: pxToRem(11),
+      fontWeight: 500,
+      height: 18,
+      justifyContent: "center",
+      lineHeight: 1,
+      marginLeft: 0.75,
+      minWidth: 18,
+      paddingX: "5px",
+    }}
+  >
+    {children}
+  </Box>
+);
+
 const getFinalValue = (value: string | AutocompleteFilterOption | AutocompleteFilterOption[] | null | undefined, multiple?: boolean) => {
   if (multiple) {
     if (!value) {
@@ -178,7 +268,7 @@ const getFinalValue = (value: string | AutocompleteFilterOption | AutocompleteFi
   return value || null;
 };
 
-const Count = (variant?: "standard" | "chip") => {
+const Count = (variant?: "standard" | "chip" | "filled") => {
   const { palette } = useTheme();
   const color = palette.mode === "light" ? "default" : "primary";
   const isChipVariant = variant === "chip";
@@ -193,6 +283,9 @@ const Count = (variant?: "standard" | "chip") => {
             ...(isChipVariant && {
               backgroundColor: "grey.100",
               color: "text.primary",
+              // Slightly shorter than the badge's 20px default so it never touches the chip's edges
+              height: 16,
+              minWidth: 16,
             }),
             position: "relative",
             transform: "none",
@@ -344,6 +437,8 @@ const AutocompleteFilter = <
     onChange,
     disableCheckbox,
     placeholder,
+    label,
+    summary,
     localeText,
     disableReset,
     disableSelectAll,
@@ -372,12 +467,19 @@ const AutocompleteFilter = <
   }: AutocompleteFilterProps<Multiple, DisableClearable, FreeSolo, ChipComponent, Value> & { inputValue?: string },
   ref: Ref<HTMLDivElement>,
 ) => {
+  const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(false);
   const [internalInputValue, setInternalInputValue] = useState("");
   const finalInputValue = inputValue || internalInputValue;
   const isChipVariant = variant === "chip";
+  const isFilledVariant = variant === "filled";
   const hasValue = Array.isArray(value) ? !!value.length : value !== undefined && value !== null;
   const finalValue = getFinalValue(value, multiple);
+  const withSummary = !!summary;
+  const summaryLabel = label ?? placeholder;
+  const isSearching = internalOpen && !!finalInputValue;
+  const showsSummary = withSummary && hasValue && !isSearching;
+  const showsLabelInPlaceholder = withSummary && !showsSummary;
 
   const handleChange = (
     event: SyntheticEvent,
@@ -509,30 +611,58 @@ const AutocompleteFilter = <
       }
       renderValue={
         renderValue ||
-        (multiple
-          ? (selectedValue, getItemProps, ownerState) => {
-              if (Array.isArray(selectedValue)) {
-                return selectedValue.map((option, index) => {
-                  if (ownerState?.focused) {
-                    return null;
-                  }
-
-                  const { key } = getItemProps({ index }) as ItemPropsWithKey;
-
-                  return (
-                    <Typography key={key} marginX={1} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
-                      {typeof option === "object" && "label" in option && option?.label ? option.label : option.toString()}
-                    </Typography>
-                  );
-                });
+        (withSummary
+          ? (selectedValue) => {
+              if (!showsSummary) {
+                return null;
               }
 
-              return null;
+              const { count, text } = getSummary(selectedValue as AutocompleteFilterOption[], summaryLabel);
+
+              return (
+                <Box component="span" sx={{ alignItems: "center", display: "inline-flex", marginLeft: 1, minWidth: 0 }}>
+                  <Typography
+                    component="span"
+                    overflow="hidden"
+                    sx={{ fontSize: "inherit", fontWeight: "inherit" }}
+                    textOverflow="ellipsis"
+                    whiteSpace="nowrap"
+                  >
+                    {text}
+                  </Typography>
+                  {count > 1 && <SummaryCount>{count}</SummaryCount>}
+                </Box>
+              );
             }
-          : undefined)
+          : multiple
+            ? (selectedValue, getItemProps, ownerState) => {
+                if (Array.isArray(selectedValue)) {
+                  return selectedValue.map((option, index) => {
+                    if (ownerState?.focused) {
+                      return null;
+                    }
+
+                    const { key } = getItemProps({ index }) as ItemPropsWithKey;
+
+                    return (
+                      <Typography key={key} marginX={1} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
+                        {typeof option === "object" && "label" in option && option?.label ? option.label : option.toString()}
+                      </Typography>
+                    );
+                  });
+                }
+
+                return null;
+              }
+            : undefined)
       }
       renderInput={(params) => {
         const getPlaceholder = () => {
+          // No placeholder while the summary is on screen, otherwise the label prints twice
+          if (withSummary) {
+            return showsLabelInPlaceholder ? (placeholder ?? summaryLabel) : undefined;
+          }
+
           if (!internalOpen && ((Array.isArray(value) && value.length) || (!Array.isArray(value) && value))) {
             return undefined;
           }
@@ -541,6 +671,65 @@ const AutocompleteFilter = <
         };
 
         const getAdornmentElement = () => {
+          if (isFilledVariant) {
+            const isClearable = (finalInputValue || hasValue) && !disableClearable;
+
+            return (
+              <InputAdornment
+                position="end"
+                sx={{
+                  color: "text.primary",
+                  position: "absolute",
+                  right: 6,
+                }}
+              >
+                {isClearable ? (
+                  // Always visible, hover does not exist on a touch screen
+                  <IconButton
+                    aria-label={t("clear")}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setInternalInputValue("");
+                      onInputChange?.(e, "", "clear");
+                      // Clear the value only if there is a value
+                      if (hasValue) {
+                        onChange?.(e, multiple ? [] : null, "clear");
+                      }
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    size="small"
+                    sx={{
+                      "& .MuiSvgIcon-root": {
+                        fontSize: pxToRem(16),
+                        pointerEvents: "none",
+                      },
+                      "&:hover": { backgroundColor: "action.selected" },
+                      color: "text.primary",
+                      cursor: "pointer",
+                      padding: "3px",
+                      pointerEvents: "auto",
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                ) : (
+                  <ChevronIcon
+                    fontSize="small"
+                    sx={{
+                      cursor: "pointer",
+                      transform: internalOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 0.2s ease-in-out",
+                    }}
+                  />
+                )}
+              </InputAdornment>
+            );
+          }
+
           if (isChipVariant) {
             return (
               <InputAdornment
@@ -681,12 +870,61 @@ const AutocompleteFilter = <
                   paddingY: "0 !important",
                 },
               }),
+              ...(isFilledVariant && {
+                "& .MuiInputBase-root": {
+                  "&:hover": {
+                    // Overlays stack as background layers, so a set filter keeps its selected tint and gains the hover one on top
+                    backgroundImage: (theme: Theme) =>
+                      hasValue
+                        ? `${overlay(theme.palette.action.selected)}, ${overlay(theme.palette.action.hover)}`
+                        : overlay(theme.palette.action.hover),
+                  },
+                  backgroundColor: "grey.100",
+                  // Keep the input on the summary line instead of wrapping the filter to two rows
+                  flexWrap: "nowrap",
+                  ...(hasValue && {
+                    backgroundImage: (theme: Theme) => overlay(theme.palette.action.selected),
+                  }),
+                  // Explicit px: a bare number is multiplied by shape.borderRadius, `borderRadius: 20` came out as 160px
+                  borderRadius: (theme: Theme) => `${theme.shape.borderRadius}px`,
+                  color: "text.primary",
+                  cursor: "pointer",
+                  fieldset: {
+                    borderColor: "transparent !important",
+                  },
+                  fontSize: getFilledStyle(size).fontSize,
+                  fontWeight: 400,
+                  height: getFilledStyle(size).height,
+                  input: {
+                    // The placeholder is a label here, not a hint, so it keeps full contrast
+                    "&::placeholder": {
+                      color: "text.primary",
+                      opacity: 1,
+                    },
+                    cursor: "pointer",
+                    padding: "0 !important",
+                    // Keep the placeholder label from being clipped once it passes the 90px floor
+                    ...(showsLabelInPlaceholder && { minWidth: "max-content !important" }),
+                  },
+                  maxWidth: FILLED_MAX_WIDTH,
+                  minWidth: 90,
+                  "p.MuiTypography-root": {
+                    fontSize: getFilledStyle(size).fontSize,
+                    margin: 0,
+                  },
+                  // MUI gives sizeSmall a 6px padding while medium and the custom xSmall get 9px — align all three
+                  paddingLeft: "9px !important",
+                  paddingRight: "30px !important",
+                  paddingY: "0 !important",
+                },
+              }),
             }}
             {...params}
             slotProps={{
               htmlInput: {
                 ...params.inputProps,
                 ...(placeholder && { "aria-label": placeholder }),
+                ...(withSummary && showsLabelInPlaceholder && summaryLabel && { size: summaryLabel.length + 2 }),
               },
               input: {
                 ...params.InputProps,

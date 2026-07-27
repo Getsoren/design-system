@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import type { Interpolation } from "@mui/system";
 import { Children, CSSProperties, isValidElement } from "react";
+import CheckboxIcon from "@/components/Inputs/Checkbox/CheckboxIcon";
 
 // Local type definition since OverridesStyleRules is not exported from @mui/material/styles
 type OverridesStyleRules<
@@ -726,6 +727,19 @@ const commonThemeOptions: MuiThemeOptions = {
         root: ({ theme }) => ({ padding: theme.spacing(3) }),
       },
     },
+    MuiCheckbox: {
+      defaultProps: {
+        checkedIcon: <CheckboxIcon checked />,
+        icon: <CheckboxIcon />,
+        indeterminateIcon: <CheckboxIcon indeterminate />,
+      },
+      styleOverrides: {
+        root: ({ theme }) => ({
+          "&:hover": { backgroundColor: "transparent" },
+          "&:hover .MuiBox-root": { borderColor: theme.palette.text.primary },
+        }),
+      },
+    },
     MuiChip: {
       styleOverrides: {
         root: ({ theme, ownerState }) => {
@@ -1323,10 +1337,15 @@ const commonThemeOptions: MuiThemeOptions = {
     },
     MuiTooltip: {
       styleOverrides: {
-        tooltip: {
+        // Fully opaque: MUI's default rgba(97,97,97,0.92) let the background bleed through. Same grey (A700), no alpha.
+        arrow: ({ theme }) => ({
+          color: theme.palette.grey.A700,
+        }),
+        tooltip: ({ theme }) => ({
+          backgroundColor: theme.palette.grey.A700,
           fontSize: pxToRem(14),
           letterSpacing: 0,
-        },
+        }),
       },
     },
   },

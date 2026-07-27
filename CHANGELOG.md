@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.61.0](https://github.com/getsoren/design-system/compare/4.60.1...4.61.0) (2026-07-27)
+
+
+### Features
+
+* add story indeterminate for checkbox ([16ac185](https://github.com/getsoren/design-system/commit/16ac185147c2cc3d15ca653be85f6f2b2c589bb6))
+* autocomplete filter chip variant ([c210656](https://github.com/getsoren/design-system/commit/c2106567bd257b4b81fd4b2c71f2d096231d96ab))
+* improvement ([9dfe3cd](https://github.com/getsoren/design-system/commit/9dfe3cd70ba0de4a105c76b4bf913c98c2ead822))
+* improvement ([812996c](https://github.com/getsoren/design-system/commit/812996c14d36d405b05d9a2e0e2464811b31921d))
+* improvement ([f133203](https://github.com/getsoren/design-system/commit/f133203a8bd863e2d5c2d073bdbfad2fe5727177))
+* rounded checkbox icon ([896a64b](https://github.com/getsoren/design-system/commit/896a64b943591d12ce0ad5930ea12a23d8e51844))
+
+
+### Bug Fixes
+
+* **AutocompleteFilter:** paddding small size for filled variant ([2c16a7a](https://github.com/getsoren/design-system/commit/2c16a7ad5db337c7a5027b580151bff65fb05242))
+* kanban column header ([e2db30f](https://github.com/getsoren/design-system/commit/e2db30f76550108957355aa9392bd06d3c558e31))
+* tooltip background ([43ee9c6](https://github.com/getsoren/design-system/commit/43ee9c6bb7d6754f8a10e7583ceaf2f01f9230b2))
+
 ## [4.60.1](https://github.com/getsoren/design-system/compare/4.60.0...4.60.1) (2026-07-24)
 
 

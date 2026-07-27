@@ -96,15 +96,16 @@ const statuses = [
   { id: "4", label: "Annulée", value: "cancelled" },
 ];
 
-const TemplateChipFilterBar: StoryFn<typeof AutocompleteFilter> = (args) => {
+const TemplateFilled: StoryFn<typeof AutocompleteFilter> = (args) => {
   const [status, setStatus] = useState<AutocompleteFilterOption[]>([statuses[0]]);
   const [users, setUsers] = useState<AutocompleteFilterOption[]>([data[0], data[1], data[2]]);
   const [empty, setEmpty] = useState<AutocompleteFilterOption[]>([]);
 
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" height="100%" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
       <AutocompleteFilter
         {...args}
+        size="xSmall"
         label="Statut"
         onChange={(_: SyntheticEvent, value: AutocompleteFilterOption[]) => setStatus(value)}
         options={statuses}
@@ -112,6 +113,7 @@ const TemplateChipFilterBar: StoryFn<typeof AutocompleteFilter> = (args) => {
       />
       <AutocompleteFilter
         {...args}
+        size="small"
         label="Utilisateurs"
         onChange={(_: SyntheticEvent, value: AutocompleteFilterOption[]) => setUsers(value)}
         options={data}
@@ -119,6 +121,7 @@ const TemplateChipFilterBar: StoryFn<typeof AutocompleteFilter> = (args) => {
       />
       <AutocompleteFilter
         {...args}
+        size="medium"
         label="Chantier"
         onChange={(_: SyntheticEvent, value: AutocompleteFilterOption[]) => setEmpty(value)}
         options={data}
@@ -259,15 +262,14 @@ UniqueSelection.args = {
 
 export const ChipVariant = TemplateChip.bind({});
 ChipVariant.args = {
-  label: "Utilisateurs",
   options: data,
+  placeholder: "Search",
   variant: "chip",
 };
 
-export const ChipVariantFilterBar = TemplateChipFilterBar.bind({});
-ChipVariantFilterBar.args = {
-  size: "medium",
-  variant: "chip",
+export const FilledVariant = TemplateFilled.bind({});
+FilledVariant.args = {
+  variant: "filled",
 };
 
 export const WithTooltip = TemplateTooltip.bind({});

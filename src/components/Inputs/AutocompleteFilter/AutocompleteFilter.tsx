@@ -73,7 +73,7 @@ export interface AutocompleteFilterProps<
   /**
    * Variant of the Autocomplete
    */
-  variant?: "standard" | "chip";
+  variant?: "standard" | "chip" | "filled";
   /**
    * Width of the Autocomplete
    */
@@ -93,7 +93,7 @@ export interface AutocompleteFilterProps<
    */
   placeholder?: string;
   /**
-   *  Name of the filtered dimension, kept visible in the `chip` variant once a value is selected
+   *  Name of the filtered dimension, kept visible in the `filled` variant once a value is selected
    *  @default placeholder
    */
   label?: string;
@@ -154,13 +154,34 @@ export interface AutocompleteFilterProps<
 
 const checkboxStyle = { padding: 0, paddingRight: 1 };
 
-/** Widest a chip filter may get before its summary ellipsises */
-const CHIP_MAX_WIDTH = 260;
+/** Widest a filled filter may get before its summary ellipsises */
+const FILLED_MAX_WIDTH = 260;
 
 /** A flat colour as a background layer, so rest and hover tints can stack */
 const overlay = (color: string) => `linear-gradient(${color}, ${color})`;
 
 const getChipStyle = (size: "xSmall" | "small" | "medium") => {
+  if (size === "xSmall") {
+    return {
+      fontSize: pxToRem(12),
+      height: 20,
+    };
+  }
+
+  if (size === "small") {
+    return {
+      fontSize: pxToRem(13),
+      height: 24,
+    };
+  }
+
+  return {
+    fontSize: pxToRem(14),
+    height: 32,
+  };
+};
+
+const getFilledStyle = (size: "xSmall" | "small" | "medium") => {
   if (size === "xSmall") {
     return {
       fontSize: pxToRem(12),
@@ -190,8 +211,8 @@ const getOptionText = (option: AutocompleteFilterOption | string) => {
   return typeof option?.label === "string" ? option.label : "";
 };
 
-/** Summary shown inside a chip filter once it holds a value: one value is spelled out, several collapse to a count */
-const getChipSummary = (value: string | AutocompleteFilterOption | AutocompleteFilterOption[] | null | undefined, label?: string) => {
+/** Summary shown inside a filled filter once it holds a value: one value is spelled out, several collapse to a count */
+const getFilledSummary = (value: string | AutocompleteFilterOption | AutocompleteFilterOption[] | null | undefined, label?: string) => {
   const selected = Array.isArray(value) ? value : [value];
   const texts = selected.filter(Boolean).map((option) => getOptionText(option as AutocompleteFilterOption | string));
 
@@ -207,7 +228,7 @@ const getChipSummary = (value: string | AutocompleteFilterOption | AutocompleteF
   return { count: 0, text: label ? `${label} : ${texts[0]}` : texts[0] };
 };
 
-const ChipCount = ({ children }: { children: number }) => (
+const FilledCount = ({ children }: { children: number }) => (
   <Box
     component="span"
     sx={{
@@ -241,7 +262,7 @@ const getFinalValue = (value: string | AutocompleteFilterOption | AutocompleteFi
   return value || null;
 };
 
-const Count = (variant?: "standard" | "chip") => {
+const Count = (variant?: "standard" | "chip" | "filled") => {
   const { palette } = useTheme();
   const color = palette.mode === "light" ? "default" : "primary";
   const isChipVariant = variant === "chip";
@@ -441,13 +462,14 @@ const AutocompleteFilter = <
   const [internalInputValue, setInternalInputValue] = useState("");
   const finalInputValue = inputValue || internalInputValue;
   const isChipVariant = variant === "chip";
+  const isFilledVariant = variant === "filled";
   const hasValue = Array.isArray(value) ? !!value.length : value !== undefined && value !== null;
   const finalValue = getFinalValue(value, multiple);
-  const chipLabel = label ?? placeholder;
+  const filledLabel = label ?? placeholder;
   // The summary yields only while the user is actually typing a search (not on focus alone)
   const isSearching = internalOpen && !!finalInputValue;
   const showsSummary = hasValue && !isSearching;
-  // Without the summary the chip carries its name in the placeholder instead
+  // Without the summary the filled filter carries its name in the placeholder instead
   const showsLabelInPlaceholder = !showsSummary;
 
   const handleChange = (
@@ -580,13 +602,13 @@ const AutocompleteFilter = <
       }
       renderValue={
         renderValue ||
-        (isChipVariant
+        (isFilledVariant
           ? (selectedValue) => {
               if (!showsSummary) {
                 return null;
               }
 
-              const { count, text } = getChipSummary(selectedValue as AutocompleteFilterOption[], chipLabel);
+              const { count, text } = getFilledSummary(selectedValue as AutocompleteFilterOption[], filledLabel);
 
               return (
                 <Box component="span" sx={{ alignItems: "center", display: "inline-flex", marginLeft: 1, minWidth: 0 }}>
@@ -599,7 +621,7 @@ const AutocompleteFilter = <
                   >
                     {text}
                   </Typography>
-                  {count > 1 && <ChipCount>{count}</ChipCount>}
+                  {count > 1 && <FilledCount>{count}</FilledCount>}
                 </Box>
               );
             }
@@ -628,8 +650,8 @@ const AutocompleteFilter = <
       renderInput={(params) => {
         const getPlaceholder = () => {
           // No placeholder while the summary is on screen, otherwise the label prints twice
-          if (isChipVariant) {
-            return showsLabelInPlaceholder ? (placeholder ?? chipLabel) : undefined;
+          if (isFilledVariant) {
+            return showsLabelInPlaceholder ? (placeholder ?? filledLabel) : undefined;
           }
 
           if (!internalOpen && ((Array.isArray(value) && value.length) || (!Array.isArray(value) && value))) {
@@ -640,7 +662,7 @@ const AutocompleteFilter = <
         };
 
         const getAdornmentElement = () => {
-          if (isChipVariant) {
+          if (isFilledVariant) {
             const isClearable = (finalInputValue || hasValue) && !disableClearable;
 
             return (
@@ -699,6 +721,77 @@ const AutocompleteFilter = <
             );
           }
 
+          if (isChipVariant) {
+            return (
+              <InputAdornment
+                position="end"
+                sx={{
+                  color: hasValue ? "text.contrast" : "text.primary",
+                  position: "absolute",
+                  right: 5,
+                  transform: internalOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.2s ease-in-out",
+                }}
+              >
+                {(finalInputValue || hasValue) && !disableClearable && (
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setInternalInputValue("");
+                      onInputChange?.(e, "", "clear");
+                      // Clear the value only if there is a value
+                      if (hasValue) {
+                        onChange?.(e, multiple ? [] : null, "clear");
+                      }
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    sx={{
+                      ".MuiTextField-root:hover &": {
+                        opacity: 1,
+                      },
+                      "& .MuiSvgIcon-root": {
+                        fontSize: pxToRem(16),
+                        pointerEvents: "none",
+                      },
+                      color: hasValue ? "text.contrast" : "text.primary",
+                      cursor: "pointer",
+                      left: "50%",
+                      opacity: 0,
+                      padding: "2px",
+                      pointerEvents: "auto",
+                      position: "absolute",
+                      top: "50%",
+                      transform: "translate(-50%, -50%)",
+                      transition: "opacity 0.2s ease-in-out",
+                      zIndex: 1,
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                )}
+
+                <ChevronIcon
+                  fontSize="small"
+                  sx={{
+                    cursor: "pointer",
+                    transition: "opacity 0.2s ease-in-out",
+                    ...((finalInputValue || hasValue) &&
+                      !disableClearable && {
+                        ".MuiTextField-root:hover &": {
+                          opacity: 0,
+                        },
+                      }),
+                  }}
+                />
+              </InputAdornment>
+            );
+          }
+
           if (internalOpen) {
             return (
               <InputAdornment
@@ -748,15 +841,37 @@ const AutocompleteFilter = <
               },
               ...(isChipVariant && {
                 "& .MuiInputBase-root": {
+                  backgroundColor: hasValue ? "text.primary" : "grey.100",
+                  borderRadius: 20,
+                  color: hasValue ? "text.contrast" : "text.primary",
+                  fieldset: {
+                    borderColor: "transparent !important",
+                  },
+                  fontSize: getChipStyle(size).fontSize,
+                  height: getChipStyle(size).height,
+                  input: {
+                    padding: "0 !important",
+                  },
+                  minWidth: 90,
+                  "p.MuiTypography-root": {
+                    fontSize: getChipStyle(size).fontSize,
+                    margin: 0,
+                  },
+                  paddingRight: "30px !important",
+                  paddingY: "0 !important",
+                },
+              }),
+              ...(isFilledVariant && {
+                "& .MuiInputBase-root": {
                   "&:hover": {
-                    // Overlays stack as background layers, so a set chip keeps its selected tint and gains the hover one on top
+                    // Overlays stack as background layers, so a set filter keeps its selected tint and gains the hover one on top
                     backgroundImage: (theme: Theme) =>
                       hasValue
                         ? `${overlay(theme.palette.action.selected)}, ${overlay(theme.palette.action.hover)}`
                         : overlay(theme.palette.action.hover),
                   },
                   backgroundColor: "grey.100",
-                  // Keep the input on the summary line instead of wrapping the chip to two rows
+                  // Keep the input on the summary line instead of wrapping the filter to two rows
                   flexWrap: "nowrap",
                   ...(hasValue && {
                     backgroundImage: (theme: Theme) => overlay(theme.palette.action.selected),
@@ -768,9 +883,9 @@ const AutocompleteFilter = <
                   fieldset: {
                     borderColor: "transparent !important",
                   },
-                  fontSize: getChipStyle(size).fontSize,
+                  fontSize: getFilledStyle(size).fontSize,
                   fontWeight: 400,
-                  height: getChipStyle(size).height,
+                  height: getFilledStyle(size).height,
                   input: {
                     // The placeholder is a label here, not a hint, so it keeps full contrast
                     "&::placeholder": {
@@ -782,10 +897,10 @@ const AutocompleteFilter = <
                     // Keep the placeholder label from being clipped once it passes the 90px floor
                     ...(showsLabelInPlaceholder && { minWidth: "max-content !important" }),
                   },
-                  maxWidth: CHIP_MAX_WIDTH,
+                  maxWidth: FILLED_MAX_WIDTH,
                   minWidth: 90,
                   "p.MuiTypography-root": {
-                    fontSize: getChipStyle(size).fontSize,
+                    fontSize: getFilledStyle(size).fontSize,
                     margin: 0,
                   },
                   paddingRight: "30px !important",
@@ -799,7 +914,7 @@ const AutocompleteFilter = <
                 ...params.inputProps,
                 ...(placeholder && { "aria-label": placeholder }),
                 // An input's intrinsic width comes from `size` (average character widths, hence the slack), not from its placeholder
-                ...(isChipVariant && showsLabelInPlaceholder && chipLabel && { size: chipLabel.length + 2 }),
+                ...(isFilledVariant && showsLabelInPlaceholder && filledLabel && { size: filledLabel.length + 2 }),
               },
               input: {
                 ...params.InputProps,

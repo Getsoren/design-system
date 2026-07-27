@@ -1339,10 +1339,15 @@ const commonThemeOptions: MuiThemeOptions = {
     },
     MuiTooltip: {
       styleOverrides: {
-        tooltip: {
+        // Fully opaque: MUI's default rgba(97,97,97,0.92) let the background bleed through. Same grey (A700), no alpha.
+        arrow: ({ theme }) => ({
+          color: theme.palette.grey.A700,
+        }),
+        tooltip: ({ theme }) => ({
+          backgroundColor: theme.palette.grey.A700,
           fontSize: pxToRem(14),
           letterSpacing: 0,
-        },
+        }),
       },
     },
   },

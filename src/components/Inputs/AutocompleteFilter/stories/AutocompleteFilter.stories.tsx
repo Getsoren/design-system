@@ -267,18 +267,20 @@ ChipVariant.args = {
   variant: "chip",
 };
 
-// Summary is the default: one value is spelled out ("Statut : En cours"),
-// several collapse to the label plus a primary count pill ("Utilisateurs" + 3),
-// empty keeps the label alone — all updated live while the menu is open.
+// With a label the selection collapses into a summary: one value is spelled out
+// ("Statut : En cours"), several collapse to the label plus a primary count pill
+// ("Utilisateurs" + 3), empty keeps the label alone — all updated live while the
+// menu is open.
 export const FilledVariant = TemplateFilled.bind({});
 FilledVariant.args = {
   variant: "filled",
 };
 
-// Opt-out: inline values + "+N" limit-tags display.
-export const WithoutSummary = TemplateFilled.bind({});
-WithoutSummary.args = {
-  summary: false,
+// Without a label or placeholder there is no name to collapse under, so the
+// filter falls back to the inline values + "+N" display.
+export const FilledWithoutLabel = Template.bind({});
+FilledWithoutLabel.args = {
+  options: data,
   variant: "filled",
 };
 

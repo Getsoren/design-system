@@ -93,10 +93,16 @@ export interface AutocompleteFilterProps<
    */
   placeholder?: string;
   /**
-   *  Name of the filtered dimension, kept visible in the `filled` variant once a value is selected
+   *  Name of the filtered dimension, kept visible in the summary once a value is selected
    *  @default placeholder
    */
   label?: string;
+  /**
+   *  If true, collapses the selection into a summary: one value is spelled out ("Label : value"),
+   *  several collapse to a count badge, and the label stays visible as placeholder otherwise
+   *  @default false
+   */
+  summary?: boolean;
   /**
    *  If true, the checkbox is disabled
    *  @default false
@@ -211,8 +217,8 @@ const getOptionText = (option: AutocompleteFilterOption | string) => {
   return typeof option?.label === "string" ? option.label : "";
 };
 
-/** Summary shown inside a filled filter once it holds a value: one value is spelled out, several collapse to a count */
-const getFilledSummary = (value: string | AutocompleteFilterOption | AutocompleteFilterOption[] | null | undefined, label?: string) => {
+/** Summary shown inside the filter once it holds a value: one value is spelled out, several collapse to a count */
+const getSummary = (value: string | AutocompleteFilterOption | AutocompleteFilterOption[] | null | undefined, label?: string) => {
   const selected = Array.isArray(value) ? value : [value];
   const texts = selected.filter(Boolean).map((option) => getOptionText(option as AutocompleteFilterOption | string));
 
@@ -228,7 +234,7 @@ const getFilledSummary = (value: string | AutocompleteFilterOption | Autocomplet
   return { count: 0, text: label ? `${label} : ${texts[0]}` : texts[0] };
 };
 
-const FilledCount = ({ children }: { children: number }) => (
+const SummaryCount = ({ children }: { children: number }) => (
   <Box
     component="span"
     sx={{
@@ -277,6 +283,9 @@ const Count = (variant?: "standard" | "chip" | "filled") => {
             ...(isChipVariant && {
               backgroundColor: "grey.100",
               color: "text.primary",
+              // Slightly shorter than the badge's 20px default so it never touches the chip's edges
+              height: 16,
+              minWidth: 16,
             }),
             position: "relative",
             transform: "none",
@@ -429,6 +438,7 @@ const AutocompleteFilter = <
     disableCheckbox,
     placeholder,
     label,
+    summary,
     localeText,
     disableReset,
     disableSelectAll,
@@ -465,12 +475,11 @@ const AutocompleteFilter = <
   const isFilledVariant = variant === "filled";
   const hasValue = Array.isArray(value) ? !!value.length : value !== undefined && value !== null;
   const finalValue = getFinalValue(value, multiple);
-  const filledLabel = label ?? placeholder;
-  // The summary yields only while the user is actually typing a search (not on focus alone)
+  const withSummary = !!summary;
+  const summaryLabel = label ?? placeholder;
   const isSearching = internalOpen && !!finalInputValue;
-  const showsSummary = hasValue && !isSearching;
-  // Without the summary the filled filter carries its name in the placeholder instead
-  const showsLabelInPlaceholder = !showsSummary;
+  const showsSummary = withSummary && hasValue && !isSearching;
+  const showsLabelInPlaceholder = withSummary && !showsSummary;
 
   const handleChange = (
     event: SyntheticEvent,
@@ -602,13 +611,13 @@ const AutocompleteFilter = <
       }
       renderValue={
         renderValue ||
-        (isFilledVariant
+        (withSummary
           ? (selectedValue) => {
               if (!showsSummary) {
                 return null;
               }
 
-              const { count, text } = getFilledSummary(selectedValue as AutocompleteFilterOption[], filledLabel);
+              const { count, text } = getSummary(selectedValue as AutocompleteFilterOption[], summaryLabel);
 
               return (
                 <Box component="span" sx={{ alignItems: "center", display: "inline-flex", marginLeft: 1, minWidth: 0 }}>
@@ -621,7 +630,7 @@ const AutocompleteFilter = <
                   >
                     {text}
                   </Typography>
-                  {count > 1 && <FilledCount>{count}</FilledCount>}
+                  {count > 1 && <SummaryCount>{count}</SummaryCount>}
                 </Box>
               );
             }
@@ -650,8 +659,8 @@ const AutocompleteFilter = <
       renderInput={(params) => {
         const getPlaceholder = () => {
           // No placeholder while the summary is on screen, otherwise the label prints twice
-          if (isFilledVariant) {
-            return showsLabelInPlaceholder ? (placeholder ?? filledLabel) : undefined;
+          if (withSummary) {
+            return showsLabelInPlaceholder ? (placeholder ?? summaryLabel) : undefined;
           }
 
           if (!internalOpen && ((Array.isArray(value) && value.length) || (!Array.isArray(value) && value))) {
@@ -913,8 +922,7 @@ const AutocompleteFilter = <
               htmlInput: {
                 ...params.inputProps,
                 ...(placeholder && { "aria-label": placeholder }),
-                // An input's intrinsic width comes from `size` (average character widths, hence the slack), not from its placeholder
-                ...(isFilledVariant && showsLabelInPlaceholder && filledLabel && { size: filledLabel.length + 2 }),
+                ...(withSummary && showsLabelInPlaceholder && summaryLabel && { size: summaryLabel.length + 2 }),
               },
               input: {
                 ...params.InputProps,

@@ -912,6 +912,8 @@ const AutocompleteFilter = <
                     fontSize: getFilledStyle(size).fontSize,
                     margin: 0,
                   },
+                  // MUI gives sizeSmall a 6px padding while medium and the custom xSmall get 9px — align all three
+                  paddingLeft: "9px !important",
                   paddingRight: "30px !important",
                   paddingY: "0 !important",
                 },

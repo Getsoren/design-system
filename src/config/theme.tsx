@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import type { Interpolation } from "@mui/system";
 import { Children, CSSProperties, isValidElement } from "react";
+import CheckboxIcon from "@/components/Inputs/Checkbox/CheckboxIcon";
 
 // Local type definition since OverridesStyleRules is not exported from @mui/material/styles
 type OverridesStyleRules<
@@ -724,6 +725,21 @@ const commonThemeOptions: MuiThemeOptions = {
     MuiCardContent: {
       styleOverrides: {
         root: ({ theme }) => ({ padding: theme.spacing(3) }),
+      },
+    },
+    MuiCheckbox: {
+      defaultProps: {
+        checkedIcon: <CheckboxIcon checked />,
+        icon: <CheckboxIcon />,
+        indeterminateIcon: <CheckboxIcon indeterminate />,
+      },
+      styleOverrides: {
+        root: ({ theme }) => ({
+          // Only the hover *tint* is dropped; the padding stays, so the tap
+          // target is unchanged. The box itself already answers on hover.
+          "&:hover": { backgroundColor: "transparent" },
+          "&:hover .MuiBox-root": { borderColor: theme.palette.text.primary },
+        }),
       },
     },
     MuiChip: {

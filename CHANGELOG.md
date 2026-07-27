@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.62.0](https://github.com/getsoren/design-system/compare/4.61.0...4.62.0) (2026-07-27)
+
+
+### Features
+
+* **AutocompleteFilter:** summary display by default ([2285bd9](https://github.com/getsoren/design-system/commit/2285bd9af40936cc4e7e11c1a5b18b421245cb0f))
+
+
+### Bug Fixes
+
+* **AutocompleteFilter:** carret & improvement ([18786b6](https://github.com/getsoren/design-system/commit/18786b6c92567b1f936072f5688b1be07d7ccddb))
+* **AutocompleteFilter:** primary count pills on the filter summaries ([3ffac99](https://github.com/getsoren/design-system/commit/3ffac99180c77c2fb3a55f2ccaa070514d4a9fcb))
+
 ## [4.61.0](https://github.com/getsoren/design-system/compare/4.60.1...4.61.0) (2026-07-27)
 
 

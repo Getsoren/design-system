@@ -1,0 +1,22 @@
+import{i as e,s as t}from"./preload-helper-xPQekRTU.js";import{Dt as n,Si as r,Ya as i,at as a,d as o,f as s,m as c,p as l}from"./iframe-94AAr2Wq.js";var u,d=e((()=>{c(),o(),u=e=>s(n,{...e});try{u.displayName=`Rating`,u.__docgenInfo={description:``,displayName:`Rating`,filePath:`/home/runner/work/design-system/design-system/src/components/Inputs/Rating/stories/Rating.tsx`,methods:[],props:{slots:{defaultValue:{value:`{}`},declarations:[{fileName:`design-system/node_modules/@mui/material/esm/utils/types.d.ts`,name:`TypeLiteral`}],description:`The components used for each slot inside.`,name:`slots`,required:!1,tags:{default:`{}`},type:{name:`Partial<RatingSlots>`}},slotProps:{defaultValue:{value:`{}`},declarations:[{fileName:`design-system/node_modules/@mui/material/esm/utils/types.d.ts`,name:`TypeLiteral`}],description:`The props used for each slot inside.`,name:`slotProps`,required:!1,tags:{default:`{}`},type:{name:`{ root?: SlotProps<"span", RatingRootSlotPropsOverrides, RatingOwnerState>; label?: SlotProps<"label", RatingLabelSlotPropsOverrides, RatingOwnerState>; icon?: SlotProps<...> | undefined; decimal?: SlotProps<...> | undefined; } | undefined`}},component:{defaultValue:null,declarations:[{fileName:`design-system/node_modules/@mui/material/esm/Rating/Rating.d.ts`,name:`TypeLiteral`}],description:``,name:`component`,required:!1,tags:{},type:{name:`ElementType<any, keyof IntrinsicElements>`}}},tags:{}}}catch{}})),f,p,m,h,g,_,v,y,b;e((()=>{c(),f=t(i(),1),d(),o(),p=e=>{let[t,n]=(0,f.useState)(2);return l(a,{spacing:2,alignItems:`center`,justifyContent:`center`,height:`100%`,children:[s(r,{component:`legend`,children:`Controlled`}),s(u,{name:`simple-controlled`,value:t,onChange:(e,t)=>{n(t)},...e}),s(r,{component:`legend`,children:`Read only`}),s(u,{name:`read-only`,value:t,readOnly:!0,...e}),s(r,{component:`legend`,children:`Disabled`}),s(u,{name:`disabled`,value:t,disabled:!0,...e}),s(r,{component:`legend`,children:`No rating given`}),s(u,{name:`no-value`,value:null,...e})]})},m=e=>l(a,{spacing:2,alignItems:`center`,justifyContent:`center`,height:`100%`,children:[s(u,{name:`half-rating`,defaultValue:2.5,precision:.5,...e}),s(u,{name:`half-rating-read`,defaultValue:2.5,precision:.5,readOnly:!0,...e})]}),h=e=>l(a,{spacing:2,alignItems:`center`,justifyContent:`center`,height:`100%`,children:[s(u,{name:`size-small`,defaultValue:2,size:`small`,...e}),s(u,{name:`size-medium`,defaultValue:2,...e}),s(u,{name:`size-large`,defaultValue:2,size:`large`,...e})]}),g=p.bind({}),g.args={},_=m.bind({}),_.args={},v=h.bind({}),v.args={},y={component:u,title:`Components/Inputs/Rating`},g.parameters={...g.parameters,docs:{...g.parameters?.docs,source:{originalSource:`args => {
+  const [value, setValue] = useState<null | number>(2);
+  return <Stack spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <Typography component="legend">Controlled</Typography>
+      <Rating name="simple-controlled" value={value} onChange={(_, newValue) => {
+      setValue(newValue);
+    }} {...args} />
+      <Typography component="legend">Read only</Typography>
+      <Rating name="read-only" value={value} readOnly {...args} />
+      <Typography component="legend">Disabled</Typography>
+      <Rating name="disabled" value={value} disabled {...args} />
+      <Typography component="legend">No rating given</Typography>
+      <Rating name="no-value" value={null} {...args} />
+    </Stack>;
+}`,...g.parameters?.docs?.source}}},_.parameters={..._.parameters,docs:{..._.parameters?.docs,source:{originalSource:`args => <Stack spacing={2} alignItems="center" justifyContent="center" height="100%">
+    <Rating name="half-rating" defaultValue={2.5} precision={0.5} {...args} />
+    <Rating name="half-rating-read" defaultValue={2.5} precision={0.5} readOnly {...args} />
+  </Stack>`,..._.parameters?.docs?.source}}},v.parameters={...v.parameters,docs:{...v.parameters?.docs,source:{originalSource:`args => <Stack spacing={2} alignItems="center" justifyContent="center" height="100%">
+    <Rating name="size-small" defaultValue={2} size="small" {...args} />
+    <Rating name="size-medium" defaultValue={2} {...args} />
+    <Rating name="size-large" defaultValue={2} size="large" {...args} />
+  </Stack>`,...v.parameters?.docs?.source}}},b=[`Size`,`Precision`,`Sizes`]}))();export{_ as Precision,g as Size,v as Sizes,b as __namedExportsOrder,y as default};

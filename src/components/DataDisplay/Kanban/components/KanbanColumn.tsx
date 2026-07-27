@@ -1,10 +1,10 @@
 import { capitalize, useInView } from "@getsoren/react-utils";
-import { Box, Card, CircularProgress, Skeleton, Stack } from "@mui/material";
+import { Box, Card, ChipProps, CircularProgress, Skeleton, Stack, Typography } from "@mui/material";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { memo, useEffect, useRef } from "react";
 import ChipStatusKanban from "@/components/DataDisplay/Kanban/components/ChipStatusKanban";
 import KanbanCard from "@/components/DataDisplay/Kanban/components/KanbanCard";
-import { HeaderColumnChip, KanbanCardVariant, KanbanDataItemProps } from "@/components/DataDisplay/Kanban/types";
+import { defaultKanbanChip, HeaderColumnChip, KanbanCardVariant, KanbanDataItemProps } from "@/components/DataDisplay/Kanban/types";
 
 const CARD_HEIGHT = 165;
 const SKELETON_COUNT = 3;
@@ -14,7 +14,7 @@ export interface KanbanColumnProps {
   label?: string;
   count?: number;
   items: KanbanDataItemProps[];
-  chipColumVariant?: "filled" | "outlined";
+  chipColumVariant?: ChipProps["variant"];
   chipColumDot?: boolean;
   chipStatus?: string;
   isLoading?: boolean;
@@ -68,13 +68,15 @@ const KanbanColumn = memo(
       overscan: 5,
     });
 
-    const getCountLabel = (): string => {
-      if (disableCount) {
-        return "";
-      }
-      const value = count ?? items.length;
-      return value ? ` ${value}` : "";
-    };
+    const countValue = disableCount ? undefined : (count ?? items.length);
+
+    const countColor = (() => {
+      const mapping = headerColumnChip ?? defaultKanbanChip;
+      const { color } = (chipStatus && mapping[chipStatus]) || mapping[name] || { color: "default" };
+
+      // `.dark`, not `.main`: the shade an outlined Chip paints its own label with
+      return !color || color === "default" ? "text.secondary" : `${color}.dark`;
+    })();
 
     /**
      * Infinite scroll: trigger loadMoreItems when the last rendered
@@ -106,19 +108,7 @@ const KanbanColumn = memo(
     }, [name, inView, onInView]);
 
     return (
-      <Stack ref={containerRef} spacing={1.5}>
-        {/* Header */}
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <ChipStatusKanban
-            dot={chipColumDot}
-            label={`${capitalize(label || name)}${getCountLabel()}`}
-            variant={chipColumVariant}
-            status={chipStatus || name}
-            size="small"
-            headerColumnChip={headerColumnChip}
-          />
-          {isFetching && <CircularProgress size={16} sx={{ color: "text.secondary" }} />}
-        </Stack>
+      <Stack ref={containerRef}>
         <Card
           variant="elevation"
           elevation={0}
@@ -139,6 +129,30 @@ const KanbanColumn = memo(
           }}
         >
           <Stack height="100%">
+            {/* Header */}
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              sx={{ flexShrink: 0, paddingBottom: 0.5, paddingTop: 1.5, paddingX: `${gutterSize}px` }}
+            >
+              {/* The count stands outside the pill, so a four-digit count does not stretch it */}
+              <ChipStatusKanban
+                dot={chipColumDot}
+                label={capitalize(label || name)}
+                variant={chipColumVariant}
+                status={chipStatus || name}
+                size="small"
+                headerColumnChip={headerColumnChip}
+                sx={{ ".MuiChip-label": { fontWeight: 500 } }}
+              />
+              {!!countValue && (
+                <Typography sx={{ color: countColor, fontWeight: 500 }} variant="body2">
+                  {countValue}
+                </Typography>
+              )}
+              {isFetching && <CircularProgress size={16} sx={{ color: "text.secondary" }} />}
+            </Stack>
             {/* Content */}
             <Box flex={1} ref={parentRef} className="kanban-virtual-list">
               {isLoading ? (

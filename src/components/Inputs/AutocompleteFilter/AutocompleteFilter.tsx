@@ -98,8 +98,9 @@ export interface AutocompleteFilterProps<
   label?: string;
   /**
    *  If true, collapses the selection into a summary: one value is spelled out ("Label : value"),
-   *  several collapse to a count badge, and the label stays visible as placeholder otherwise
-   *  @default false
+   *  several collapse to a count badge, and the label stays visible as placeholder otherwise.
+   *  Set to false to fall back to the inline values + "+N" limit-tags display.
+   *  @default true
    */
   summary?: boolean;
   /**
@@ -442,7 +443,7 @@ const AutocompleteFilter = <
     disableCheckbox,
     placeholder,
     label,
-    summary,
+    summary = true,
     localeText,
     disableReset,
     disableSelectAll,

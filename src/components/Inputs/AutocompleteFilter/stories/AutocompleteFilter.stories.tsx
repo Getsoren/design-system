@@ -272,6 +272,15 @@ FilledVariant.args = {
   variant: "filled",
 };
 
+// One value is spelled out ("Statut : En cours"), several collapse to the label
+// plus a primary count pill ("Utilisateurs" + 3), empty keeps the label alone —
+// all updated live while the menu is open.
+export const Summary = TemplateFilled.bind({});
+Summary.args = {
+  summary: true,
+  variant: "filled",
+};
+
 export const WithTooltip = TemplateTooltip.bind({});
 WithTooltip.args = {
   options: data,

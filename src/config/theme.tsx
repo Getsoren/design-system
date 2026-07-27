@@ -735,8 +735,6 @@ const commonThemeOptions: MuiThemeOptions = {
       },
       styleOverrides: {
         root: ({ theme }) => ({
-          // Only the hover *tint* is dropped; the padding stays, so the tap
-          // target is unchanged. The box itself already answers on hover.
           "&:hover": { backgroundColor: "transparent" },
           "&:hover .MuiBox-root": { borderColor: theme.palette.text.primary },
         }),

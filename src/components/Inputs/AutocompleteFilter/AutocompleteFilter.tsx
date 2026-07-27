@@ -24,7 +24,6 @@ import {
   Tooltip,
   TooltipProps,
   Typography,
-  useTheme,
 } from "@mui/material";
 import type { AutocompleteChangeDetails, AutocompleteChangeReason } from "@mui/material/useAutocomplete";
 import {
@@ -239,9 +238,9 @@ const SummaryCount = ({ children }: { children: number }) => (
     component="span"
     sx={{
       alignItems: "center",
-      backgroundColor: "text.primary",
+      backgroundColor: "primary.main",
       borderRadius: 99,
-      color: "text.contrast",
+      color: "primary.contrastText",
       display: "inline-flex",
       flexShrink: 0,
       fontSize: pxToRem(11),
@@ -269,24 +268,29 @@ const getFinalValue = (value: string | AutocompleteFilterOption | AutocompleteFi
 };
 
 const Count = (variant?: "standard" | "chip" | "filled") => {
-  const { palette } = useTheme();
-  const color = palette.mode === "light" ? "default" : "primary";
   const isChipVariant = variant === "chip";
 
   return function RenderCount(more: number) {
     return (
       <Badge
         badgeContent={`+${more}`}
-        color={color}
         sx={{
           "& .MuiBadge-badge": {
-            ...(isChipVariant && {
-              backgroundColor: "grey.100",
-              color: "text.primary",
-              // Slightly shorter than the badge's 20px default so it never touches the chip's edges
-              height: 16,
-              minWidth: 16,
-            }),
+            ...(isChipVariant
+              ? {
+                  // Inverted on the chip variant, whose selected background is already dark
+                  backgroundColor: "grey.100",
+                  color: "text.primary",
+                  // Slightly shorter than the badge's 20px default so it never touches the chip's edges
+                  height: 16,
+                  minWidth: 16,
+                }
+              : {
+                  // Same primary pill as the summary count and the filter icon badge,
+                  // so every count in the filter bar reads the same
+                  backgroundColor: "primary.main",
+                  color: "primary.contrastText",
+                }),
             position: "relative",
             transform: "none",
           },

@@ -19,6 +19,8 @@ import {
   AutocompleteProps as MuiAutocompleteProps,
   Paper,
   PaperProps,
+  Popper,
+  PopperProps,
   TextField,
   Theme,
   Tooltip,
@@ -26,6 +28,7 @@ import {
   Typography,
 } from "@mui/material";
 import type { AutocompleteChangeDetails, AutocompleteChangeReason } from "@mui/material/useAutocomplete";
+import type { Instance } from "@popperjs/core";
 import {
   ElementType,
   forwardRef,
@@ -34,7 +37,10 @@ import {
   JSXElementConstructor,
   ReactNode,
   Ref,
+  RefObject,
   SyntheticEvent,
+  useEffect,
+  useRef,
   useState,
 } from "react";
 import ChevronIcon from "@/components/DataDisplay/Icons/ChevronIcon";
@@ -325,7 +331,7 @@ const PaperComponent = <
   const headerOptions = (!optionsIsArrayOfStrings && options?.filter((option) => option?.isHeader)) || [];
 
   return (
-    <Paper sx={{ minWidth: 250 }} {...props}>
+    <Paper sx={{ minWidth: 350 }} {...props}>
       {multiple && !loading && (!disableSelectAll || !!headerOptions?.length) && (
         <>
           <List role="listbox">
@@ -421,6 +427,52 @@ const PaperComponent = <
       )}
       {children}
     </Paper>
+  );
+};
+
+/**
+ * Popper kept aligned with the field: anchored on its left edge rather than centered
+ * (the panel is often wider than the field), and repositioned when opening the filter
+ * resizes the field — the appearing input can widen it, which would leave the panel offset.
+ */
+const AnchorResizePopper = ({ anchorEl, popperRef, sx, ...props }: PopperProps) => {
+  const instanceRef = useRef<Instance | null>(null);
+
+  const handlePopperRef = (instance: Instance | null) => {
+    instanceRef.current = instance;
+    if (typeof popperRef === "function") {
+      popperRef(instance);
+    } else if (popperRef) {
+      (popperRef as RefObject<Instance | null>).current = instance;
+    }
+  };
+
+  /**
+   * popper.js only recomputes on window scroll/resize, so watch the anchor itself
+   * and reposition the panel whenever the field changes size
+   */
+  useEffect(() => {
+    if (!(anchorEl instanceof HTMLElement)) {
+      return undefined;
+    }
+
+    const observer = new ResizeObserver(() => {
+      instanceRef.current?.update();
+    });
+
+    observer.observe(anchorEl);
+
+    return () => observer.disconnect();
+  }, [anchorEl]);
+
+  return (
+    <Popper
+      placement="bottom-start"
+      {...props}
+      anchorEl={anchorEl}
+      popperRef={handlePopperRef}
+      sx={[({ zIndex }: Theme) => ({ zIndex: zIndex.modal }), ...(Array.isArray(sx) ? sx : [sx])]}
+    />
   );
 };
 
@@ -520,6 +572,7 @@ const AutocompleteFilter = <
       }}
       slots={{
         paper: PaperComponent as JSXElementConstructor<HTMLAttributes<HTMLElement>>,
+        popper: AnchorResizePopper,
       }}
       slotProps={{
         ...slotProps,
@@ -637,7 +690,7 @@ const AutocompleteFilter = <
             }
           : multiple
             ? (selectedValue, getItemProps, ownerState) => {
-                if (!Array.isArray(selectedValue) || !selectedValue.length) {
+                if (!(Array.isArray(selectedValue) && selectedValue.length)) {
                   return null;
                 }
 

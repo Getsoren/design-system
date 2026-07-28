@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.62.2](https://github.com/getsoren/design-system/compare/4.62.1...4.62.2) (2026-07-28)
+
+
+### Bug Fixes
+
+* **AutocompleteFilter:** focus stability & caret spacing ([a64ff64](https://github.com/getsoren/design-system/commit/a64ff64a26fb2099df383337b47b5e2771d5c978))
+
 ## [4.62.1](https://github.com/getsoren/design-system/compare/4.62.0...4.62.1) (2026-07-28)
 
 

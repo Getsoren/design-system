@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.62.1](https://github.com/getsoren/design-system/compare/4.62.0...4.62.1) (2026-07-28)
+
+
+### Bug Fixes
+
+* **AutocompleteFilter:** paper min width ([410dcda](https://github.com/getsoren/design-system/commit/410dcda4b065844ed244662af6a606580ff28f0c))
+
 ## [4.62.0](https://github.com/getsoren/design-system/compare/4.61.0...4.62.0) (2026-07-27)
 
 

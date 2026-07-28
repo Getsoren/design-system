@@ -711,11 +711,19 @@ const AutocompleteFilter = <
 
                   return (
                     <>
-                      {/* minWidth 0 so the value ellipsises instead of pushing the input (and its caret) out of the field */}
-                      <Typography key={key} marginRight={1} minWidth={0} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
+                      {/* minWidth 0 so the value ellipsises instead of pushing the input (and its caret) out of the field.
+                          No marginRight: the spacing lives on the badge below, so with a single
+                          value the caret sits right next to the label instead of 8px further */}
+                      <Typography key={key} minWidth={0} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
                         {optionLabel(first)}
                       </Typography>
-                      {more.length > 0 && Count(variant)(more.length)}
+                      {more.length > 0 && (
+                        // marginLeft 11 = the closed state's 8px label margin + 3px MuiAutocomplete-tag
+                        // margin (the span MUI wraps the count with), so the badge doesn't shift on focus
+                        <Box component="span" sx={{ flexShrink: 0, margin: "3px", marginLeft: "11px" }}>
+                          {Count(variant)(more.length)}
+                        </Box>
+                      )}
                     </>
                   );
                 }
@@ -917,23 +925,62 @@ const AutocompleteFilter = <
 
         return (
           <TextField
+            // Reopen on click anywhere in the field: after a single-mode select the panel
+            // closes but the input keeps focus, so no focus event will ever fire again —
+            // clicking the summary/label was a dead zone until the field was blurred
+            onClick={() => {
+              if (!params.disabled) {
+                setInternalOpen(true);
+              }
+            }}
             sx={{
               "& .MuiInputBase-root .MuiInputBase-input": {
                 flex: !(multiple && (internalOpen || finalInputValue)) || internalOpen ? 1 : 0,
-                // Breathing room between the summary/count and the caret
-                ...(internalOpen && hasValue && { marginLeft: 0.75 }),
+                // Breathing room between the summary/count and the caret — only when such an
+                // element precedes the input: in single mode without a summary the value lives
+                // in the input itself, and the margin would shift it on open.
+                // Chip/filled size to their content, so the margin stays on while closed
+                // too — reserving the room open-only resized the pill on every focus/blur.
+                // Standard's input keeps its 5px left padding (chip/filled zero it), so 1px
+                // of margin lands the caret ~6px after the value, same gap as the pills
+                ...(hasValue &&
+                  (multiple || showsSummary) &&
+                  (internalOpen || isChipVariant || isFilledVariant) && {
+                    marginLeft: isChipVariant || isFilledVariant ? 0.75 : "1px",
+                  }),
                 // Keep the placeholder label from being clipped by the min-width floor.
                 // Once open, keep enough width for the blinking text caret: squeezed
                 // to zero by the summary, nothing shows the field accepts typing.
-                minWidth: showsLabelInPlaceholder ? "max-content" : internalOpen ? 24 : 0,
+                // Chip/filled size to their content, so their caret room is reserved in the
+                // closed state too — open-only room resized the pill on every focus/blur
+                minWidth: showsLabelInPlaceholder
+                  ? "max-content"
+                  : isChipVariant || isFilledVariant
+                    ? hasValue && (multiple || showsSummary)
+                      ? 12
+                      : 0
+                    : internalOpen
+                      ? 24
+                      : 0,
               },
-              // Keep the input on the summary line instead of wrapping the filter
-              // to two rows — the chip and filled variants do it in their blocks
-              ...(!(isChipVariant || isFilledVariant) && {
-                "& .MuiInputBase-root": {
-                  flexWrap: "nowrap",
-                },
-              }),
+              // Keep the input on the summary line instead of wrapping the filter to two rows.
+              // The class is doubled on purpose: MUI's multiple-mode `flex-wrap: wrap` on the
+              // inputRoot has the same specificity as a single-class sx rule, so the winner
+              // would depend on style injection order — the input randomly dropped under the summary.
+              "& .MuiInputBase-root.MuiInputBase-root": {
+                flexWrap: "nowrap",
+              },
+              ...(!isChipVariant &&
+                !isFilledVariant && {
+                  // MUI gives sizeSmall a 6px left padding while medium and the custom xSmall get 9px —
+                  // align the three (root 9px + input 5px = same 14px text inset as the other sizes)
+                  "& .MuiOutlinedInput-root.MuiInputBase-sizeSmall": {
+                    "& .MuiAutocomplete-input": {
+                      paddingLeft: "5px !important",
+                    },
+                    paddingLeft: "9px !important",
+                  },
+                }),
               ...(isChipVariant && {
                 "& .MuiInputBase-root": {
                   backgroundColor: hasValue ? "text.primary" : "grey.100",
@@ -942,8 +989,6 @@ const AutocompleteFilter = <
                   fieldset: {
                     borderColor: "transparent !important",
                   },
-                  // Keep the input on the summary line instead of wrapping the filter to two rows
-                  flexWrap: "nowrap",
                   fontSize: getChipStyle(size).fontSize,
                   height: getChipStyle(size).height,
                   input: {
@@ -968,8 +1013,6 @@ const AutocompleteFilter = <
                         : overlay(theme.palette.action.hover),
                   },
                   backgroundColor: "grey.100",
-                  // Keep the input on the summary line instead of wrapping the filter to two rows
-                  flexWrap: "nowrap",
                   ...(hasValue && {
                     backgroundImage: (theme: Theme) => overlay(theme.palette.action.selected),
                   }),

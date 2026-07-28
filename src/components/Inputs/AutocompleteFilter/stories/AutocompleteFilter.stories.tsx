@@ -42,49 +42,63 @@ const Template: StoryFn<typeof AutocompleteFilter> = (args) => {
   );
 };
 
+const allVariants = ["standard", "chip", "filled"] as const;
+const allSizes = ["xSmall", "small", "medium"] as const;
+
 const TemplateUniqueSelection: StoryFn<typeof AutocompleteFilter> = (args) => {
-  const [selectedOptionsXSmall, setSelectedOptionsXSmall] = useState<AutocompleteFilterOption | null>(null);
-  const [selectedOptionsSmall, setSelectedOptionsSmall] = useState<AutocompleteFilterOption | null>(null);
-  const [selectedOptionsMedium, setSelectedOptionsMedium] = useState<AutocompleteFilterOption | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, AutocompleteFilterOption | null>>({});
 
-  const handleChangeXSmall = (_: SyntheticEvent, value: AutocompleteFilterOption | null) => {
-    setSelectedOptionsXSmall(value);
-  };
-
-  const handleChangeSmall = (_: SyntheticEvent, value: AutocompleteFilterOption | null) => {
-    setSelectedOptionsSmall(value);
-  };
-
-  const handleChangeMedium = (_: SyntheticEvent, value: AutocompleteFilterOption | null) => {
-    setSelectedOptionsMedium(value);
+  const handleChange = (key: string) => (_: SyntheticEvent, value: AutocompleteFilterOption | null) => {
+    setSelectedOptions((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
-    <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
-      <AutocompleteFilter
-        {...args}
-        size="xSmall"
-        sx={{ width: 300 }}
-        onChange={handleChangeXSmall}
-        value={selectedOptionsXSmall}
-        multiple={false}
-      />
-      <AutocompleteFilter
-        {...args}
-        size="small"
-        sx={{ width: 300 }}
-        onChange={handleChangeSmall}
-        value={selectedOptionsSmall}
-        multiple={false}
-      />
-      <AutocompleteFilter
-        {...args}
-        size="medium"
-        sx={{ width: 300 }}
-        onChange={handleChangeMedium}
-        value={selectedOptionsMedium}
-        multiple={false}
-      />
+    <Stack spacing={4} alignItems="center" justifyContent="center" height="100%">
+      {allVariants.map((variant) => (
+        <Stack key={variant} direction="row" spacing={2} alignItems="center">
+          {allSizes.map((size) => (
+            <AutocompleteFilter
+              {...args}
+              key={size}
+              size={size}
+              variant={variant}
+              label={"xxxx"}
+              sx={variant === "chip" ? undefined : { width: 300 }}
+              onChange={handleChange(`${variant}-${size}`)}
+              value={selectedOptions[`${variant}-${size}`] ?? null}
+              multiple={false}
+            />
+          ))}
+        </Stack>
+      ))}
+    </Stack>
+  );
+};
+
+const TemplateFixedWidth: StoryFn<typeof AutocompleteFilter> = (args) => {
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, AutocompleteFilterOption[]>>({});
+
+  const handleChange = (key: string) => (_: SyntheticEvent, value: AutocompleteFilterOption[]) => {
+    setSelectedOptions((prev) => ({ ...prev, [key]: value }));
+  };
+
+  return (
+    <Stack spacing={4} alignItems="center" justifyContent="center" height="100%">
+      {allVariants.map((variant) => (
+        <Stack key={variant} direction="row" spacing={2} alignItems="center">
+          {allSizes.map((size) => (
+            <AutocompleteFilter
+              {...args}
+              key={size}
+              size={size}
+              variant={variant}
+              sx={{ width: 220 }}
+              onChange={handleChange(`${variant}-${size}`)}
+              value={selectedOptions[`${variant}-${size}`] ?? []}
+            />
+          ))}
+        </Stack>
+      ))}
     </Stack>
   );
 };
@@ -258,6 +272,14 @@ export const UniqueSelection = TemplateUniqueSelection.bind({});
 UniqueSelection.args = {
   multiple: false,
   options: data,
+};
+
+// Same 220px width on every variant and size: chip and filled normally size to
+// their content, this story checks they also behave when a width is imposed
+export const FixedWidth = TemplateFixedWidth.bind({});
+FixedWidth.args = {
+  options: data,
+  placeholder: "Filter",
 };
 
 export const ChipVariant = TemplateChip.bind({});

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.62.3](https://github.com/getsoren/design-system/compare/4.62.2...4.62.3) (2026-07-30)
+
+
+### Bug Fixes
+
+* **AutocompleteFilter:** unify count badge across variants ([3b35ab1](https://github.com/getsoren/design-system/commit/3b35ab1e4777369f011428efa4c2f8dcc172d0b4))
+
 ## [4.62.2](https://github.com/getsoren/design-system/compare/4.62.1...4.62.2) (2026-07-28)
 
 

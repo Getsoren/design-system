@@ -2,7 +2,6 @@ import {
   AutocompletePaperSlotPropsOverrides,
   AutocompleteValue,
   Avatar,
-  Badge,
   Box,
   Button,
   Checkbox,
@@ -216,7 +215,7 @@ const getOptionText = (option: AutocompleteFilterOption | string) => {
   return typeof option?.label === "string" ? option.label : "";
 };
 
-/** Summary shown inside the filter once it holds a value: one value is spelled out, several collapse to a count */
+/** Summary shown inside the filter once it holds a value: one value is spelled out, several collapse to the label; the count badge shows from the first selection */
 const getSummary = (value: string | AutocompleteFilterOption | AutocompleteFilterOption[] | null | undefined, label?: string) => {
   const selected = Array.isArray(value) ? value : [value];
   const texts = selected.filter(Boolean).map((option) => getOptionText(option as AutocompleteFilterOption | string));
@@ -230,10 +229,21 @@ const getSummary = (value: string | AutocompleteFilterOption | AutocompleteFilte
   }
 
   // U+202F (narrow no-break space) before the colon, per French typography.
-  return { count: 0, text: label ? `${label} : ${texts[0]}` : texts[0] };
+  return { count: 1, text: label ? `${label} : ${texts[0]}` : texts[0] };
 };
 
-const SummaryCount = ({ children, inverted }: { children: number; inverted?: boolean }) => (
+/** Primary pill shared by the summary count and the collapsed-tags "+N" badge, so every count in the filter reads the same */
+const CountPill = ({
+  children,
+  compact,
+  inverted,
+  withMargin,
+}: {
+  children: ReactNode;
+  compact?: boolean;
+  inverted?: boolean;
+  withMargin?: boolean;
+}) => (
   <Box
     component="span"
     sx={{
@@ -246,15 +256,19 @@ const SummaryCount = ({ children, inverted }: { children: number; inverted?: boo
       flexShrink: 0,
       fontSize: pxToRem(11),
       fontWeight: 500,
-      height: 18,
+      // Slightly shorter inside the chip variant so the pill never touches the chip's edges
+      height: compact ? 16 : 18,
       justifyContent: "center",
       lineHeight: 1,
-      marginLeft: 0.75,
-      minWidth: 18,
+      marginLeft: withMargin ? 0.75 : 0,
+      minWidth: compact ? 16 : 18,
       paddingX: "5px",
     }}
   >
-    {children}
+    {/* Poppins' vertical metrics leave digits ~0.5px above the geometric center at this size */}
+    <Box component="span" sx={{ position: "relative", top: "0.5px" }}>
+      {children}
+    </Box>
   </Box>
 );
 
@@ -273,31 +287,9 @@ const Count = (variant?: "standard" | "chip" | "filled") => {
 
   return function RenderCount(more: number) {
     return (
-      <Badge
-        badgeContent={`+${more}`}
-        sx={{
-          "& .MuiBadge-badge": {
-            ...(isChipVariant
-              ? {
-                  // Inverted on the chip variant, whose selected background is already dark
-                  backgroundColor: "grey.100",
-                  color: "text.primary",
-                  // Slightly shorter than the badge's 20px default so it never touches the chip's edges
-                  height: 16,
-                  minWidth: 16,
-                }
-              : {
-                  // Same primary pill as the summary count and the filter icon badge,
-                  // so every count in the filter bar reads the same
-                  backgroundColor: "primary.main",
-                  color: "primary.contrastText",
-                }),
-            position: "relative",
-            transform: "none",
-          },
-          alignItems: "center",
-        }}
-      />
+      <CountPill compact={isChipVariant} inverted={isChipVariant}>
+        {`+${more}`}
+      </CountPill>
     );
   };
 };
@@ -684,12 +676,16 @@ const AutocompleteFilter = <
                   >
                     {text}
                   </Typography>
-                  {count > 1 && <SummaryCount inverted={isChipVariant}>{count}</SummaryCount>}
+                  {count > 0 && (
+                    <CountPill inverted={isChipVariant} withMargin>
+                      {count}
+                    </CountPill>
+                  )}
                 </Box>
               );
             }
           : multiple
-            ? (selectedValue, getItemProps, ownerState) => {
+            ? (selectedValue, getItemProps) => {
                 if (!(Array.isArray(selectedValue) && selectedValue.length)) {
                   return null;
                 }
@@ -702,41 +698,24 @@ const AutocompleteFilter = <
                 const optionLabel = (option: AutocompleteFilterOption<Value> | string) =>
                   typeof option === "object" && "label" in option && option?.label ? option.label : option.toString();
 
-                // MUI only collapses the tags to limitTags + "+N" when the field is blurred.
-                // Collapse them ourselves while it is focused, so the selection stays
-                // visible — and live — while the menu is open, in the same shape as closed.
-                if (ownerState?.focused) {
-                  const [first, ...more] = selectedValue;
-                  const { key } = getItemProps({ index: 0 }) as ItemPropsWithKey;
+                // Same shape as the summary mode: first value spelled out, total count pill from
+                // the first selection, in one center-aligned container so the pill stays level with
+                // the value. Rendered identically focused and blurred (a fragment instead of an
+                // array also keeps MUI's limitTags splicing from producing a second, different collapse).
+                const [first] = selectedValue;
+                const { key } = getItemProps({ index: 0 }) as ItemPropsWithKey;
 
-                  return (
-                    <>
-                      {/* minWidth 0 so the value ellipsises instead of pushing the input (and its caret) out of the field.
-                          No marginRight: the spacing lives on the badge below, so with a single
-                          value the caret sits right next to the label instead of 8px further */}
-                      <Typography key={key} minWidth={0} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
-                        {optionLabel(first)}
-                      </Typography>
-                      {more.length > 0 && (
-                        // marginLeft 11 = the closed state's 8px label margin + 3px MuiAutocomplete-tag
-                        // margin (the span MUI wraps the count with), so the badge doesn't shift on focus
-                        <Box component="span" sx={{ flexShrink: 0, margin: "3px", marginLeft: "11px" }}>
-                          {Count(variant)(more.length)}
-                        </Box>
-                      )}
-                    </>
-                  );
-                }
-
-                return selectedValue.map((option, index) => {
-                  const { key } = getItemProps({ index }) as ItemPropsWithKey;
-
-                  return (
-                    <Typography key={key} marginRight={1} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
-                      {optionLabel(option)}
+                return (
+                  <Box key={key} component="span" sx={{ alignItems: "center", display: "inline-flex", minWidth: 0 }}>
+                    {/* minWidth 0 so the value ellipsises instead of pushing the input (and its caret) out of the field */}
+                    <Typography minWidth={0} whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
+                      {optionLabel(first)}
                     </Typography>
-                  );
-                });
+                    <CountPill compact={isChipVariant} inverted={isChipVariant} withMargin>
+                      {selectedValue.length}
+                    </CountPill>
+                  </Box>
+                );
               }
             : undefined)
       }

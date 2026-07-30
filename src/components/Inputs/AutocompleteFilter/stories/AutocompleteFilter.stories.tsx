@@ -299,7 +299,7 @@ FilledVariant.args = {
 };
 
 // Without a label or placeholder there is no name to collapse under, so the
-// filter falls back to the inline values + "+N" display.
+// filter falls back to the first value + total count pill display.
 export const FilledWithoutLabel = Template.bind({});
 FilledWithoutLabel.args = {
   options: data,

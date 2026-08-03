@@ -523,6 +523,10 @@ const AutocompleteFilter = <
   const isClearable = (!!finalInputValue || hasValue) && !disableClearable;
   const showsSummary = withSummary && hasValue && !isSearching;
   const showsLabelInPlaceholder = withSummary && !showsSummary;
+  // Blurred with the selection displayed outside the input (summary or first value + pill),
+  // the input is invisible dead weight that only truncates the label — collapse it entirely.
+  // Single mode without a summary keeps it: the value lives in the input itself.
+  const hidesInput = hasValue && (multiple || showsSummary) && !internalOpen;
 
   const handleChange = (
     event: SyntheticEvent,
@@ -913,34 +917,45 @@ const AutocompleteFilter = <
               }
             }}
             sx={{
-              "& .MuiInputBase-root .MuiInputBase-input": {
-                flex: !(multiple && (internalOpen || finalInputValue)) || internalOpen ? 1 : 0,
-                // Breathing room between the summary/count and the caret — only when such an
-                // element precedes the input: in single mode without a summary the value lives
-                // in the input itself, and the margin would shift it on open.
-                // Chip/filled size to their content, so the margin stays on while closed
-                // too — reserving the room open-only resized the pill on every focus/blur.
-                // Standard's input keeps its 5px left padding (chip/filled zero it), so 1px
-                // of margin lands the caret ~6px after the value, same gap as the pills
-                ...(hasValue &&
-                  (multiple || showsSummary) &&
-                  (internalOpen || isChipVariant || isFilledVariant) && {
-                    marginLeft: isChipVariant || isFilledVariant ? 0.75 : "1px",
-                  }),
-                // Keep the placeholder label from being clipped by the min-width floor.
-                // Once open, keep enough width for the blinking text caret: squeezed
-                // to zero by the summary, nothing shows the field accepts typing.
-                // Chip/filled size to their content, so their caret room is reserved in the
-                // closed state too — open-only room resized the pill on every focus/blur
-                minWidth: showsLabelInPlaceholder
-                  ? "max-content"
-                  : isChipVariant || isFilledVariant
-                    ? hasValue && (multiple || showsSummary)
-                      ? 12
-                      : 0
-                    : internalOpen
-                      ? 24
-                      : 0,
+              // The input class is doubled like the flexWrap rule below: MUI's own
+              // `min-width: 30px` on the multiple-mode input ties this rule's specificity,
+              // and losing the injection-order race left a 30px hole in the summary
+              "& .MuiInputBase-root .MuiInputBase-input.MuiInputBase-input": {
+                ...(hidesInput
+                  ? {
+                      flex: "0 0 0px",
+                      minWidth: 0,
+                      // Horizontal only: the vertical padding is what gives the standard
+                      // field its height per size — zeroed, a closed medium collapsed to
+                      // the small height. !important so it beats MUI's own !important-free
+                      // padding rules of equal specificity regardless of injection order
+                      paddingLeft: "0 !important",
+                      paddingRight: "0 !important",
+                    }
+                  : {
+                      flex: !(multiple && (internalOpen || finalInputValue)) || internalOpen ? 1 : 0,
+                      // Breathing room between the summary/count and the caret — only when such an
+                      // element precedes the input: in single mode without a summary the value lives
+                      // in the input itself, and the margin would shift it on open.
+                      // Standard's input keeps its 5px left padding (chip/filled zero it), so 1px
+                      // of margin lands the caret ~6px after the value, same gap as the pills
+                      ...(hasValue &&
+                        (multiple || showsSummary) && {
+                          marginLeft: isChipVariant || isFilledVariant ? 0.75 : "1px",
+                        }),
+                      // Keep the placeholder label from being clipped by the min-width floor.
+                      // Once open, keep enough width for the blinking text caret: squeezed
+                      // to zero by the summary, nothing shows the field accepts typing
+                      minWidth: showsLabelInPlaceholder
+                        ? "max-content"
+                        : isChipVariant || isFilledVariant
+                          ? hasValue && (multiple || showsSummary)
+                            ? 12
+                            : 0
+                          : internalOpen
+                            ? 24
+                            : 0,
+                    }),
               },
               // Keep the input on the summary line instead of wrapping the filter to two rows.
               // The class is doubled on purpose: MUI's multiple-mode `flex-wrap: wrap` on the
@@ -949,17 +964,37 @@ const AutocompleteFilter = <
               "& .MuiInputBase-root.MuiInputBase-root": {
                 flexWrap: "nowrap",
               },
-              ...(!isChipVariant &&
-                !isFilledVariant && {
-                  // MUI gives sizeSmall a 6px left padding while medium and the custom xSmall get 9px —
-                  // align the three (root 9px + input 5px = same 14px text inset as the other sizes)
-                  "& .MuiOutlinedInput-root.MuiInputBase-sizeSmall": {
+              ...(!(isChipVariant || isFilledVariant) && {
+                // MUI gives sizeSmall a 6px left padding while medium and the custom xSmall get 9px —
+                // align the three (root 9px + input 5px = same 14px text inset as the other sizes)
+                "& .MuiOutlinedInput-root.MuiInputBase-sizeSmall": {
+                  // Skipped while the input is collapsed: both rules are !important at
+                  // equal specificity, this one must not resurrect the phantom width
+                  ...(!hidesInput && {
                     "& .MuiAutocomplete-input": {
                       paddingLeft: "5px !important",
                     },
-                    paddingLeft: "9px !important",
-                  },
-                }),
+                  }),
+                  paddingLeft: "9px !important",
+                },
+                // At rest the clear cross is invisible (MUI reveals it on hover/focus), yet its
+                // slot stays reserved and stops the summary 26px before the visible icons — give
+                // that slot back to the label, and re-reserve it exactly when the cross appears.
+                // !important: MUI's hasClearIcon padding rules tie this sx's specificity
+                ...(!internalOpen &&
+                  isClearable &&
+                  !params.disabled && {
+                    "& .MuiInputBase-root.MuiInputBase-root": {
+                      // 26 + 4 + 9: MUI's own chevron-only reservation, as if there were no cross
+                      paddingRight: "39px !important",
+                      transition: "padding-right 0.2s ease-in-out",
+                    },
+                    "&:hover .MuiInputBase-root, & .MuiInputBase-root.Mui-focused": {
+                      // 52 + 4 + 9: MUI's two-icon reservation, restored while the cross shows
+                      paddingRight: "65px !important",
+                    },
+                  }),
+              }),
               ...(isChipVariant && {
                 "& .MuiInputBase-root": {
                   backgroundColor: hasValue ? "text.primary" : "grey.100",

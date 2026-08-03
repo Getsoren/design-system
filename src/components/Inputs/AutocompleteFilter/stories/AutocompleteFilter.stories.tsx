@@ -92,7 +92,7 @@ const TemplateFixedWidth: StoryFn<typeof AutocompleteFilter> = (args) => {
               key={size}
               size={size}
               variant={variant}
-              sx={{ width: 220 }}
+              sx={{ width: 150 }}
               onChange={handleChange(`${variant}-${size}`)}
               value={selectedOptions[`${variant}-${size}`] ?? []}
             />

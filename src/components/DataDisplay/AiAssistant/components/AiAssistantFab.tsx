@@ -1,3 +1,4 @@
+import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import Tooltip from "@mui/material/Tooltip";
 import type { AiAssistantFabProps } from "@/components/DataDisplay/AiAssistant/types";
@@ -22,42 +23,83 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab" }:
           "70%": { boxShadow: "0 0 0 14px rgba(139, 92, 246, 0), 0 6px 26px rgba(0, 176, 255, 0.5)" },
           "100%": { boxShadow: "0 0 0 0 rgba(139, 92, 246, 0), 0 6px 22px rgba(0, 176, 255, 0.35)" },
         },
-        // Liquid orb: the button's own shape undulates (blob morph) and gently breathes
+        /**
+         * Liquid orb: subtle undulation (radii stay within 42-58%), but through 7
+         * irregularly spaced keyframes — no even 25/50/75 grid — so the gentle morph
+         * never reads as a metronome.
+         */
         "@keyframes aiAssistantBlob": {
           "0%, 100%": { borderRadius: "58% 42% 55% 45% / 48% 56% 44% 52%" },
-          "25%": { borderRadius: "45% 55% 48% 52% / 56% 44% 56% 44%" },
-          "50%": { borderRadius: "52% 48% 42% 58% / 44% 52% 48% 56%" },
-          "75%": { borderRadius: "48% 52% 58% 42% / 52% 46% 54% 48%" },
+          "13%": { borderRadius: "46% 54% 57% 43% / 55% 45% 55% 45%" },
+          "29%": { borderRadius: "55% 45% 43% 57% / 44% 53% 47% 56%" },
+          "41%": { borderRadius: "43% 57% 52% 48% / 56% 44% 55% 45%" },
+          "58%": { borderRadius: "56% 44% 46% 54% / 46% 56% 43% 54%" },
+          "72%": { borderRadius: "47% 53% 56% 44% / 54% 46% 53% 47%" },
+          "87%": { borderRadius: "53% 47% 44% 56% / 49% 55% 45% 55%" },
         },
-        "@keyframes aiAssistantBreath": {
-          "0%, 100%": { transform: "scale(1)" },
-          "50%": { transform: "scale(1.05)" },
-        },
+        // The gradient wanders diagonally through 4 corners instead of ping-ponging on one axis
         "@keyframes aiAssistantFlow": {
-          "0%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-          "100%": { backgroundPosition: "0% 50%" },
+          "0%": { backgroundPosition: "0% 40%" },
+          "27%": { backgroundPosition: "60% 90%" },
+          "52%": { backgroundPosition: "100% 40%" },
+          "78%": { backgroundPosition: "40% 0%" },
+          "100%": { backgroundPosition: "0% 40%" },
         },
         "@keyframes aiAssistantSpark": {
           "0%, 100%": { opacity: 1, transform: "scale(1) rotate(0deg)" },
-          "50%": { opacity: 0.9, transform: "scale(1.14) rotate(10deg)" },
+          "34%": { opacity: 0.9, transform: "scale(1.12) rotate(8deg)" },
+          "55%": { opacity: 1, transform: "scale(0.98) rotate(-2deg)" },
+          "76%": { opacity: 0.95, transform: "scale(1.06) rotate(4deg)" },
+        },
+        // Gentle breath with a barely asymmetric squash — organic, but no visible roll
+        "@keyframes aiAssistantWobble": {
+          "0%, 100%": { transform: "scale(1)" },
+          "21%": { transform: "scale(1.04, 0.99)" },
+          "38%": { transform: "scale(0.99, 1.03)" },
+          "57%": { transform: "scale(1.05, 1.01)" },
+          "79%": { transform: "scale(1, 1.03)" },
         },
         // Doubled selector (&&) so this a11y override beats the base rules regardless of emission order
         "@media (prefers-reduced-motion: reduce)": {
+          "&& .aiAssistantFabIcon": { transition: "none" },
           "&& svg": { animation: "none" },
           "&&::before": { animation: "none" },
         },
-        "& svg": {
-          animation: open ? "none" : "aiAssistantSpark 2.8s ease-in-out infinite",
+        /**
+         * Spark <-> close morph: both icons are stacked in one grid cell and rotate 90°
+         * clockwise together during the cross-fade. Both glyphs have 4-fold symmetry, so
+         * the outgoing spark passes through the X orientation while the incoming cross
+         * departs from a "+" pose that mirrors the spark — one continuous transformation
+         * to the eye. The twinkle animation stays scoped to the spark's own svg (its
+         * transform layer), so it never fights the wrapper's morph transform.
+         */
+        "& .aiAssistantFabIcon": {
+          display: "flex",
+          gridArea: "1 / 1",
+          transition: "transform 280ms cubic-bezier(0.2, 0, 0, 1), opacity 180ms ease",
+        },
+        "& .aiAssistantFabIconClose": {
+          opacity: open ? 1 : 0,
+          transform: open ? "rotate(0deg) scale(1)" : "rotate(-90deg) scale(0.4)",
+        },
+        "& .aiAssistantFabIconSpark": {
+          "& svg": {
+            animation: open ? "none" : "aiAssistantSpark 3.7s ease-in-out infinite",
+          },
+          opacity: open ? 0 : 1,
+          transform: open ? "rotate(90deg) scale(0.4)" : "rotate(0deg) scale(1)",
         },
         /**
-         * The living orb is a ::before layer: it flows, undulates (blob morph) and breathes
-         * while the button's own hit-box stays perfectly still.
+         * The living orb is a ::before layer: it flows, undulates (blob morph) and
+         * breathes while the button's own hit-box stays perfectly still. Amplitudes are
+         * kept subtle; the aliveness comes from timing — mutually prime durations
+         * (11.3 / 8.7 / 6.1 / 4.1s) so the composite motion realigns only after minutes,
+         * and negative delays that scatter the phases from the very first frame.
          */
         "&::before": {
           animation: open
             ? "aiAssistantFlow 5s ease infinite"
-            : "aiAssistantFlow 5s ease infinite, aiAssistantBlob 7s ease-in-out infinite, aiAssistantBreath 4.5s ease-in-out infinite, aiAssistantAura 2.8s ease-out infinite",
+            : "aiAssistantFlow 11.3s ease -5.3s infinite, aiAssistantBlob 8.7s ease-in-out -2.7s infinite, aiAssistantWobble 6.1s ease-in-out -1.9s infinite, aiAssistantAura 4.1s ease-out -1.3s infinite",
           background: "linear-gradient(125deg, #4f8dff 0%, #8b5cf6 30%, #00c8ff 60%, #ff5fa2 85%, #4f8dff 100%)",
           backgroundSize: "320% 320%",
           borderRadius: "50%",
@@ -80,7 +122,14 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab" }:
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
-      {open ? <CloseIcon /> : <AiSparkIcon />}
+      <Box sx={{ display: "grid", placeItems: "center" }}>
+        <Box className="aiAssistantFabIcon aiAssistantFabIconSpark">
+          <AiSparkIcon />
+        </Box>
+        <Box className="aiAssistantFabIcon aiAssistantFabIconClose">
+          <CloseIcon />
+        </Box>
+      </Box>
     </Fab>
   </Tooltip>
 );

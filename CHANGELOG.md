@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.63.0](https://github.com/getsoren/design-system/compare/4.62.4...4.63.0) (2026-08-03)
+
+
+### Features
+
+* **AiAssistant:** smoother fab animations and panel opening. ([957703e](https://github.com/getsoren/design-system/commit/957703eb8964a16534e56798dd4b1a6e3ab9b6db))
+
 ## [4.62.4](https://github.com/getsoren/design-system/compare/4.62.3...4.62.4) (2026-07-30)
 
 ## [4.62.3](https://github.com/getsoren/design-system/compare/4.62.2...4.62.3) (2026-07-30)

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.64.0](https://github.com/getsoren/design-system/compare/4.63.0...4.64.0) (2026-08-03)
+
+
+### Features
+
+* **NavigationMenu:** add compact density ([7ab3b05](https://github.com/getsoren/design-system/commit/7ab3b05d55c405805bfa8300a3bddc03cd22e689))
+* **NavigationMenu:** ai assitant improvement & planning timeline ([10aee40](https://github.com/getsoren/design-system/commit/10aee40cbe1d9fd10bf471727f147d09fdc46fea))
+
 ## [4.63.0](https://github.com/getsoren/design-system/compare/4.62.4...4.63.0) (2026-08-03)
 
 

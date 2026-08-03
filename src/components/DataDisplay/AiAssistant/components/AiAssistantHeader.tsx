@@ -12,7 +12,7 @@ const AiAssistantHeader = ({ title, subtitle, onClose, icon = <AiSparkIcon varia
     <Stack direction="row" alignItems="center" justifyContent="space-between" paddingX={2} paddingY={1}>
       <Stack direction="row" alignItems="center" spacing={1}>
         {icon}
-        <Typography variant="subtitle1" fontWeight={700}>
+        <Typography variant="subtitle1" fontWeight={600}>
           {title}
         </Typography>
         {subtitle && (

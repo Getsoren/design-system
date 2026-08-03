@@ -3,23 +3,68 @@ import { createContext, MouseEvent, memo, ReactElement, ReactNode, useCallback, 
 import BurgerAppBar from "@/components/Navigation/NavigationMenu/BurgerAppBar";
 import SideBar from "@/components/Navigation/NavigationMenu/SideBar";
 import SideBarMenu from "@/components/Navigation/NavigationMenu/SideBarMenu";
+import type { NavigationDensity } from "@/components/Navigation/NavigationMenu/utils/navigationDensity";
+
+export * from "@/components/Navigation/NavigationMenu/utils/navigationDensity";
 
 export type ObjectNavigationItem = {
+  /**
+   * Destination URL of the link
+   */
   url?: string;
+  /**
+   * Text displayed for the link
+   */
   label?: string;
+  /**
+   * Number displayed in a chip next to the label
+   */
   count?: number;
+  /**
+   * Color of the `count` chip
+   */
   countColor?: ChipProps["color"];
-  /** Small highlight chip rendered next to the label (e.g. "New"). Hidden when the sidebar is collapsed to the icon rail. */
+  /**
+   * Small highlight chip rendered next to the label (e.g. "New").
+   * Hidden when the sidebar is collapsed to the icon rail.
+   */
   tag?: string;
-  /** Color of the `tag` chip. @default "info" */
+  /**
+   * Color of the `tag` chip
+   * @default "info"
+   */
   tagColor?: ChipProps["color"];
+  /**
+   * Icon displayed before the label
+   */
   icon?: ReactNode;
+  /**
+   * Force the active state of the link
+   */
   active?: boolean;
+  /**
+   * State passed to the router NavLink
+   */
   state?: any;
+  /**
+   * Only mark the link active on an exact URL match (react-router NavLink `end` prop)
+   */
   end?: boolean;
+  /**
+   * Disable the link
+   */
   disabled?: boolean;
+  /**
+   * Hide the link on mobile
+   */
   hideOnMobile?: boolean;
+  /**
+   * Hide the link when the user has no access to it
+   */
   hasAccess?: boolean;
+  /**
+   * Target attribute of the link (e.g. "_blank")
+   */
   target?: string;
 };
 
@@ -54,24 +99,72 @@ export type NavigationGroupItem = {
 };
 
 export interface BottomLinkProps {
+  /**
+   * Destination URL of the link
+   */
   url?: string;
+  /**
+   * State passed to the router NavLink
+   */
   state?: any;
+  /**
+   * Only mark the link active on an exact URL match (react-router NavLink `end` prop)
+   */
   end?: boolean;
+  /**
+   * Content displayed for the link
+   */
   label?: ReactNode;
+  /**
+   * Force the active state of the link
+   */
   active?: boolean;
+  /**
+   * Icon displayed before the label
+   */
   icon?: ReactNode;
+  /**
+   * Disable the link
+   */
   disabled?: boolean;
+  /**
+   * Callback fired when the link is clicked
+   */
   onClick?: (e?: MouseEvent) => void;
+  /**
+   * Target attribute of the link (e.g. "_blank")
+   */
   target?: string;
 }
 
 export interface NavLinkProps {
+  /**
+   * Class name applied to the link, or a function receiving the link state and returning it
+   */
   className?: string | ((props: { isActive: boolean; isPending: boolean }) => string | undefined);
+  /**
+   * Callback fired when the link is clicked
+   */
   onClick?: () => void;
+  /**
+   * Destination URL of the link
+   */
   to: string;
+  /**
+   * Only mark the link active on an exact URL match (react-router NavLink `end` prop)
+   */
   end?: boolean;
+  /**
+   * Content of the link, or a function receiving the link state and returning it
+   */
   children?: ReactNode | ((props: { isActive: boolean; isPending: boolean }) => ReactNode);
+  /**
+   * State passed to the router NavLink
+   */
   state?: any;
+  /**
+   * Target attribute of the link (e.g. "_blank")
+   */
   target?: string;
 }
 
@@ -83,10 +176,7 @@ export interface NavigationMenuProps {
    */
   items?: NavigationItem[];
   /**
-   * Override the default translations
-   */
-  /**
-   * Enabler search field focus shortcut when pressing "ctrl + f" or "cmd + f"
+   * Enable search field focus shortcut when pressing "ctrl + f" or "cmd + f"
    */
   enableSearchFocusShortcut?: boolean;
   /**
@@ -127,7 +217,7 @@ export interface NavigationMenuProps {
    */
   AppBar?: ReactElement;
   /**
-   * Search component
+   * Footer component displayed at the bottom of the sidebar
    */
   Footer?: ReactNode;
   /**
@@ -135,6 +225,13 @@ export interface NavigationMenuProps {
    * @default "soren-navigation-menu-collapsed"
    */
   storageKey?: string;
+  /**
+   * Vertical density of the navigation. A closed set owned by the design system: "compact" only
+   * tightens the vertical rhythm (row height, paddings, gaps between blocks). Font size, horizontal
+   * gutters, icon gutter and collapsed rail are identical in both densities.
+   * @default "standard"
+   */
+  density?: NavigationDensity;
 }
 
 const DEFAULT_COLLAPSED_STORAGE_KEY = "soren-navigation-menu-collapsed";
@@ -150,6 +247,7 @@ const getStoredCollapsed = (storageKey: string) => {
 
 const DEFAULT_CONTEXT_VALUE = {
   closeDrawerMenu: () => {},
+  density: "standard" as NavigationDensity,
   isCollapsed: false,
   isDrawerOpen: false,
   isMobile: false,
@@ -199,6 +297,7 @@ const NavigationMenu = ({
   bottomLink,
   sideBarWidth = 260,
   storageKey = DEFAULT_COLLAPSED_STORAGE_KEY,
+  density = "standard",
 }: NavigationMenuProps) => {
   const { breakpoints } = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(DEFAULT_CONTEXT_VALUE.isDrawerOpen);
@@ -234,6 +333,7 @@ const NavigationMenu = ({
       AppBar,
       bottomLink,
       closeDrawerMenu,
+      density,
       disableResponsive,
       enableSearchFocusShortcut,
       Footer,
@@ -252,6 +352,7 @@ const NavigationMenu = ({
     }),
     [
       closeDrawerMenu,
+      density,
       disableResponsive,
       isDrawerOpen,
       isMobile,

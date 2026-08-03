@@ -1,13 +1,14 @@
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
-import SendIcon from "@/components/DataDisplay/Icons/SendIcon";
-import Button from "@/components/Inputs/Button";
+import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
 
 const RADIUS = 15;
+const COUNTER_VISIBLE_FROM = 40;
 
 const ChatMessageInput = ({
   onSend,
@@ -49,6 +50,7 @@ const ChatMessageInput = ({
     <Box
       sx={{
         backgroundColor: "grey.A100",
+        // The composer surface is as light as the message list: without this line the two merge.
         borderTop: ({ palette }) => `1px solid ${palette.divider}`,
         p: 2,
       }}
@@ -101,12 +103,31 @@ const ChatMessageInput = ({
           {startActions}
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography variant="caption" color="text.secondary">
-            {message.length}/{maxLength}
-          </Typography>
-          <Button variant="contained" size="xSmall" endIcon={<SendIcon />} onClick={handleSend} disabled={!message.trim() || isSending}>
-            {labels?.send ?? "Send"}
-          </Button>
+          {/* The counter only comes out near the limit: shown permanently it taught nothing, hidden
+              entirely the input truncated silently. */}
+          {message.length > maxLength - COUNTER_VISIBLE_FROM && (
+            <Typography variant="caption" color={message.length >= maxLength ? "error.main" : "text.secondary"}>
+              {message.length}/{maxLength}
+            </Typography>
+          )}
+          {/* Send: an upward arrow, like the note field of an order. */}
+          <IconButton
+            aria-label={labels?.send ?? "Send"}
+            title={labels?.send ?? "Send"}
+            onClick={handleSend}
+            disabled={!message.trim() || isSending}
+            sx={{
+              "&:hover": { backgroundColor: "primary.dark" },
+              "&.Mui-disabled": { backgroundColor: "action.disabledBackground", color: "action.disabled" },
+              backgroundColor: "primary.main",
+              borderRadius: 1.5,
+              color: "primary.contrastText",
+              height: 32,
+              width: 32,
+            }}
+          >
+            <ArrowUpwardRoundedIcon sx={{ fontSize: 18 }} />
+          </IconButton>
         </Stack>
       </Stack>
       {/* Pass an empty string to hide the hint entirely (undefined keeps the default) */}

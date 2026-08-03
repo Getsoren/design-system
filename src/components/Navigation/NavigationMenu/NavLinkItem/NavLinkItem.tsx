@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { MouseEvent, ReactNode, useContext } from "react";
-import { NavigationMenuContext, NavLinkProps, ObjectNavigationItem } from "@/components/Navigation/NavigationMenu";
+import { NavigationMenuContext, NavLinkProps, ObjectNavigationItem } from "@/components/Navigation/NavigationMenu/NavigationMenu";
 
 interface NavLinkItemProps extends Omit<ObjectNavigationItem, "label"> {
   children?: ReactNode;

@@ -2,8 +2,13 @@ import { Box, Divider, Fade, IconButton, Stack, Theme, Tooltip, useTheme } from 
 import { ReactNode, useContext } from "react";
 import ChevronLeftDoubleIcon from "@/components/DataDisplay/Icons/ChevronLeftDoubleIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
-import { BottomLinkProps, NavigationMenuContext, NavLinkProps } from "@/components/Navigation/NavigationMenu";
+import { BottomLinkProps, NavigationMenuContext, NavLinkProps } from "@/components/Navigation/NavigationMenu/NavigationMenu";
 import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem";
+import {
+  NAVIGATION_DENSITY_TOKENS,
+  type NavigationDensity,
+  type NavigationDensityTokens,
+} from "@/components/Navigation/NavigationMenu/utils/navigationDensity";
 
 export interface SideBarProps {
   children?: ReactNode;
@@ -13,7 +18,7 @@ export interface SideBarProps {
   Search?: ReactNode;
 }
 
-const styles = {
+const buildStyles = (tokens: NavigationDensityTokens) => ({
   bottomLink: {
     "& > a, & > div": {
       "& svg": {
@@ -46,14 +51,15 @@ const styles = {
       fontSize: 16,
       justifyContent: "flex-start",
       paddingX: 1.25,
-      paddingY: 1,
+      paddingY: tokens.bottomLinkPaddingY,
       textAlign: "left",
       textDecoration: "none",
       width: "100%",
     },
   },
   bottomLinkWrapper: {
-    p: 2,
+    paddingX: 2,
+    paddingY: tokens.bottomLinkWrapperPaddingY,
   },
   container: {
     backgroundColor: "grey.A100",
@@ -80,8 +86,14 @@ const styles = {
   logoContainer: {
     display: "flex",
     justifyContent: "center",
-    paddingY: 2,
+    paddingY: tokens.logoPaddingY,
   },
+});
+
+/** Both densities are built once: an sx object rebuilt on every render would defeat the emotion cache. */
+const STYLES: Record<NavigationDensity, ReturnType<typeof buildStyles>> = {
+  compact: buildStyles(NAVIGATION_DENSITY_TOKENS.compact),
+  standard: buildStyles(NAVIGATION_DENSITY_TOKENS.standard),
 };
 
 const BottomNavLink = ({
@@ -93,7 +105,7 @@ const BottomNavLink = ({
   link: BottomLinkProps;
   NavLink: ((props: NavLinkProps) => ReactNode) | undefined;
   isCollapsed: boolean;
-  sx: typeof styles;
+  sx: ReturnType<typeof buildStyles>;
 }) => (
   <Box sx={sx?.bottomLink}>
     <NavLinkItem component={NavLink} {...link}>
@@ -132,7 +144,10 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
     Footer,
     Search = props.Logo,
     Logo = props.Logo,
+    density,
   } = useContext(NavigationMenuContext);
+  const styles = STYLES[density];
+  const { collapseButtonPaddingY, searchPaddingY } = NAVIGATION_DENSITY_TOKENS[density];
 
   const { palette } = useTheme();
   const backgroundColor = palette.mode === "dark" ? palette.background.default : palette.primary.black;
@@ -187,7 +202,11 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
       )}
 
       {/* Search */}
-      {Search && displaySearch && <Box p={2}>{Search}</Box>}
+      {Search && displaySearch && (
+        <Box paddingX={2} paddingY={searchPaddingY}>
+          {Search}
+        </Box>
+      )}
 
       {/* Menu Item */}
       <Box flex={1}>{children}</Box>
@@ -220,7 +239,7 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
             justifyContent: "flex-end",
 
             paddingX: 3,
-            paddingY: 3,
+            paddingY: collapseButtonPaddingY,
             width: "100%",
           }}
         >

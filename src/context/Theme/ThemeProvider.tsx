@@ -59,12 +59,20 @@ export const ThemeContext = createContext<{ language: Language }>({
   language: "en",
 });
 
+/**
+ * The theme prop comes either as a mode ("dark") or as ThemeOptions carrying `palette.mode`: both
+ * forms must answer the same question, otherwise the app-level overrides (which can only be objects)
+ * left these global styles in their light version.
+ */
+const isDarkTheme = (theme: ThemeProviderProps["theme"]) =>
+  theme === "dark" || (typeof theme === "object" && !!theme && "palette" in theme && theme?.palette?.mode === "dark");
+
 const ScrollBarStyle = ({ theme }: { theme: ThemeProviderProps["theme"] }) => (
   <GlobalStyles
     styles={css`
       * {
         scrollbar-color: ${
-          theme === "dark" ? "rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05)"
+          isDarkTheme(theme) ? "rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05)"
         };
         scrollbar-width: thin;
       }
@@ -129,7 +137,7 @@ const ThemeProvider = ({
       ...(language === "fr" && frFR),
     };
 
-    if (theme === "dark" || (typeof theme === "object" && "palette" in theme && theme?.palette?.mode === "dark")) {
+    if (isDarkTheme(theme)) {
       return createTheme(darkTheme, themeOptions, languages);
     }
 
@@ -146,7 +154,7 @@ const ThemeProvider = ({
         <GlobalStyles
           styles={css`
             ::-webkit-calendar-picker-indicator {
-              filter: invert(${theme === "dark" ? 1 : 0});
+              filter: invert(${isDarkTheme(theme) ? 1 : 0});
             }
           `}
         />

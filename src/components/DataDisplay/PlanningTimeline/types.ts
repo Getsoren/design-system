@@ -12,6 +12,9 @@ export type PlanningTimelineStatusColor = "default" | "error" | "info" | "succes
  * An incident (e.g. a breakdown) rendered as a hatched day-wide segment on the bar.
  */
 export interface PlanningTimelineIncident {
+  /**
+   * Day the incident occurred — the whole day is hatched on the bar
+   */
   incidentDate: string | Date;
 }
 
@@ -20,7 +23,13 @@ export interface PlanningTimelineIncident {
  * to attach your own domain data and get it back, typed, in `renderGroup` and `onGroupClick`.
  */
 export interface PlanningTimelineGroup {
+  /**
+   * Unique id, referenced by resources via their `groupId`
+   */
   id: string;
+  /**
+   * Text displayed in the group header
+   */
   name: string;
   /**
    * Whether the group's resources are hidden. Toggle it from `onGroupClick` to make headers collapsible.
@@ -43,7 +52,13 @@ export interface PlanningTimelineGroup {
  * `renderResource` and `onResourceClick`.
  */
 export interface PlanningTimelineResource {
+  /**
+   * Unique id, referenced by tasks via their `resourceId`
+   */
   id: string;
+  /**
+   * Text displayed in the left-column cell
+   */
   name: string;
   /**
    * Id of the `groups` entry this resource belongs to; omit for an ungrouped top-level resource.
@@ -57,13 +72,25 @@ export interface PlanningTimelineResource {
  * back, typed, in every render prop and callback.
  */
 export interface PlanningTimelineTask {
+  /**
+   * Unique id of the task
+   */
   id: string;
   /**
    * Id of the `resources` entry this bar is drawn on.
    */
   resourceId: string;
+  /**
+   * Text displayed inside the bar (default `renderBar` content)
+   */
   name: string;
+  /**
+   * Start of the bar
+   */
   start: Date;
+  /**
+   * End of the bar
+   */
   end: Date;
   /**
    * Incidents rendered as red hatched day-wide segments on the bar.
@@ -91,6 +118,9 @@ export interface PlanningTimelineGroupContext<G extends PlanningTimelineGroup = 
    * Forwarded `onGroupClick` — call it to make the whole header clickable (e.g. a collapse toggle).
    */
   onJump: (group: G) => void;
+  /**
+   * True when the left column is folded away
+   */
   sidebarCollapsed: boolean;
   /**
    * `group.childCount` when set, otherwise the number of resources in the group.
@@ -113,6 +143,9 @@ export interface PlanningTimelineResourceContext<
    * True when one of the resource's tasks is selected (`isTaskSelected`).
    */
   selected: boolean;
+  /**
+   * True when the left column is folded away
+   */
   sidebarCollapsed: boolean;
   /**
    * The resource's tasks (its bars), e.g. to summarize them in the cell.
@@ -124,6 +157,9 @@ export interface PlanningTimelineResourceContext<
  * Context given to `renderBar` for a bar's inner content.
  */
 export interface PlanningTimelineBarContext {
+  /**
+   * True when the left column is folded away
+   */
   sidebarCollapsed: boolean;
 }
 
@@ -141,12 +177,38 @@ export interface PlanningTimelineLocalStorageKeys {
  * Built-in UI strings; each falls back to the design-system locale (en/fr) when not overridden.
  */
 export interface PlanningTimelineLabels {
+  /**
+   * "Day" option of the view-mode toggle
+   */
   day: string;
+  /**
+   * "Week" option of the view-mode toggle
+   */
   week: string;
+  /**
+   * "Month" option of the view-mode toggle
+   */
   month: string;
+  /**
+   * "Year" option of the view-mode toggle
+   */
   year: string;
+  /**
+   * Toolbar button that re-centres the timeline on today
+   */
   today: string;
+  /**
+   * Message displayed when there is no resource to show
+   */
   noResult: string;
+  /**
+   * Accessible name of the button that folds the left column away
+   */
+  collapseSidebar: string;
+  /**
+   * Accessible name of the button that brings the left column back
+   */
+  expandSidebar: string;
 }
 
 export interface PlanningTimelineProps<
@@ -198,6 +260,9 @@ export interface PlanningTimelineProps<
    * Inner content of a bar. Defaults to the task name.
    */
   renderBar?: (task: T, context: PlanningTimelineBarContext) => ReactNode;
+  /**
+   * Content of the tooltip shown while hovering a bar. Omit to disable the tooltip.
+   */
   renderTooltip?: (task: T) => ReactNode;
   /**
    * Whether a task is the currently selected one (e.g. its detail view is open).
@@ -212,7 +277,12 @@ export interface PlanningTimelineProps<
    */
   toolbarActions?: ReactNode;
   /**
-   * Title of the left (frozen) column, also used as the collapse button tooltip.
+   * Extra content rendered in the toolbar right after the "today" button (e.g. the view's filters),
+   * where it reads as part of the date controls instead of crowding the view-mode toggle.
+   */
+  toolbarLeadingActions?: ReactNode;
+  /**
+   * Title of the left (frozen) column.
    */
   sidebarTitle?: string;
   /**

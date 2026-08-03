@@ -23,13 +23,13 @@ const AiAssistantPanel = ({ open, isBusy = false, children, dataTestId = "assist
       sx={{
         "@keyframes aiAssistantPanelAura": {
           "0%": {
-            boxShadow: "0 0 24px 4px rgba(139, 92, 246, 0.3), 0 0 40px 10px rgba(0, 200, 255, 0.16), 0 12px 40px rgba(0, 0, 0, 0.2)",
+            boxShadow: "0 0 24px 4px rgba(255, 79, 18, 0.3), 0 0 40px 10px rgba(229, 71, 16, 0.16), 0 12px 40px rgba(0, 0, 0, 0.2)",
           },
           "70%": {
-            boxShadow: "0 0 52px 16px rgba(139, 92, 246, 0.16), 0 0 72px 22px rgba(0, 200, 255, 0.28), 0 12px 40px rgba(0, 0, 0, 0.2)",
+            boxShadow: "0 0 52px 16px rgba(255, 79, 18, 0.16), 0 0 72px 22px rgba(229, 71, 16, 0.28), 0 12px 40px rgba(0, 0, 0, 0.2)",
           },
           "100%": {
-            boxShadow: "0 0 24px 4px rgba(139, 92, 246, 0.3), 0 0 40px 10px rgba(0, 200, 255, 0.16), 0 12px 40px rgba(0, 0, 0, 0.2)",
+            boxShadow: "0 0 24px 4px rgba(255, 79, 18, 0.3), 0 0 40px 10px rgba(229, 71, 16, 0.16), 0 12px 40px rgba(0, 0, 0, 0.2)",
           },
         },
         // Doubled selector (&&) so this a11y override beats the base rule regardless of emission order

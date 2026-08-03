@@ -29,6 +29,8 @@ import useTranslation from "@/hooks/useTranslation";
 import getBackgroundImageElevation from "@/utils/getBackgroundImageElevation";
 
 const HEADER_HEIGHT = 56;
+const ZOOM_GESTURE_IDLE_MS = 150;
+const ZOOM_DELTA_THRESHOLD = 24;
 const DEFAULT_LOCAL_STORAGE_KEYS: PlanningTimelineLocalStorageKeys = { viewMode: "soren-planning-timeline-view-mode" };
 const VIEW_MODES: ViewMode[] = ["day", "week", "month", "year"];
 
@@ -59,6 +61,7 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
   isTaskSelected,
   recenterKey,
   toolbarActions,
+  toolbarLeadingActions,
   sidebarTitle,
   locale,
   labels,
@@ -81,6 +84,8 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
   const lastModeRef = useRef(viewMode);
   const lastRecenterKeyRef = useRef(recenterKey);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const zoomFocusRef = useRef<{ date: Date; viewportX: number } | null>(null);
+  const zoomGestureRef = useRef({ delta: 0, lastEventAt: 0, used: false });
   const allGroups = useMemo(() => groups ?? [], [groups]);
   const allResources = useMemo(() => resources ?? [], [resources]);
   const allTasks = useMemo(() => tasks ?? [], [tasks]);
@@ -264,21 +269,107 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
     if (!scrollRef.current || scale.width === 0) {
       return;
     }
+
     const modeChanged = lastModeRef.current !== viewMode;
     const filtersChanged = lastRecenterKeyRef.current !== recenterKey;
+
     if (didInitRef.current && !modeChanged && !filtersChanged) {
       return;
     }
+
     didInitRef.current = true;
     lastModeRef.current = viewMode;
     lastRecenterKeyRef.current = recenterKey;
+
+    // Zoom at the cursor: the date being aimed at stays under it, the view "opens" around that date
+    // instead of jumping to the centre. Consumed in every case, so a stale focus never hijacks the
+    // next scale change.
+    const zoomFocus = zoomFocusRef.current;
+
+    zoomFocusRef.current = null;
+    if (zoomFocus && !filtersChanged) {
+      scrollRef.current.scrollLeft = Math.max(0, scale.dateToX(zoomFocus.date) + visibleSidebarWidth - zoomFocus.viewportX);
+      return;
+    }
+
     // A filter change resets the focus to today; a mode change keeps the current focus date.
     const target = filtersChanged ? new Date() : viewDate;
+
     if (filtersChanged) {
       setViewDate(target);
     }
     scrollToDate(target);
-  }, [scale, viewMode, viewDate, recenterKey, scrollToDate]);
+  }, [scale, viewMode, viewDate, recenterKey, scrollToDate, visibleSidebarWidth]);
+
+  /**
+   * Trackpad pinch or ctrl/⌘ + wheel moves one scale up or down (day → week → month → year) instead
+   * of scrolling. A plain wheel is left untouched, otherwise the slightest scroll would change the
+   * scale.
+   *
+   * One step per gesture: a pinch fires a burst of wheel events, so they are accumulated and the
+   * gesture only counts once, until a short silence separates it from the next one.
+   *
+   * The date under the cursor is stored before the change, then put back exactly under it once the
+   * new scale is computed (see the re-centring effect above).
+   */
+  useEffect(() => {
+    const element = scrollRef.current;
+
+    if (!element) {
+      return undefined;
+    }
+
+    const handleWheel = (event: WheelEvent) => {
+      // A trackpad pinch arrives as a `wheel` carrying `ctrlKey` — the same gesture as the native zoom.
+      if (!(event.ctrlKey || event.metaKey)) {
+        return;
+      }
+
+      // Before any threshold: whatever this gesture ends up doing here, it must not zoom the browser.
+      event.preventDefault();
+
+      const gesture = zoomGestureRef.current;
+
+      if (event.timeStamp - gesture.lastEventAt > ZOOM_GESTURE_IDLE_MS) {
+        gesture.delta = 0;
+        gesture.used = false;
+      }
+
+      gesture.lastEventAt = event.timeStamp;
+
+      if (gesture.used) {
+        return;
+      }
+
+      gesture.delta += event.deltaY;
+
+      if (Math.abs(gesture.delta) < ZOOM_DELTA_THRESHOLD) {
+        return;
+      }
+
+      // Pinching in (deltaY > 0) zooms out: day → week → month → year.
+      const step = gesture.delta > 0 ? 1 : -1;
+      gesture.delta = 0;
+      const nextIndex = VIEW_MODES.indexOf(viewMode) + step;
+
+      if (nextIndex < 0 || nextIndex >= VIEW_MODES.length) {
+        return;
+      }
+
+      gesture.used = true;
+
+      const viewportX = event.clientX - element.getBoundingClientRect().left;
+      const dateUnderCursor = scale.xToDate(Math.max(0, viewportX + element.scrollLeft - visibleSidebarWidth));
+
+      zoomFocusRef.current = { date: dateUnderCursor, viewportX };
+      setViewDate(dateUnderCursor);
+      setViewMode(VIEW_MODES[nextIndex]);
+    };
+
+    element.addEventListener("wheel", handleWheel, { passive: false });
+    return () => element.removeEventListener("wheel", handleWheel);
+    // `isLoading` swaps the whole grid: without it the listener would stay on the unmounted node.
+  }, [isLoading, scale, viewMode, visibleSidebarWidth]);
 
   /**
    * Persist the selected view mode so it survives page reloads.
@@ -321,10 +412,19 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
           p: 2,
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <IconButton onClick={() => setSidebarCollapsed((value) => !value)} size="small" title={sidebarTitle}>
-            {sidebarCollapsed ? <KeyboardDoubleArrowRightRoundedIcon /> : <KeyboardDoubleArrowLeftRoundedIcon />}
-          </IconButton>
+        <Stack direction="row" alignItems="center" spacing={2} sx={{ minWidth: 0 }}>
+          {/* Collapsed column: its header (which carries the button) is no longer rendered, so the way
+              back lives here. Expanded, the button sits next to the column title. */}
+          {sidebarCollapsed && (
+            <IconButton
+              onClick={() => setSidebarCollapsed(false)}
+              size="small"
+              aria-label={label("expandSidebar")}
+              title={label("expandSidebar")}
+            >
+              <KeyboardDoubleArrowRightRoundedIcon />
+            </IconButton>
+          )}
           <Stack direction="row" alignItems="center">
             <IconButton onClick={() => handleNav("prev")}>
               <KeyboardArrowLeftRoundedIcon />
@@ -333,14 +433,23 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
               <KeyboardArrowRightRoundedIcon />
             </IconButton>
           </Stack>
-          <Typography variant="body2" textTransform="capitalize">
+          <Typography variant="body2" textTransform="capitalize" noWrap>
             {dateLabel}
           </Typography>
-          <Button variant="outlined" size="small" color="inherit" onClick={handleToday} sx={{ borderColor: palette.divider }}>
+          <Button
+            variant="outlined"
+            size="small"
+            color="inherit"
+            onClick={handleToday}
+            sx={{ borderColor: palette.divider, flexShrink: 0 }}
+          >
             <Typography variant="body2" textTransform="none" color="textSecondary">
               {label("today")}
             </Typography>
           </Button>
+          {/* Slot for the view's own controls (filters…): right after the date navigation rather than
+              on the right, where they would crowd the scale picker. */}
+          {toolbarLeadingActions}
         </Stack>
 
         <Stack direction="row" alignItems="center" spacing={2}>
@@ -387,6 +496,7 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
                 borderRight: `1px solid ${palette.divider}`,
                 display: sidebarCollapsed ? "none" : "flex",
                 flexShrink: 0,
+                justifyContent: "space-between",
                 left: 0,
                 position: "sticky",
                 px: 3,
@@ -395,6 +505,14 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
               }}
             >
               <Typography variant="h5">{sidebarTitle}</Typography>
+              <IconButton
+                onClick={() => setSidebarCollapsed(true)}
+                size="small"
+                aria-label={label("collapseSidebar")}
+                title={label("collapseSidebar")}
+              >
+                <KeyboardDoubleArrowLeftRoundedIcon />
+              </IconButton>
             </Box>
             <Box
               sx={{

@@ -1,6 +1,7 @@
-import { SvgIcon } from "@mui/material";
+import { SvgIcon, useTheme } from "@mui/material";
 import { useId } from "react";
 import type { AiSparkIconProps } from "@/components/DataDisplay/AiAssistant/types";
+import { assistantSparkStops } from "@/components/DataDisplay/AiAssistant/utils/gradient";
 
 /**
  * Four-point spark with concave curved edges — the filled, organic "AI" glyph
@@ -8,6 +9,7 @@ import type { AiSparkIconProps } from "@/components/DataDisplay/AiAssistant/type
  */
 const AiSparkIcon = ({ size = 24, color = "currentColor", variant = "solid" }: AiSparkIconProps) => {
   const gradientId = useId();
+  const { palette } = useTheme();
   const isGradient = variant === "gradient";
 
   return (
@@ -15,9 +17,10 @@ const AiSparkIcon = ({ size = 24, color = "currentColor", variant = "solid" }: A
       {isGradient && (
         <defs>
           <linearGradient id={gradientId} x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#4f8dff" />
-            <stop offset="0.5" stopColor="#8b5cf6" />
-            <stop offset="1" stopColor="#00c8ff" />
+            {/* Brand gradient: the Soren orange sinking into black (charcoal on a dark surface). */}
+            {assistantSparkStops(palette.mode).map(({ color, offset }) => (
+              <stop key={color} offset={offset} stopColor={color} />
+            ))}
           </linearGradient>
         </defs>
       )}

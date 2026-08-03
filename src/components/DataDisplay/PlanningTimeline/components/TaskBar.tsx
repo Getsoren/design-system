@@ -101,8 +101,8 @@ const TaskBar = <T extends PlanningTimelineTask>({
   // "default" (e.g. an ended task) is rendered muted.
   const statusColor: PlanningTimelineStatusColor = task.statusColor ?? "default";
   const isDefault = statusColor === "default";
-  const barColor = isDefault ? palette.grey[500] : palette[statusColor].main;
-  const textColor = isDefault ? palette.getContrastText(palette.grey[500]) : palette[statusColor].contrastText;
+  const barColor = isDefault ? palette.grey[600] : palette[statusColor].dark;
+  const textColor = isDefault ? palette.getContrastText(palette.grey[600]) : palette[statusColor].contrastText;
 
   // Overdue overrun segment: planned end → today, hatched in warning (orange).
   const overrunStart = task.overdue && task.plannedEnd ? scale.dateToX(task.plannedEnd) - left : null;

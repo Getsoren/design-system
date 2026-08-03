@@ -2,11 +2,13 @@ import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import Tooltip from "@mui/material/Tooltip";
 import type { AiAssistantFabProps } from "@/components/DataDisplay/AiAssistant/types";
+import { assistantOrbGradient } from "@/components/DataDisplay/AiAssistant/utils/gradient";
 import AiSparkIcon from "@/components/DataDisplay/Icons/AiSparkIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 
 /**
- * The assistant's floating action button — a liquid orb: iridescent gradient flow,
+ * The assistant's floating action button — a liquid orb: brand gradient flow (Soren orange
+ * dissolving into black),
  * blob morph, breath and pulsing aura while idle; calm circle with a close glyph when
  * the panel is open. The animations live on a ::before layer so the hit-box never
  * moves (reliable clicks, stable e2e).
@@ -19,9 +21,9 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab" }:
       data-testid={dataTestId}
       sx={{
         "@keyframes aiAssistantAura": {
-          "0%": { boxShadow: "0 0 0 0 rgba(139, 92, 246, 0.45), 0 6px 22px rgba(0, 176, 255, 0.35)" },
-          "70%": { boxShadow: "0 0 0 14px rgba(139, 92, 246, 0), 0 6px 26px rgba(0, 176, 255, 0.5)" },
-          "100%": { boxShadow: "0 0 0 0 rgba(139, 92, 246, 0), 0 6px 22px rgba(0, 176, 255, 0.35)" },
+          "0%": { boxShadow: "0 0 0 0 rgba(255, 79, 18, 0.45), 0 6px 22px rgba(255, 79, 18, 0.3)" },
+          "70%": { boxShadow: "0 0 0 14px rgba(255, 79, 18, 0), 0 6px 26px rgba(255, 79, 18, 0.42)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(255, 79, 18, 0), 0 6px 22px rgba(255, 79, 18, 0.3)" },
         },
         /**
          * Liquid orb: subtle undulation (radii stay within 42-58%), but through 7
@@ -100,7 +102,7 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab" }:
           animation: open
             ? "aiAssistantFlow 5s ease infinite"
             : "aiAssistantFlow 11.3s ease -5.3s infinite, aiAssistantBlob 8.7s ease-in-out -2.7s infinite, aiAssistantWobble 6.1s ease-in-out -1.9s infinite, aiAssistantAura 4.1s ease-out -1.3s infinite",
-          background: "linear-gradient(125deg, #4f8dff 0%, #8b5cf6 30%, #00c8ff 60%, #ff5fa2 85%, #4f8dff 100%)",
+          background: ({ palette }) => assistantOrbGradient(palette.mode),
           backgroundSize: "320% 320%",
           borderRadius: "50%",
           content: '""',

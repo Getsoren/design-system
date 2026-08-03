@@ -292,6 +292,13 @@ WithFooter.args = {
   items: ITEMS,
 };
 
+export const Compact = Template.bind({});
+Compact.args = {
+  density: "compact",
+  items: ITEMS_WITH_GROUPS,
+  Logo: <Logo colorShape="white" />,
+};
+
 export default {
   component: NavigationMenu,
   title: "Components/Navigation/NavigationMenu",

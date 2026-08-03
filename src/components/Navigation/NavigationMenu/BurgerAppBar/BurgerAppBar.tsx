@@ -1,7 +1,7 @@
 import { AppBar, IconButton, Stack, Toolbar, useTheme } from "@mui/material";
 import { cloneElement, ReactElement, useContext } from "react";
 import MenuIcon from "@/components/DataDisplay/Icons/MenuIcon";
-import { NavigationMenuContext } from "@/components/Navigation/NavigationMenu";
+import { NavigationMenuContext } from "@/components/Navigation/NavigationMenu/NavigationMenu";
 
 const cloneElementWithProps = <T extends Record<string, unknown>>(element: ReactElement, props: T): ReactElement =>
   cloneElement(element, props as any);

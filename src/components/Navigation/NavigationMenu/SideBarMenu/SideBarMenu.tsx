@@ -1,20 +1,30 @@
 import { Box, Chip, Collapse, Fade, List, ListItem, Stack, SvgIcon, Theme, Tooltip, Typography } from "@mui/material";
 import { isValidElement, KeyboardEvent, useContext, useState } from "react";
-import { NavigationGroupItem, NavigationItem, NavigationMenuContext, ObjectNavigationItem } from "@/components/Navigation/NavigationMenu";
+import {
+  NavigationGroupItem,
+  NavigationItem,
+  NavigationMenuContext,
+  ObjectNavigationItem,
+} from "@/components/Navigation/NavigationMenu/NavigationMenu";
 import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem";
+import {
+  NAVIGATION_DENSITY_TOKENS,
+  type NavigationDensity,
+  type NavigationDensityTokens,
+} from "@/components/Navigation/NavigationMenu/utils/navigationDensity";
 
 export interface SideBarMenuProps {
   items?: NavigationItem[];
 }
 
-const styles = {
+const buildStyles = (tokens: NavigationDensityTokens) => ({
   groupHeader: {
     alignItems: "center",
     color: "text.secondary",
     display: "flex",
     fontWeight: 600,
     justifyContent: "space-between",
-    minHeight: 32,
+    minHeight: tokens.groupHeaderMinHeight,
     paddingX: 1.25,
     paddingY: 0.5,
     textTransform: "uppercase",
@@ -23,7 +33,7 @@ const styles = {
   },
   groupItem: {
     listStyle: "none",
-    mt: 2,
+    mt: tokens.groupItemMarginTop,
   },
   iconWrapper: {
     alignItems: "center",
@@ -65,15 +75,21 @@ const styles = {
       display: "flex",
       fontSize: 16,
       justifyContent: "flex-start",
-      minHeight: 42,
+      minHeight: tokens.itemMinHeight,
       paddingX: 1.25,
-      paddingY: 1,
+      paddingY: tokens.itemPaddingY,
       textAlign: "left",
       textDecoration: "none",
       width: "100%",
     },
-    mt: 3,
+    mt: tokens.listMarginTop,
   },
+});
+
+/** Both densities are built once: an sx object rebuilt on every render would defeat the emotion cache. */
+const STYLES: Record<NavigationDensity, ReturnType<typeof buildStyles>> = {
+  compact: buildStyles(NAVIGATION_DENSITY_TOKENS.compact),
+  standard: buildStyles(NAVIGATION_DENSITY_TOKENS.standard),
 };
 
 // The chip is absolutely positioned inside the 24px icon wrapper: shrink-to-fit width plus MUI's default
@@ -105,7 +121,8 @@ const isGroupItem = (item: NavigationItem): item is NavigationGroupItem =>
  * Shared between top-level items and grouped items.
  */
 const SideBarNavRow = ({ item }: { item: ObjectNavigationItem }) => {
-  const { NavLink, isCollapsed } = useContext(NavigationMenuContext);
+  const { NavLink, density, isCollapsed } = useContext(NavigationMenuContext);
+  const styles = STYLES[density];
   const { count, countColor, tag, tagColor, url, label, icon, active, disabled, target, end, state } = item;
 
   return (
@@ -149,9 +166,11 @@ const SideBarNavRow = ({ item }: { item: ObjectNavigationItem }) => {
  * collapsed to its icon rail, the header is hidden and the icons stay visible.
  */
 const SideBarMenuGroup = ({ group }: { group: NavigationGroupItem }) => {
-  const { isMobile, isCollapsed } = useContext(NavigationMenuContext);
+  const { density, isMobile, isCollapsed } = useContext(NavigationMenuContext);
+  const { listItemPaddingY } = NAVIGATION_DENSITY_TOKENS[density];
   const { groupLabel, items, collapsible = false, defaultExpanded = true } = group;
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const styles = STYLES[density];
 
   const visibleItems = items.filter((child) => !isItemHidden(child, isMobile));
 
@@ -192,7 +211,7 @@ const SideBarMenuGroup = ({ group }: { group: NavigationGroupItem }) => {
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List disablePadding component="ul">
           {visibleItems.map((child, index) => (
-            <ListItem key={`${child.url}-${child.label}-${index}`} disableGutters sx={{ paddingY: 0.5 }}>
+            <ListItem key={`${child.url}-${child.label}-${index}`} disableGutters sx={{ paddingY: listItemPaddingY }}>
               <SideBarNavRow item={child} />
             </ListItem>
           ))}
@@ -203,7 +222,9 @@ const SideBarMenuGroup = ({ group }: { group: NavigationGroupItem }) => {
 };
 
 const SideBarMenu = ({ items }: SideBarMenuProps) => {
-  const { isMobile } = useContext(NavigationMenuContext);
+  const { density, isMobile } = useContext(NavigationMenuContext);
+  const { listItemPaddingY } = NAVIGATION_DENSITY_TOKENS[density];
+  const styles = STYLES[density];
 
   return (
     <Box px={2} component="nav">
@@ -226,7 +247,7 @@ const SideBarMenu = ({ items }: SideBarMenuProps) => {
               const key = `${item.url}-${item.label}-${index}`;
 
               return (
-                <ListItem key={key} disableGutters sx={{ paddingY: 0.5 }}>
+                <ListItem key={key} disableGutters sx={{ paddingY: listItemPaddingY }}>
                   <SideBarNavRow item={item} />
                 </ListItem>
               );

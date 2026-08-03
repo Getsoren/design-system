@@ -22,7 +22,7 @@ import MenuIcon from "@/components/DataDisplay/Icons/MenuIcon";
 import Logo, { LogoProps } from "@/components/DataDisplay/Logo";
 import ActionAppBar from "@/components/Inputs/ActionAppBar";
 import TextFieldAppBar from "@/components/Inputs/TextFieldAppBar";
-import { NavigationItem, NavLinkProps } from "@/components/Navigation/NavigationMenu";
+import { NavigationItem, NavLinkProps } from "@/components/Navigation/NavigationMenu/NavigationMenu";
 import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem";
 import useMenu from "@/hooks/useMenu";
 

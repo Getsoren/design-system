@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import NavigationMenu from "@/components/Navigation/NavigationMenu";
+import NavigationMenu from "@/components/Navigation/NavigationMenu/NavigationMenu";
 import AppBar from "@/components/Surface/AppBar";
 import Backoffice from "../Backoffice";
 

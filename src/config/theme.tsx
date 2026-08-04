@@ -905,7 +905,25 @@ const commonThemeOptions: MuiThemeOptions = {
       },
     },
     MuiDialogActions: {
-      styleOverrides: actionStyleOverrides,
+      styleOverrides: {
+        ...actionStyleOverrides,
+        root: (params) => ({
+          ...((typeof actionStyleOverrides.root === "function" ? actionStyleOverrides.root(params) : undefined) as object | undefined),
+          // Cancel buttons (outlined inherit): grey outline and text, black on hover — the same
+          // language as the ✕ close button.
+          "& .MuiButton-outlinedInherit": {
+            borderColor: params.theme.palette.divider,
+            color: params.theme.palette.text.secondary,
+          },
+          "& .MuiButton-outlinedInherit:hover": {
+            // No hover background: the outline and the text turning black are enough (transparent
+            // is explicit to cancel the MUI hover overlay).
+            backgroundColor: "transparent",
+            borderColor: params.theme.palette.text.primary,
+            color: params.theme.palette.text.primary,
+          },
+        }),
+      },
     },
     MuiDialogTitle: {
       defaultProps: {
@@ -1337,15 +1355,23 @@ const commonThemeOptions: MuiThemeOptions = {
     },
     MuiTooltip: {
       styleOverrides: {
-        // Fully opaque: MUI's default rgba(97,97,97,0.92) let the background bleed through. Same grey (A700), no alpha.
-        arrow: ({ theme }) => ({
-          color: theme.palette.grey.A700,
-        }),
-        tooltip: ({ theme }) => ({
-          backgroundColor: theme.palette.grey.A700,
+        // Near-black and near-opaque: MUI's default rgba(97,97,97,0.92) read mid-grey and let the
+        // background bleed through.
+        arrow: {
+          color: "rgba(33, 33, 33, 0.96)",
+        },
+        tooltip: {
+          // Rich tooltips (a card as content): the dark background otherwise shows at the four
+          // corners of the card.
+          "&:has(.MuiPaper-root)": {
+            backgroundColor: "transparent",
+            padding: 0,
+          },
+          backgroundColor: "rgba(33, 33, 33, 0.96)",
           fontSize: pxToRem(14),
+          fontWeight: 400,
           letterSpacing: 0,
-        }),
+        },
       },
     },
   },

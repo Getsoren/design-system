@@ -150,8 +150,26 @@ const ChatConversationDetail = ({
               return (
                 <Stack key={message.id} spacing={3}>
                   {showDayDivider && (
-                    <Divider>
-                      <Typography variant="caption" color="text.secondary">
+                    // Centered pill rather than a full-width line: the ::before/::after keep their
+                    // flex (centering) but lose their line.
+                    <Divider
+                      sx={{
+                        "& .MuiDivider-wrapper": {
+                          alignItems: "center",
+                          backgroundColor: "background.paper",
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 999,
+                          display: "flex",
+                          paddingX: 1.5,
+                          paddingY: 0.75,
+                        },
+                        "&::after": { borderTop: "none" },
+                        "&::before": { borderTop: "none" },
+                      }}
+                    >
+                      {/* lineHeight 1: the tall caption line height (1.66) pushes the text below the optical center. */}
+                      <Typography variant="caption" color="text.secondary" lineHeight={1}>
                         {getDayLabel(message.createdAt)}
                       </Typography>
                     </Divider>

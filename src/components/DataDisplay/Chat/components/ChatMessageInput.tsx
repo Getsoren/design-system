@@ -88,6 +88,8 @@ const ChatMessageInput = ({
           },
         }}
       />
+      {/* The input fieldset draws the top and the sides, this bar the sides and the bottom: no top
+          border here, so both merge into a single continuous pill outline. */}
       <Stack
         direction="row"
         justifyContent="space-between"
@@ -96,7 +98,9 @@ const ChatMessageInput = ({
           border: ({ palette }) => `1px solid ${palette.divider}`,
           borderBottomLeftRadius: RADIUS,
           borderBottomRightRadius: RADIUS,
+          borderTop: "none",
           padding: 1,
+          paddingTop: 0,
         }}
       >
         <Stack direction="row" alignItems="center" spacing={1}>

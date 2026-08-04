@@ -119,14 +119,28 @@ const AppBar = ({
               <MenuIcon />
             </IconButton>
           )}
+          {/* Desktop: both side blocks (logo left, actions right) take the same flex share so the
+              search block — fixed-width — is centered on the real center of the bar and stays in
+              the flow (it scrolls with the bar). Below md the burger layout keeps its own flow. */}
           {isSmallScreen || LogoComponent === null ? null : (
-            <Box sx={styles.logoContainer}>{LogoComponent || <Logo mode="dark" {...logoProps} />}</Box>
+            <Box sx={{ ...styles.logoContainer, flex: "1 1 0", minWidth: 0 }}>{LogoComponent || <Logo mode="dark" {...logoProps} />}</Box>
           )}
-          <Stack alignItems="center" direction="row" justifyContent={isMobile ? "flex-end" : "center"} spacing={1} flex={1}>
+          <Stack
+            alignItems="center"
+            direction="row"
+            justifyContent={isMobile ? "flex-end" : "center"}
+            spacing={1}
+            sx={{ flex: { md: "0 0 auto", xs: 1 }, width: { md: "min(520px, 45%)" } }}
+          >
             {isMobile && (ActionComponent === null ? null : ActionComponent || (actionProps ? <ActionAppBar {...actionProps} /> : null))}
             {SearchComponent === null ? null : SearchComponent || <TextFieldAppBar {...searchProps} />}
           </Stack>
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{ flex: { md: "1 1 0" }, justifyContent: { md: "flex-end" }, minWidth: { md: 0 } }}
+          >
             {!isMobile && (ActionComponent === null ? null : ActionComponent || (actionProps ? <ActionAppBar {...actionProps} /> : null))}
             {AvatarComponent === null
               ? null

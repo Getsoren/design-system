@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.67.0](https://github.com/getsoren/design-system/compare/4.66.0...4.67.0) (2026-08-04)
+
+
+### Features
+
+* **dialog:** DialogForm wrapper preserving the paper flex column ([bb9d127](https://github.com/getsoren/design-system/commit/bb9d1279204b014933b4e50a92ce9d124cc4e562))
+
 ## [4.66.0](https://github.com/getsoren/design-system/compare/4.65.0...4.66.0) (2026-08-04)
 
 

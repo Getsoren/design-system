@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.65.0](https://github.com/getsoren/design-system/compare/4.64.0...4.65.0) (2026-08-04)
+
+
+### Features
+
+* **ui:** tooltips, dialog cancel buttons, app bar centering and chat polish ([f5d97fb](https://github.com/getsoren/design-system/commit/f5d97fba20f38cff6501cb0a0b00501ce97d3584))
+
 ## [4.64.0](https://github.com/getsoren/design-system/compare/4.63.0...4.64.0) (2026-08-03)
 
 

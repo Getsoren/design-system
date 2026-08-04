@@ -49,6 +49,8 @@ export * from "@/components/DataDisplay/TypographySkeleton";
 export { default as TypographySkeleton } from "@/components/DataDisplay/TypographySkeleton";
 export * from "@/components/Feedback/Dialog/DialogCloseIcon";
 export { default as DialogCloseIcon } from "@/components/Feedback/Dialog/DialogCloseIcon";
+export * from "@/components/Feedback/Dialog/DialogForm/DialogForm";
+export { default as DialogForm } from "@/components/Feedback/Dialog/DialogForm/DialogForm";
 export * from "@/components/Feedback/Dialog/DialogPopper";
 export { default as DialogPopper } from "@/components/Feedback/Dialog/DialogPopper";
 export * from "@/components/Feedback/Dialog/DialogValidation/DialogValidation";

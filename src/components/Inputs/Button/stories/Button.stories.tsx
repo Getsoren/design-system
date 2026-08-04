@@ -30,6 +30,12 @@ const AlarmIcon = () => (
 
 const Template: StoryFn<typeof Button> = (args) => (
   <Stack spacing={2} alignItems="center" justifyContent="center" height="100%" paddingY={5}>
+    <Button size="xSmall" color="inherit" {...args}>
+      XSmall inherit
+    </Button>
+    <Button size="xSmall" startIcon={<AddShoppingCartIcon />} {...args}>
+      XSmall with icon
+    </Button>
     <Button size="small" color="inherit" {...args}>
       Small inherit
     </Button>

@@ -15,6 +15,7 @@ import {
   ListItemText,
   Slide,
   Stack,
+  TextField,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -23,6 +24,7 @@ import type { TransitionProps } from "@mui/material/transitions";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { forwardRef, ReactElement, Ref, useState } from "react";
 import DialogCloseIcon from "@/components/Feedback/Dialog/DialogCloseIcon";
+import DialogForm from "@/components/Feedback/Dialog/DialogForm/DialogForm";
 import Dialog from "./Dialog";
 
 export interface SimpleDialogProps {
@@ -285,6 +287,90 @@ SmallActionsButton.parameters = {
 
 export const WithDialogCloseIcon = WithCloseIconTemplate.bind({});
 WithDialogCloseIcon.args = {};
+
+const StickyActionsTemplate: StoryFn<typeof DialogActions> = (args) => {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <>
+      <Button variant="outlined" onClick={() => setOpen(true)}>
+        Open dialog
+      </Button>
+      <Dialog fullWidth maxWidth="sm" open={open} onClose={() => setOpen(false)}>
+        <DialogCloseIcon onClick={() => setOpen(false)} />
+        <DialogTitle>Long form</DialogTitle>
+        <DialogContent>
+          {Array.from({ length: 12 }, (_, index) => (
+            <DialogContentText key={index} paragraph>
+              Scrollable content block {index + 1} — the actions bar below sticks to the bottom of the dialog while this content scrolls
+              underneath it.
+            </DialogContentText>
+          ))}
+        </DialogContent>
+        <DialogActions {...args}>
+          <Button variant="outlined" color="inherit" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={() => setOpen(false)}>
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+};
+
+const FormDialogTemplate: StoryFn<typeof Dialog> = () => {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <>
+      <Button variant="outlined" onClick={() => setOpen(true)}>
+        Open form dialog
+      </Button>
+      <Dialog fullWidth maxWidth="sm" open={open} onClose={() => setOpen(false)}>
+        <DialogCloseIcon onClick={() => setOpen(false)} />
+        {/* DialogForm restores the Paper's flex column a plain <form> breaks: the content scrolls,
+            the title and the actions stay in place. */}
+        <DialogForm
+          onSubmit={(event) => {
+            event.preventDefault();
+            setOpen(false);
+          }}
+        >
+          <DialogTitle>Long form</DialogTitle>
+          <DialogContent>
+            <Stack spacing={3} paddingTop={1}>
+              {Array.from({ length: 10 }, (_, index) => (
+                <TextField key={index} fullWidth label={`Field ${index + 1}`} />
+              ))}
+            </Stack>
+          </DialogContent>
+          <DialogActions variant="sticky">
+            <Button variant="outlined" color="inherit" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="contained" type="submit">
+              Save
+            </Button>
+          </DialogActions>
+        </DialogForm>
+      </Dialog>
+    </>
+  );
+};
+
+export const WithFormWrapper = FormDialogTemplate.bind({});
+
+export const StickyActions = StickyActionsTemplate.bind({});
+StickyActions.args = {
+  variant: "sticky",
+};
+
+export const StickyFlatActions = StickyActionsTemplate.bind({});
+StickyFlatActions.args = {
+  variant: "sticky-flat",
+};
 
 export const BackgroundSecondary = BasicTemplate.bind({});
 BackgroundSecondary.args = {

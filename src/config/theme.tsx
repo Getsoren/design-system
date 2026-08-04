@@ -80,6 +80,17 @@ declare module "@mui/material/Dialog" {
   }
 }
 
+declare module "@mui/material/DialogActions" {
+  interface DialogActionsProps {
+    /**
+     * "sticky": the buttons stay reachable when the dialog scrolls (engages only on overflow, so
+     * short dialogs render as before). "sticky-flat": same without the hairline, for small
+     * confirmation dialogs where the line separates nothing.
+     */
+    variant?: "sticky" | "sticky-flat";
+  }
+}
+
 declare module "@mui/material/FormControlLabel" {
   interface FormControlLabelProps {
     variant?: "card";
@@ -944,6 +955,33 @@ const commonThemeOptions: MuiThemeOptions = {
           },
         }),
       },
+      variants: [
+        {
+          props: { variant: "sticky" },
+          style: ({ theme }) => ({
+            backgroundColor: theme.palette.background.paper,
+            // The opaque background and hairline keep the form from showing through the buttons
+            // while it scrolls underneath. Inline colour: the borderTop shorthand would otherwise
+            // fall back to currentColor and paint a black line.
+            borderTop: `1px solid ${theme.palette.divider}`,
+            bottom: 0,
+            // Tightened: the default padding made for very tall footers.
+            padding: theme.spacing(1.5, 3),
+            position: "sticky",
+            zIndex: 1,
+          }),
+        },
+        {
+          props: { variant: "sticky-flat" },
+          style: ({ theme }) => ({
+            backgroundColor: theme.palette.background.paper,
+            bottom: 0,
+            padding: theme.spacing(1.5, 3),
+            position: "sticky",
+            zIndex: 1,
+          }),
+        },
+      ],
     },
     MuiDialogTitle: {
       defaultProps: {

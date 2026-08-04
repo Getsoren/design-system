@@ -1,4 +1,5 @@
 export default {
+  anErrorOccurred: "An error occurred",
   apply: "Apply",
   clear: "Clear",
   clickToUpload: "Click to upload",
@@ -11,9 +12,12 @@ export default {
   files: "Files",
   month: "Month",
   noResult: "No result",
+  oops: "Oops!",
   open: "Open",
   openFullPage: "Open full page",
   openFullScreen: "Open in full screen",
+  orDragAndDrop: "or drag and drop",
+  reload: "Reload",
   reset: "Reset",
   selectAll: "Select all",
   today: "Today",

@@ -196,8 +196,19 @@ const File = forwardRef<HTMLInputElement, FileUploadProps>(
               </Typography>
             </>
           ) : (
-            <Typography variant="subtitle1" color={disabled ? "text.disabled" : "primary"}>
-              {label || t("clickToUpload")} {required && "*"}
+            // Default label: the action stands out in bold, "drag and drop" comes second — the old
+            // subtitle1 in primary read too massive for a secondary area. A custom label keeps the
+            // same quiet typography.
+            <Typography component="span" variant="body2" color={disabled ? "text.disabled" : "text.primary"}>
+              {label || (
+                <>
+                  <Typography component="strong" variant="inherit" fontWeight={600}>
+                    {t("clickToUpload")}
+                  </Typography>{" "}
+                  {t("orDragAndDrop")}
+                </>
+              )}
+              {required && " *"}
             </Typography>
           )}
           {helperText && (

@@ -21,6 +21,7 @@ const ICON_LOADING_SIZE = {
   large: 17,
   medium: 16,
   small: 15,
+  xSmall: 14,
 };
 
 const Loader = ({ size, loadingPosition, position = "absolute" }: LoaderProps) => (

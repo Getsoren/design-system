@@ -51,6 +51,9 @@ declare module "@mui/material/Button" {
   interface ButtonPropsColorOverrides {
     contrast: true;
   }
+  interface ButtonPropsSizeOverrides {
+    xSmall: true;
+  }
   interface ButtonPropsVariantOverrides {
     dashed: true;
     "dashed-rounded": true;
@@ -410,6 +413,23 @@ const commonThemeOptions: MuiThemeOptions = {
               backgroundColor: theme.palette.tertiary.main,
               borderColor: theme.palette.divider,
             };
+          },
+        },
+        {
+          props: { size: "xSmall" },
+          style: {
+            "& .MuiButton-endIcon": { marginLeft: 6, marginRight: 0 },
+            // The horizontal padding follows the DS ratio (24px for 14px of text → 16px for 12px),
+            // and the negative margin MUI applies to the start icon is neutralized, otherwise the
+            // left side looks tighter than the right.
+            "& .MuiButton-startIcon": { marginLeft: 0, marginRight: 6 },
+            "& .MuiButton-startIcon > *:nth-of-type(1), & .MuiButton-endIcon > *:nth-of-type(1)": { fontSize: 14 },
+            fontSize: pxToRem(12),
+            letterSpacing: -0.3,
+            minHeight: 28,
+            minWidth: 0,
+            paddingLeft: "16px",
+            paddingRight: "16px",
           },
         },
         {
@@ -927,10 +947,28 @@ const commonThemeOptions: MuiThemeOptions = {
     },
     MuiDialogTitle: {
       defaultProps: {
-        variant: "h3",
+        // One size below h4 but reinforced, in the primary text colour — the same as page titles.
+        variant: "h5",
       },
       styleOverrides: {
         root: ({ theme }) => ({
+          // MUI cancels the top padding of any DialogContent adjacent to the title — but not when
+          // a <form> wrapper sits in between, which gave two different spacings depending on the
+          // dialog structure. The 20px are restored everywhere for a consistent header.
+          // Doubled class: at equal specificity the MUI DialogContent rule can win on injection order.
+          "& + .MuiDialogContent-root.MuiDialogContent-root": { paddingTop: theme.spacing(2.5) },
+          // Sticks the subtitle to the title: DialogContent brings its own top padding. Neutralized
+          // ONLY when the content starts with a subtitle (body2) — content starting on a card or a
+          // form keeps its padding, otherwise the close button sits on top of it.
+          "& + .MuiDialogContent-root.MuiDialogContent-root:has(> .MuiTypography-body2:first-child)": { paddingTop: 0 },
+          // Same rule when a <form> wrapper sits between the title and the content (form dialogs):
+          // without it the body2 subtitle floats far from the title.
+          "& + form > .MuiDialogContent-root:has(> .MuiTypography-body2:first-child)": { paddingTop: 0 },
+          color: theme.palette.text.primary,
+          fontWeight: 600,
+          // 12px: the title block must stay above the absolute close button zone, otherwise it
+          // overflows onto the content when scrolling.
+          paddingBottom: theme.spacing(1.5),
           paddingRight: theme.spacing(7),
         }),
       },

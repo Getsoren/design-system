@@ -1,4 +1,5 @@
 export default {
+  anErrorOccurred: "Une erreur est survenue",
   apply: "Appliquer",
   clear: "Effacer",
   clickToUpload: "Cliquez pour télécharger",
@@ -11,9 +12,12 @@ export default {
   files: "Fichiers",
   month: "Mois",
   noResult: "Aucun résultat",
+  oops: "Oups !",
   open: "Ouvert",
   openFullPage: "Ouvrir en pleine page",
   openFullScreen: "Ouvrir en plein écran",
+  orDragAndDrop: "ou glissez-déposez",
+  reload: "Recharger",
   reset: "Réinitialiser",
   selectAll: "Tout sélectionner",
   today: "Aujourd'hui",

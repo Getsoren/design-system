@@ -2,7 +2,7 @@
   "name": "@getsoren/design-system",
   "description": "Design System React library",
   "sideEffects": false,
-  "version": "4.65.0",
+  "version": "4.66.0",
   "license": "ISC",
   "type": "module",
   "types": "./dist/src/main.d.ts",

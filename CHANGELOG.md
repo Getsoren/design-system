@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.66.0](https://github.com/getsoren/design-system/compare/4.65.0...4.66.0) (2026-08-04)
+
+
+### Features
+
+* **ui:** new components (ApiAutocomplete, PageHeader, ErrorState, LogoAvatar, NumberBadge) and dialog/button refinements ([6ccd7c4](https://github.com/getsoren/design-system/commit/6ccd7c452427d3e8bf5a134bb1bae1f3eaec4592))
+
 ## [4.65.0](https://github.com/getsoren/design-system/compare/4.64.0...4.65.0) (2026-08-04)
 
 

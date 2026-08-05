@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.67.3](https://github.com/getsoren/design-system/compare/4.67.2...4.67.3) (2026-08-05)
+
+
+### Bug Fixes
+
+* **PlanningTimeline:** default rowHeight ([d0e6dae](https://github.com/getsoren/design-system/commit/d0e6dae8bf7eab0dd0d004d82d9b4dd77c54234b))
+
 ## [4.67.2](https://github.com/getsoren/design-system/compare/4.67.1...4.67.2) (2026-08-05)
 
 

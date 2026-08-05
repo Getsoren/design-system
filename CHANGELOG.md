@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.68.0](https://github.com/getsoren/design-system/compare/4.67.3...4.68.0) (2026-08-05)
+
+
+### Features
+
+* **ErrorState:** add logo props ([f1238ad](https://github.com/getsoren/design-system/commit/f1238ad88b398e6f7cf55bf23db4daabc1f2113f))
+
 ## [4.67.3](https://github.com/getsoren/design-system/compare/4.67.2...4.67.3) (2026-08-05)
 
 

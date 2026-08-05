@@ -228,18 +228,32 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
   );
 
   const autocompleteOptions = useMemo(() => {
-    if (!(Array.isArray(data) || actionEndOption)) {
+    if (!(Array.isArray(data) || actionEndOption || actionStartOption)) {
       return [];
     }
 
-    if (actionEndOption) {
+    if (actionEndOption || actionStartOption) {
       return [
+        ...(actionStartOption
+          ? [
+              {
+                id: "apiAutocompletePropsActionStartOption",
+                isActionOption: true,
+                isActionStartOption: true,
+                label: actionStartOption?.label,
+              } as unknown as Value & ActionOption,
+            ]
+          : []),
         ...(Array.isArray(data) ? data : []),
-        {
-          id: "apiAutocompletePropsActionOption",
-          isActionOption: true,
-          label: actionEndOption?.label,
-        } as unknown as Value & ActionOption,
+        ...(actionEndOption
+          ? [
+              {
+                id: "apiAutocompletePropsActionOption",
+                isActionOption: true,
+                label: actionEndOption?.label,
+              } as unknown as Value & ActionOption,
+            ]
+          : []),
       ];
     }
 
@@ -266,7 +280,7 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
     (_: SyntheticEvent, newValue: Value | null, reason: AutocompleteChangeReason) => {
       if (Array.isArray(newValue) && newValue.some((item) => item?.isActionOption)) {
         setInputValue("");
-        actionEndOption?.onClick?.();
+        (newValue.some((item) => item?.isActionStartOption) ? actionStartOption : actionEndOption)?.onClick?.();
         return;
       }
 
@@ -278,7 +292,7 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
 
       if (newValue?.isActionOption) {
         setInputValue("");
-        actionEndOption?.onClick?.();
+        (newValue.isActionStartOption ? actionStartOption : actionEndOption)?.onClick?.();
         return;
       }
 

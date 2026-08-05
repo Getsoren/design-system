@@ -68,7 +68,7 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
   localStorageKeys,
   defaultViewMode = "day",
   sidebarWidth = 300,
-  rowHeight = 56,
+  rowHeight = 36,
 }: PlanningTimelineProps<G, R, T>) => {
   // One virtualized line of the grid: a group header, or a resource carrying its task bars.
   type DisplayItem = { key: string } & ({ type: "group"; group: G; childCount: number } | { type: "resource"; resource: R; tasks: T[] });

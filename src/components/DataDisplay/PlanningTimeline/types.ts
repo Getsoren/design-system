@@ -308,7 +308,7 @@ export interface PlanningTimelineProps<
    */
   sidebarWidth?: number;
   /**
-   * Height (px) of every row (group headers and resources alike). @default 56
+   * Height (px) of every row (group headers and resources alike). @default 36
    */
   rowHeight?: number;
 }

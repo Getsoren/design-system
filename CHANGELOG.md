@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.68.3](https://github.com/getsoren/design-system/compare/4.68.2...4.68.3) (2026-08-05)
+
+
+### Bug Fixes
+
+* apiAutocomplete ([ab9549e](https://github.com/getsoren/design-system/commit/ab9549ebc435b6995ead91df1e2b0ce0f170fc7f))
+
 ## [4.68.2](https://github.com/getsoren/design-system/compare/4.68.1...4.68.2) (2026-08-05)
 
 ## [4.68.1](https://github.com/getsoren/design-system/compare/4.68.0...4.68.1) (2026-08-05)

@@ -54,7 +54,7 @@ const useLogo = () => {
     [palette.text.primary],
   );
 
-  const getImageModule = useCallback(async (variant: LogoProps["variant"], mode: string, withoutText: LogoProps["withoutText"]) => {
+  const getImageModule = useCallback((variant: LogoProps["variant"], mode: string, withoutText: LogoProps["withoutText"]) => {
     if (withoutText) {
       return import("@/assets/img/tracktor-logo.svg");
     }
@@ -83,8 +83,8 @@ const useLogo = () => {
     }) => {
       if (withoutText) {
         return {
-          height: DEFAULT_SIZE_SHAPE,
-          width: DEFAULT_SIZE_SHAPE,
+          height: height || DEFAULT_SIZE_SHAPE,
+          width: width || DEFAULT_SIZE_SHAPE,
         };
       }
 

@@ -2,7 +2,7 @@ export default {
   anErrorOccurred: "Une erreur est survenue",
   apply: "Appliquer",
   clear: "Effacer",
-  clickToUpload: "Cliquez pour télécharger",
+  clickToUpload: "Cliquez pour parcourir",
   close: "Fermer",
   closed: "Clôturé",
   collapseSidebar: "Replier la colonne",

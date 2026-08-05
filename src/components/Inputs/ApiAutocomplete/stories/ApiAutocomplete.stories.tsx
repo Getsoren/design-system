@@ -45,6 +45,15 @@ WithActionEndOption.args = {
   },
 };
 
+export const WithActionStartOption = Template.bind({});
+WithActionStartOption.args = {
+  ...BASE_ARGS,
+  actionStartOption: {
+    label: "+ Create a machine",
+    onClick: () => alert("create"),
+  },
+};
+
 export default {
   component: ApiAutocomplete,
   title: "Components/Inputs/ApiAutocomplete",

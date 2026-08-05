@@ -32,11 +32,12 @@ import {
   useState,
 } from "react";
 
-interface ActionEndOption {
+interface ActionOption {
   label?: ReactNode;
   onClick?: () => void;
   value?: unknown;
-  isActionEndOption?: boolean;
+  isActionOption?: boolean;
+  isActionStartOption?: boolean;
 }
 
 export interface ApiAutocompleteProps<
@@ -45,9 +46,13 @@ export interface ApiAutocompleteProps<
   DisableClearable extends boolean | undefined = false,
 > {
   /**
-   * Action added in and of options
+   * Action row appended at the end of the options list
    */
-  actionEndOption?: ActionEndOption;
+  actionEndOption?: ActionOption;
+  /**
+   * Action row pinned at the top of the options list (e.g. a "create new…" entry)
+   */
+  actionStartOption?: ActionOption;
   /** Replaces the default dropdown caret (e.g. a switcher's up/down chevrons). */
   popupIcon?: ReactNode;
   limitTags?: number;
@@ -59,7 +64,7 @@ export interface ApiAutocompleteProps<
   keyOptionLabel: string | string[];
   noOptionsText?: ReactNode;
   getOptionLabel?: (option: Value) => string;
-  renderOption?: (props: HTMLAttributes<HTMLLIElement>, option: Value & ActionEndOption, state: AutocompleteRenderOptionState) => ReactNode;
+  renderOption?: (props: HTMLAttributes<HTMLLIElement>, option: Value & ActionOption, state: AutocompleteRenderOptionState) => ReactNode;
   searchKey?: string;
   required?: boolean;
   queryParams?: Record<string, unknown>;
@@ -143,6 +148,7 @@ const getEndAdornment = (isFetching: boolean, InputProps?: TextFieldProps["Input
 
 const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
   actionEndOption,
+  actionStartOption,
   popupIcon,
   blurOnSelect,
   label,
@@ -230,10 +236,10 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
       return [
         ...(Array.isArray(data) ? data : []),
         {
-          id: "apiAutocompletePropsActionEndOption",
-          isActionEndOption: true,
+          id: "apiAutocompletePropsActionOption",
+          isActionOption: true,
           label: actionEndOption?.label,
-        } as unknown as Value & ActionEndOption,
+        } as unknown as Value & ActionOption,
       ];
     }
 
@@ -254,11 +260,11 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
     }
 
     return data || [];
-  }, [data, actionEndOption, value]);
+  }, [data, actionEndOption, actionStartOption, value]);
 
   const handleOnChange = useCallback(
     (_: SyntheticEvent, newValue: Value | null, reason: AutocompleteChangeReason) => {
-      if (Array.isArray(newValue) && newValue.some((item) => item?.isActionEndOption)) {
+      if (Array.isArray(newValue) && newValue.some((item) => item?.isActionOption)) {
         setInputValue("");
         actionEndOption?.onClick?.();
         return;
@@ -270,7 +276,7 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
         return;
       }
 
-      if (newValue?.isActionEndOption) {
+      if (newValue?.isActionOption) {
         setInputValue("");
         actionEndOption?.onClick?.();
         return;
@@ -290,7 +296,7 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
 
       onChange?.(_, newValue, reason);
     },
-    [actionEndOption, onChange, setSelectedValue],
+    [actionEndOption, actionStartOption, onChange, setSelectedValue],
   );
 
   const handleOnInputChange = useCallback((_: SyntheticEvent, newInputValue: string, reason: AutocompleteInputChangeReason) => {
@@ -320,7 +326,7 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
       if (Array.isArray(option)) {
         return option
           .map((opt) => {
-            if (opt?.isActionEndOption) {
+            if (opt?.isActionOption) {
               return opt.label;
             }
             if (typeof keyOptionLabel === "string") {
@@ -343,7 +349,7 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
   // Use the consumer-provided label resolver when available, otherwise fall back to the keyOptionLabel-based one.
   const getOptionLabel = useCallback(
     (option: Value | AutocompleteFreeSoloValueMapping<unknown>) =>
-      getOptionLabelProp && !Array.isArray(option) && !(option as ActionEndOption)?.isActionEndOption
+      getOptionLabelProp && !Array.isArray(option) && !(option as ActionOption)?.isActionOption
         ? getOptionLabelProp(option as Value)
         : defaultGetOptionLabel(option),
     [getOptionLabelProp, defaultGetOptionLabel],

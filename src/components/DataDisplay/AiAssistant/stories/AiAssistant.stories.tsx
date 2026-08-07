@@ -144,6 +144,25 @@ export const WithVoiceInput: StoryFn = () => {
   );
 };
 
+/**
+ * The contextual nudge: a compact one-shot bubble growing from the Fab WITHOUT opening
+ * the panel — how a host app nudges the user on a specific screen (onboarding hints).
+ * Closing it here re-arms the story via the Fab.
+ */
+export const Nudge: StoryFn = () => {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <>
+      <AiAssistant.Fab open={false} onClick={() => setOpen(true)} tooltip="Nova - Assistant IA" />
+      <AiAssistant.Nudge open={open} title="Choisissez votre matériel principal" onClose={() => setOpen(false)}>
+        C&apos;est le matériel au cœur de votre location — vous pourrez ajouter d&apos;autres matériels et accessoires juste après. Deux
+        façons de le trouver : tapez directement une référence dans la recherche, ou parcourez les catégories du catalogue.
+      </AiAssistant.Nudge>
+    </>
+  );
+};
+
 /** Panel scaffolding shared by the EmptyState stories — the thread area is the only thing they vary */
 const EmptyStatePanel = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(true);

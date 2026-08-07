@@ -2,6 +2,7 @@ import AiAssistantConfirmationCard from "@/components/DataDisplay/AiAssistant/co
 import AiAssistantEmptyState from "@/components/DataDisplay/AiAssistant/components/AiAssistantEmptyState";
 import AiAssistantFab from "@/components/DataDisplay/AiAssistant/components/AiAssistantFab";
 import AiAssistantHeader from "@/components/DataDisplay/AiAssistant/components/AiAssistantHeader";
+import AiAssistantNudge from "@/components/DataDisplay/AiAssistant/components/AiAssistantNudge";
 import AiAssistantPanel from "@/components/DataDisplay/AiAssistant/components/AiAssistantPanel";
 import AiAssistantThinkingOrb from "@/components/DataDisplay/AiAssistant/components/AiAssistantThinkingOrb";
 
@@ -16,6 +17,7 @@ const AiAssistant = {
   EmptyState: AiAssistantEmptyState,
   Fab: AiAssistantFab,
   Header: AiAssistantHeader,
+  Nudge: AiAssistantNudge,
   Panel: AiAssistantPanel,
   ThinkingOrb: AiAssistantThinkingOrb,
 };

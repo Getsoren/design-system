@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.68.4](https://github.com/getsoren/design-system/compare/4.68.3...4.68.4) (2026-08-07)
+
+
+### Bug Fixes
+
+* add AiAssistantNudge ([74ed874](https://github.com/getsoren/design-system/commit/74ed8741c40f58b7fd3d2c10260cb4c158f83a00))
+
 ## [4.68.3](https://github.com/getsoren/design-system/compare/4.68.2...4.68.3) (2026-08-05)
 
 

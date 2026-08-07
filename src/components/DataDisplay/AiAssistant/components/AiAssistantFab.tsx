@@ -39,6 +39,14 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab" }:
           "72%": { borderRadius: "47% 53% 56% 44% / 54% 46% 53% 47%" },
           "87%": { borderRadius: "53% 47% 44% 56% / 49% 55% 45% 55%" },
         },
+        // Breathing halo (two layered soft glows swelling and settling) — the same aura
+        // language as the onboarding nudge spotlight, scaled to the orb. Lives on its
+        // own ::after layer: it must COMPOSE with the sonar wave above, and two
+        // box-shadow animations on one element would override each other.
+        "@keyframes aiAssistantBreath": {
+          "0%, 100%": { boxShadow: "0 0 16px 4px rgba(255, 79, 18, 0.3), 0 0 44px 16px rgba(255, 79, 18, 0.14)" },
+          "50%": { boxShadow: "0 0 28px 9px rgba(255, 79, 18, 0.44), 0 0 70px 26px rgba(255, 79, 18, 0.22)" },
+        },
         // The gradient wanders diagonally through 4 corners instead of ping-ponging on one axis
         "@keyframes aiAssistantFlow": {
           "0%": { backgroundPosition: "0% 40%" },
@@ -65,6 +73,7 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab" }:
         "@media (prefers-reduced-motion: reduce)": {
           "&& .aiAssistantFabIcon": { transition: "none" },
           "&& svg": { animation: "none" },
+          "&&::after": { animation: "none" },
           "&&::before": { animation: "none" },
         },
         /**
@@ -90,6 +99,18 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab" }:
           },
           opacity: open ? 0 : 1,
           transform: open ? "rotate(90deg) scale(0.4)" : "rotate(0deg) scale(1)",
+        },
+        // The breathing halo layer, UNDER the orb: composes with (never replaces) the
+        // sonar wave pulsing on ::before. Calm and gone while the panel is open.
+        "&::after": {
+          animation: open ? "none" : "aiAssistantBreath 3.4s ease-in-out infinite",
+          borderRadius: "50%",
+          boxShadow: open ? "none" : "0 0 16px 4px rgba(255, 79, 18, 0.3), 0 0 44px 16px rgba(255, 79, 18, 0.14)",
+          content: '""',
+          inset: 0,
+          pointerEvents: "none",
+          position: "absolute",
+          zIndex: -2,
         },
         /**
          * The living orb is a ::before layer: it flows, undulates (blob morph) and

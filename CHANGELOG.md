@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.70.0](https://github.com/getsoren/design-system/compare/4.69.0...4.70.0) (2026-08-07)
+
+
+### Features
+
+* add breathing halo aura to AiAssistantFab ([6364923](https://github.com/getsoren/design-system/commit/63649232c37d81b57722990aecfc68dde72c006a))
+
 ## [4.69.0](https://github.com/getsoren/design-system/compare/4.68.4...4.69.0) (2026-08-07)
 
 

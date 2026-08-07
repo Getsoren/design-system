@@ -121,7 +121,9 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab" }:
         color: "common.white",
         position: "fixed",
         right: 24,
-        zIndex: (theme) => theme.zIndex.drawer + 1,
+        // Snackbar level (above modal backdrops): the assistant stays reachable while a
+        // modal flow is open (e.g. the host app's command bar) — Panel and Nudge match
+        zIndex: (theme) => theme.zIndex.snackbar,
       }}
     >
       <Box sx={{ display: "grid", placeItems: "center" }}>

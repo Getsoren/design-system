@@ -16,11 +16,19 @@ export interface AiAssistantNudgeProps {
   open: boolean;
   /** Short headline of the nudge (host-app wording, already translated) */
   title: string;
-  /** One-click dismiss — the host app decides what "seen" means */
+  /** One-click dismiss (close button, or "finish" past the last step) — the host app decides what "seen" means */
   onClose: () => void;
-  /** Body of the bubble — plain text or a few short paragraphs (\n\n separated) */
-  children: ReactNode;
-  /** Test hook on the bubble ("assistantNudge"); the close button appends "Close" */
+  /** Body of the bubble: one string = plain text; an array = one entry per step, walked with the built-in stepper */
+  content?: string | string[];
+  /** Custom body — rendered instead of `content` when provided */
+  children?: ReactNode;
+  /** Controlled index of the displayed `content` step (defaults to 0) — controlled so the host can sync a spotlight */
+  activeStep?: number;
+  /** Called with the target step index when the user navigates the stepper */
+  onStepChange?: (step: number) => void;
+  /** Stepper wording (host-app i18n) — the stepper only shows with multi-step content AND labels */
+  labels?: { previous: string; next: string; finish: string };
+  /** Test hook on the bubble ("assistantNudge"); the close and next buttons append "Close" / "Next" */
   dataTestId?: string;
 }
 

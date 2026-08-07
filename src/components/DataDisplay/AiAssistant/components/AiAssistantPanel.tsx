@@ -50,7 +50,9 @@ const AiAssistantPanel = ({ open, isBusy = false, children, dataTestId = "assist
         // inset, ~48px under the panel) — the grow visually starts from the button
         transformOrigin: "calc(100% - 24px) calc(100% + 48px)",
         width: { sm: 400, xs: "calc(100vw - 32px)" },
-        zIndex: (theme) => theme.zIndex.drawer + 1,
+        // Snackbar level, like the Fab it grows from: a Fab clickable above a modal
+        // backdrop must open a panel that is not buried under that same backdrop
+        zIndex: (theme) => theme.zIndex.snackbar,
       }}
     >
       {children}

@@ -155,10 +155,48 @@ export const Nudge: StoryFn = () => {
   return (
     <>
       <AiAssistant.Fab open={false} onClick={() => setOpen(true)} tooltip="Nova - Assistant IA" />
-      <AiAssistant.Nudge open={open} title="Choisissez votre matériel principal" onClose={() => setOpen(false)}>
-        C&apos;est le matériel au cœur de votre location — vous pourrez ajouter d&apos;autres matériels et accessoires juste après. Deux
-        façons de le trouver : tapez directement une référence dans la recherche, ou parcourez les catégories du catalogue.
-      </AiAssistant.Nudge>
+      <AiAssistant.Nudge
+        open={open}
+        title="Choisissez votre matériel principal"
+        onClose={() => setOpen(false)}
+        content="C'est le matériel au cœur de votre location — vous pourrez ajouter d'autres matériels et accessoires juste après. Deux façons de le trouver : tapez directement une référence dans la recherche, ou parcourez les catégories du catalogue."
+      />
+    </>
+  );
+};
+
+/**
+ * Multi-step content: an array + labels turn on the built-in stepper (n/N, previous /
+ * next, finish on the last step). The step is controlled, so the host app can mirror it
+ * — e.g. spotlighting the element each step talks about.
+ */
+export const NudgeWithSteps: StoryFn = () => {
+  const [open, setOpen] = useState(true);
+  const [step, setStep] = useState(0);
+
+  return (
+    <>
+      <AiAssistant.Fab
+        open={false}
+        onClick={() => {
+          setStep(0);
+          setOpen(true);
+        }}
+        tooltip="Nova - Assistant IA"
+      />
+      <AiAssistant.Nudge
+        open={open}
+        title="Tout se pilote depuis votre commande"
+        onClose={() => setOpen(false)}
+        content={[
+          "Le bloc Articles récapitule le matériel commandé et ses prix.",
+          "Juste en dessous, ajoutez des contacts pour donner accès à la commande à vos équipes.",
+          "Et surtout : le bouton Événement en haut vous permet de déclarer tout ce qui se passe sur votre location.",
+        ]}
+        activeStep={step}
+        onStepChange={setStep}
+        labels={{ finish: "Terminer", next: "Suivant", previous: "Précédent" }}
+      />
     </>
   );
 };

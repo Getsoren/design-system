@@ -779,6 +779,12 @@ const commonThemeOptions: MuiThemeOptions = {
 
           return {
             ...(color === "default" && {
+              // MUI paints the leading icon grey[300] in dark mode, but our dark grey scale holds
+              // surface tones (grey[300] ≈ the chip's own background), which makes the icon vanish.
+              // Track the text tokens instead, muted like the deleteIcon.
+              "& .MuiChip-icon": {
+                color: theme.palette.text.secondary,
+              },
               backgroundColor: isOutlinedVariant ? theme.palette.grey[50] : theme.palette.grey[100],
               border: isOutlinedVariant ? `1px solid ${theme.palette.divider}` : "transparent",
               color: theme.palette.text.primary,

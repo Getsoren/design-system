@@ -1,6 +1,14 @@
-import { Stack } from "@mui/material";
+import { Stack, SvgIcon } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import Chip from "../Chip";
+
+// Plain MUI SvgIcon rather than a DS icon: Chip clones its `icon` with a className, which the DS
+// icons drop, so they would escape the `.MuiChip-icon` theme styling this story exists to show.
+const AddIcon = (
+  <SvgIcon viewBox="0 0 24 24">
+    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z" />
+  </SvgIcon>
+);
 
 const Template: StoryFn<typeof Chip> = (args) => (
   <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
@@ -93,6 +101,12 @@ WithDeleteIcon.args = {
 
 export const Colors = TemplateColor.bind({});
 Colors.args = {
+  onDelete: undefined,
+};
+
+export const WithIcon = TemplateColor.bind({});
+WithIcon.args = {
+  icon: AddIcon,
   onDelete: undefined,
 };
 

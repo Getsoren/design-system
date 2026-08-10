@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.71.1](https://github.com/getsoren/design-system/compare/4.71.0...4.71.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* make default Chip leading icon visible in dark mode ([36621ab](https://github.com/getsoren/design-system/commit/36621ab65d2a96ce36004390aebadd18dc55b55e))
+
 ## [4.71.0](https://github.com/getsoren/design-system/compare/4.70.0...4.71.0) (2026-08-10)
 
 

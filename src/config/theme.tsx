@@ -1004,10 +1004,13 @@ const commonThemeOptions: MuiThemeOptions = {
           // Sticks the subtitle to the title: DialogContent brings its own top padding. Neutralized
           // ONLY when the content starts with a subtitle (body2) — content starting on a card or a
           // form keeps its padding, otherwise the close button sits on top of it.
-          "& + .MuiDialogContent-root.MuiDialogContent-root:has(> .MuiTypography-body2:first-child)": { paddingTop: 0 },
+          // `:not(* + *)` reads "has no preceding sibling", i.e. `:first-child` — spelled this way
+          // because Emotion warns on `:first-child` (SSR-unsafe), and the suggested `:first-of-type`
+          // would wrongly match a subtitle sitting below a card or a form.
+          "& + .MuiDialogContent-root.MuiDialogContent-root:has(> .MuiTypography-body2:not(* + *))": { paddingTop: 0 },
           // Same rule when a <form> wrapper sits between the title and the content (form dialogs):
           // without it the body2 subtitle floats far from the title.
-          "& + form > .MuiDialogContent-root:has(> .MuiTypography-body2:first-child)": { paddingTop: 0 },
+          "& + form > .MuiDialogContent-root:has(> .MuiTypography-body2:not(* + *))": { paddingTop: 0 },
           color: theme.palette.text.primary,
           fontWeight: 600,
           // 12px: the title block must stay above the absolute close button zone, otherwise it

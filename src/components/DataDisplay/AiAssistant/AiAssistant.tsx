@@ -4,6 +4,7 @@ import AiAssistantFab from "@/components/DataDisplay/AiAssistant/components/AiAs
 import AiAssistantHeader from "@/components/DataDisplay/AiAssistant/components/AiAssistantHeader";
 import AiAssistantNudge from "@/components/DataDisplay/AiAssistant/components/AiAssistantNudge";
 import AiAssistantPanel from "@/components/DataDisplay/AiAssistant/components/AiAssistantPanel";
+import AiAssistantSpotlight from "@/components/DataDisplay/AiAssistant/components/AiAssistantSpotlight";
 import AiAssistantThinkingOrb from "@/components/DataDisplay/AiAssistant/components/AiAssistantThinkingOrb";
 
 /**
@@ -19,6 +20,7 @@ const AiAssistant = {
   Header: AiAssistantHeader,
   Nudge: AiAssistantNudge,
   Panel: AiAssistantPanel,
+  Spotlight: AiAssistantSpotlight,
   ThinkingOrb: AiAssistantThinkingOrb,
 };
 

@@ -32,6 +32,17 @@ export interface AiAssistantNudgeProps {
   dataTestId?: string;
 }
 
+export interface AiAssistantSpotlightProps {
+  /** Element the spotlight follows while mounted (rect re-read on resize/scroll/tick) */
+  anchor: HTMLElement;
+  /** Shield the whole app: every click is swallowed, the lit window is the only click target */
+  blocking?: boolean;
+  /** Blocking mode only: the user clicked the lit window */
+  onWindowClick?: () => void;
+  /** Test hook on the lit window ("assistantSpotlight"); the blocking shield appends "Overlay" */
+  dataTestId?: string;
+}
+
 export interface AiAssistantPanelProps {
   /** Panel visibility — grows out of the Fab when opening, unmounted when closed */
   open: boolean;

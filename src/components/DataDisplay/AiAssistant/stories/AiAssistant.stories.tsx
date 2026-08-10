@@ -201,6 +201,23 @@ export const NudgeWithSteps: StoryFn = () => {
   );
 };
 
+/**
+ * The spotlight: dims everything but the anchored element, with the orbiting shine and
+ * the breathing aura — how a host app points at a screen element (nudge target, tour
+ * step). Non-blocking here: the button stays clickable under the highlight.
+ */
+export const Spotlight: StoryFn = () => {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const [clicks, setClicks] = useState(0);
+
+  return (
+    <Stack alignItems="center" justifyContent="center" minHeight={320}>
+      <Chip ref={setAnchor} label={`Élément mis en lumière — ${clicks} clic(s)`} onClick={() => setClicks((count) => count + 1)} />
+      {anchor && <AiAssistant.Spotlight anchor={anchor} />}
+    </Stack>
+  );
+};
+
 /** Panel scaffolding shared by the EmptyState stories — the thread area is the only thing they vary */
 const EmptyStatePanel = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(true);

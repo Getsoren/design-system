@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.71.2](https://github.com/getsoren/design-system/compare/4.71.1...4.71.2) (2026-08-10)
+
+
+### Bug Fixes
+
+* silence emotion unsafe-selector warning on DialogTitle subtitle rules ([a43e92a](https://github.com/getsoren/design-system/commit/a43e92a86247da33976bf73774db199635275cc6))
+
 ## [4.71.1](https://github.com/getsoren/design-system/compare/4.71.0...4.71.1) (2026-08-10)
 
 

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.72.0](https://github.com/getsoren/design-system/compare/4.71.3...4.72.0) (2026-08-11)
+
+
+### Features
+
+* **chat:** promote add-participant to its own header button, keep delete in the menu ([fe2e2e5](https://github.com/getsoren/design-system/commit/fe2e2e5bb479f5ad1747d45bc29455fe0f811a32))
+
 ## [4.71.3](https://github.com/getsoren/design-system/compare/4.71.2...4.71.3) (2026-08-11)
 
 

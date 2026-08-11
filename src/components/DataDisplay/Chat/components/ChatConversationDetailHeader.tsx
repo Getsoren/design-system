@@ -6,6 +6,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -86,8 +87,24 @@ const ChatConversationDetailHeader = ({
             {participantNames}
           </Typography>
         </Stack>
+        {/* Adding a participant is the frequent action, so it gets a button of its own; the menu
+            keeps what stays rare and destructive. */}
         {headerAction ?? (
-          <>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Tooltip arrow title={labels?.addParticipant ?? "Add Participant"}>
+              <IconButton
+                size="small"
+                aria-label={labels?.addParticipant ?? "Add Participant"}
+                onClick={handleOpenAddDialog}
+                sx={{
+                  "&:hover": { backgroundColor: "grey.200" },
+                  backgroundColor: "grey.100",
+                  color: "text.primary",
+                }}
+              >
+                <PersonAddIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
             <IconButton size="small" onClick={openMenu}>
               <MoreHorizIcon fontSize="small" />
             </IconButton>
@@ -98,12 +115,6 @@ const ChatConversationDetailHeader = ({
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               transformOrigin={{ horizontal: "right", vertical: "top" }}
             >
-              <MenuItem onClick={handleOpenAddDialog}>
-                <ListItemIcon>
-                  <PersonAddIcon fontSize="small" />
-                </ListItemIcon>
-                <Typography>{labels?.addParticipant ?? "Add Participant"}</Typography>
-              </MenuItem>
               <MenuItem onClick={handleDelete}>
                 <ListItemIcon>
                   <DeleteIcon fontSize="small" color="error" />
@@ -111,7 +122,7 @@ const ChatConversationDetailHeader = ({
                 <Typography color="error">{labels?.deleteConversation ?? "Delete Conversation"}</Typography>
               </MenuItem>
             </Menu>
-          </>
+          </Stack>
         )}
       </Stack>
       <ChatParticipantDialog

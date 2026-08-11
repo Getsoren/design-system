@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.73.0](https://github.com/getsoren/design-system/compare/4.72.0...4.73.0) (2026-08-11)
+
+
+### Features
+
+* **chat:** async-aware participant dialog confirm — loading until resolved, stays open on failure ([137ffa2](https://github.com/getsoren/design-system/commit/137ffa2d36ef9e0aa2b2316c0c6f7645fc997e19))
+
 ## [4.72.0](https://github.com/getsoren/design-system/compare/4.71.3...4.72.0) (2026-08-11)
 
 

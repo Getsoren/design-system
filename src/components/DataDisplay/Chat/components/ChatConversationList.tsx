@@ -127,7 +127,7 @@ const ChatConversationList = ({
       <List ref={listRef} disablePadding sx={{ flex: 1, overflowY: "auto" }}>
         {isLoading &&
           Array.from({ length: 6 }, (_, i) => (
-            <ListItemButton key={i} sx={{ px: 2, py: 1.5 }}>
+            <ListItemButton key={i} sx={{ px: 2, py: 1 }}>
               <ListItemAvatar>
                 <Skeleton variant="circular" width={40} height={40} />
               </ListItemAvatar>
@@ -143,7 +143,7 @@ const ChatConversationList = ({
               key={thread.id}
               selected={thread.id === selectedThreadId}
               onClick={() => onSelectThread(thread.id)}
-              sx={{ px: 2, py: 1.5 }}
+              sx={{ px: 2, py: 1 }}
             >
               <ListItemAvatar>
                 <Avatar

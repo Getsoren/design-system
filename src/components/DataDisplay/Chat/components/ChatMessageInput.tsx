@@ -68,6 +68,8 @@ const ChatMessageInput = ({
         onKeyDown={handleKeyDown}
         slotProps={{ htmlInput: { maxLength } }}
         sx={{
+          // body1 (16px) is a step above every other field: align the composer on body2 like the rest.
+          "& .MuiInputBase-root": { fontSize: ({ typography }) => typography.body2.fontSize },
           "& .MuiOutlinedInput-root": {
             "&:hover fieldset": { borderColor: "divider" },
             "&.Mui-focused fieldset": {

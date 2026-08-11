@@ -88,7 +88,7 @@ export interface ChatConversationDetailProps {
   onDeleteConversation: (threadId: string) => void;
   onNewConversation: () => void;
   onSendMessage: (threadId: string, body: string) => void;
-  onAddParticipants: (participants: ChatSearchUser[]) => void;
+  onAddParticipants: (participants: ChatSearchUser[]) => void | Promise<unknown>;
   onSearchParticipants?: (query: string) => void;
   searchResults?: ChatSearchUser[];
   isSearchingParticipants?: boolean;
@@ -171,7 +171,7 @@ export interface ChatVoiceRecorderProps {
 export interface ChatParticipantDialogProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (participants: ChatSearchUser[]) => void;
+  onConfirm: (participants: ChatSearchUser[]) => void | Promise<unknown>; // May return a promise: the dialog then shows the confirm button loading and only closes on success.
   onSearch: (query: string) => void;
   searchResults?: ChatSearchUser[];
   isSearchLoading?: boolean;

@@ -23,7 +23,7 @@ interface ChatConversationDetailHeaderProps {
   threadId: string;
   participants?: ChatParticipant[] | null;
   onDeleteConversation: (threadId: string) => void;
-  onAddParticipants: (participants: ChatSearchUser[]) => void;
+  onAddParticipants: (participants: ChatSearchUser[]) => void | Promise<unknown>;
   onSearchParticipants?: (query: string) => void;
   searchResults?: ChatSearchUser[];
   isSearchingParticipants?: boolean;

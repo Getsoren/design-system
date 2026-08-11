@@ -23,14 +23,29 @@ const ChatParticipantDialog = ({
   labels,
 }: ChatParticipantDialogProps) => {
   const [selectedParticipants, setSelectedParticipants] = useState<ChatSearchUser[]>([]);
+  const [isConfirming, setIsConfirming] = useState(false);
   const autocompleteRef = useRef<ChatParticipantAutocompleteHandle>(null);
 
-  const handleConfirm = () => {
-    if (!selectedParticipants.length) {
+  const handleConfirm = async () => {
+    if (!selectedParticipants.length || isConfirming) {
       return;
     }
 
-    onConfirm(selectedParticipants);
+    const result = onConfirm(selectedParticipants);
+
+    // An async confirm keeps the dialog open with the button loading, and only closes once it
+    // resolves; a rejection leaves the selection in place so the caller's error surface gets a retry.
+    if (result instanceof Promise) {
+      setIsConfirming(true);
+      try {
+        await result;
+      } catch {
+        return;
+      } finally {
+        setIsConfirming(false);
+      }
+    }
+
     setSelectedParticipants([]);
     onClose();
   };
@@ -56,7 +71,13 @@ const ChatParticipantDialog = ({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button fullWidth variant="contained" onClick={handleConfirm} disabled={!selectedParticipants.length} loading={isConfirmLoading}>
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={handleConfirm}
+          disabled={!selectedParticipants.length}
+          loading={isConfirmLoading || isConfirming}
+        >
           {labels?.confirm ?? "Chat"}
         </Button>
       </DialogActions>

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.71.3](https://github.com/getsoren/design-system/compare/4.71.2...4.71.3) (2026-08-11)
+
+
+### Bug Fixes
+
+* **chat:** align composer font on body2 and tighten conversation row density ([31ecd93](https://github.com/getsoren/design-system/commit/31ecd9326da99a2c530a69fd2ace920e85fc9642))
+
 ## [4.71.2](https://github.com/getsoren/design-system/compare/4.71.1...4.71.2) (2026-08-10)
 
 

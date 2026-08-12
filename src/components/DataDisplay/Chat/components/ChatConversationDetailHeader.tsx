@@ -97,8 +97,8 @@ const ChatConversationDetailHeader = ({
                 aria-label={labels?.addParticipant ?? "Add Participant"}
                 onClick={handleOpenAddDialog}
                 sx={{
-                  "&:hover": { backgroundColor: "grey.200" },
-                  backgroundColor: "grey.100",
+                  "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.400" : "grey.200") },
+                  backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
                   color: "text.primary",
                 }}
               >

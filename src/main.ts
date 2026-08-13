@@ -71,6 +71,8 @@ export type { ButtonProps } from "@/components/Inputs/Button";
 export { default as Button } from "@/components/Inputs/Button";
 export * from "@/components/Inputs/ChipFilter/ChipFilter";
 export { default as ChipFilter } from "@/components/Inputs/ChipFilter/ChipFilter";
+export * from "@/components/Inputs/CountryAutocomplete/CountryAutocomplete";
+export { default as CountryAutocomplete } from "@/components/Inputs/CountryAutocomplete/CountryAutocomplete";
 export * from "@/components/Inputs/File";
 export { default as File } from "@/components/Inputs/File";
 export * from "@/components/Inputs/QuantityField";
@@ -125,5 +127,6 @@ export { default as useTabs } from "@/hooks/useTabs";
 export * from "@/utils/getBackgroundImageElevation";
 // Utils
 export { default as getBackgroundImageElevation } from "@/utils/getBackgroundImageElevation";
+export { default as isoToEmojiFlag } from "@/utils/isoToEmojiFlag";
 export * from "@/utils/pxToRem";
 export { default as pxToRem } from "@/utils/pxToRem";

@@ -69,6 +69,8 @@ export * from "@/components/Inputs/AutocompleteFilter";
 export { default as AutocompleteFilter } from "@/components/Inputs/AutocompleteFilter";
 export type { ButtonProps } from "@/components/Inputs/Button";
 export { default as Button } from "@/components/Inputs/Button";
+export * from "@/components/Inputs/CheckboxCard/CheckboxCard";
+export { default as CheckboxCard } from "@/components/Inputs/CheckboxCard/CheckboxCard";
 export * from "@/components/Inputs/ChipFilter/ChipFilter";
 export { default as ChipFilter } from "@/components/Inputs/ChipFilter/ChipFilter";
 export * from "@/components/Inputs/CountryAutocomplete/CountryAutocomplete";

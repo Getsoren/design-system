@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.73.2](https://github.com/getsoren/design-system/compare/4.73.1...4.73.2) (2026-08-13)
+
+
+### Bug Fixes
+
+* **theme:** adjust letter spacing to align with MuiInputBase for consistency ([fa3e8bb](https://github.com/getsoren/design-system/commit/fa3e8bb0e58e30c1408a686d2dd03e111963a36b))
+
 ## [4.73.1](https://github.com/getsoren/design-system/compare/4.73.0...4.73.1) (2026-08-12)
 
 

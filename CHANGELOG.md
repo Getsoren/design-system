@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.75.0](https://github.com/getsoren/design-system/compare/4.74.0...4.75.0) (2026-08-13)
+
+
+### Features
+
+* **checkbox:** add CheckboxCard component with single and multi-select functionality ([15fcda3](https://github.com/getsoren/design-system/commit/15fcda3b3221ba17c751bccb791ded1e42a4767e))
+
 ## [4.74.0](https://github.com/getsoren/design-system/compare/4.73.2...4.74.0) (2026-08-13)
 
 

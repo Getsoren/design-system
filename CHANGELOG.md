@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.74.0](https://github.com/getsoren/design-system/compare/4.73.2...4.74.0) (2026-08-13)
+
+
+### Features
+
+* **autocomplete:** add CountryAutocomplete component with country selection and emoji flags ([5dc88fb](https://github.com/getsoren/design-system/commit/5dc88fb24fee0e5cc5b9cba9801c35d4ba23fffc))
+
 ## [4.73.2](https://github.com/getsoren/design-system/compare/4.73.1...4.73.2) (2026-08-13)
 
 

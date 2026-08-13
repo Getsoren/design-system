@@ -1081,7 +1081,9 @@ const commonThemeOptions: MuiThemeOptions = {
       styleOverrides: {
         root: {
           fontSize: pxToRem(14),
-          letterSpacing: 0.4,
+          // Aligned with MuiInputBase (-0.3): MUI's default positive caption tracking is the
+          // one place it would break the negative tracking used everywhere else in the theme
+          letterSpacing: -0.3,
         },
       },
     },

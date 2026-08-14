@@ -41,6 +41,8 @@ export * from "@/components/DataDisplay/NumberBadge/NumberBadge";
 export { default as NumberBadge } from "@/components/DataDisplay/NumberBadge/NumberBadge";
 export { default as PlanningTimeline } from "@/components/DataDisplay/PlanningTimeline/PlanningTimeline";
 export * from "@/components/DataDisplay/PlanningTimeline/types";
+export * from "@/components/DataDisplay/RatingBadge/RatingBadge";
+export { default as RatingBadge } from "@/components/DataDisplay/RatingBadge/RatingBadge";
 export * from "@/components/DataDisplay/StatusIcon";
 export { default as StatusIcon } from "@/components/DataDisplay/StatusIcon";
 export * from "@/components/DataDisplay/TimeLine";

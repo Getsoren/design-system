@@ -68,6 +68,7 @@ declare module "@mui/material/Chip" {
   }
   interface ChipPropsSizeOverrides {
     xSmall: true;
+    large: true;
   }
   interface ChipPropsColorOverrides {
     active: true;
@@ -857,6 +858,29 @@ const commonThemeOptions: MuiThemeOptions = {
           props: { variant: "outlined-rounded" },
           style: ({ theme }) => ({
             borderRadius: theme.shape.borderRadiusS,
+          }),
+        },
+        {
+          // Touch-friendly chip: 40px meets the minimum comfortable tap target (e.g. gloved hands
+          // on worksite tablets), fully rounded so it still reads as a chip at that height.
+          props: { size: "large" },
+          style: ({ theme }) => ({
+            // More air between the pill's edge and its content: at 40px tall, the 8px used by the
+            // other sizes makes the label look glued to the rounded edge.
+            "& .MuiChip-deleteIcon": {
+              marginRight: 8,
+            },
+            "& .MuiChip-icon": {
+              marginLeft: 8,
+            },
+            "& .MuiChip-label": {
+              fontSize: theme.typography.pxToRem(14),
+              letterSpacing: -0.3,
+              paddingLeft: 12,
+              paddingRight: 12,
+            },
+            borderRadius: 20,
+            height: 40,
           }),
         },
         {

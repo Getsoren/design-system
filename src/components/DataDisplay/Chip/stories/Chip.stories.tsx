@@ -15,6 +15,7 @@ const Template: StoryFn<typeof Chip> = (args) => (
     <Chip size="xSmall" label="xSmall" {...args} />
     <Chip size="small" label="small" {...args} />
     <Chip size="medium" label="medium" {...args} />
+    <Chip size="large" label="large" {...args} />
   </Stack>
 );
 

@@ -20,6 +20,7 @@ const optionsWithInfo = [
 const Template: StoryFn<typeof ChipFilter> = (args) => {
   const [valueSmall, setValueSmall] = useState<string>();
   const [valueMedium, setValueMedium] = useState<string>();
+  const [valueLarge, setValueLarge] = useState<string>();
 
   const handleChangeSmall = (newValue?: string) => {
     setValueSmall(newValue);
@@ -27,6 +28,10 @@ const Template: StoryFn<typeof ChipFilter> = (args) => {
 
   const handleChangeMedium = (newValue?: string) => {
     setValueMedium(newValue);
+  };
+
+  const handleChangeLarge = (newValue?: string) => {
+    setValueLarge(newValue);
   };
 
   return (
@@ -48,6 +53,18 @@ const Template: StoryFn<typeof ChipFilter> = (args) => {
         label="Medium"
         onChange={handleChangeMedium}
         value={valueMedium}
+        options={options}
+        labelMenu="Make your choice"
+        disabled={args?.disabled}
+        labelOnlyAfterSelection={args?.labelOnlyAfterSelection}
+        separatorBetweenLabelAndOptionSelected={args?.separatorBetweenLabelAndOptionSelected}
+        applyOnSelect={args?.applyOnSelect}
+      />
+      <ChipFilter
+        size="large"
+        label="Large"
+        onChange={handleChangeLarge}
+        value={valueLarge}
         options={options}
         labelMenu="Make your choice"
         disabled={args?.disabled}
@@ -155,6 +172,7 @@ const DenseMenuTemplate: StoryFn<typeof ChipFilter> = () => {
 const ToggleTemplate: StoryFn<typeof ChipFilter> = () => {
   const [valueSmallToggle, setValueSmallToggle] = useState<boolean>(false);
   const [valueMediumToggle, setValueMediumToggle] = useState<boolean>(false);
+  const [valueLargeToggle, setValueLargeToggle] = useState<boolean>(false);
 
   const handleChangeSmallToggle = (newValue: boolean) => {
     setValueSmallToggle(newValue);
@@ -164,10 +182,15 @@ const ToggleTemplate: StoryFn<typeof ChipFilter> = () => {
     setValueMediumToggle(newValue);
   };
 
+  const handleChangeLargeToggle = (newValue: boolean) => {
+    setValueLargeToggle(newValue);
+  };
+
   return (
     <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
       <ChipFilter size="small" label="Small" onCheckedChange={handleChangeSmallToggle} checked={valueSmallToggle} />
       <ChipFilter size="medium" label="Medium" onCheckedChange={handleChangeMediumToggle} checked={valueMediumToggle} />
+      <ChipFilter size="large" label="Large" onCheckedChange={handleChangeLargeToggle} checked={valueLargeToggle} />
     </Stack>
   );
 };

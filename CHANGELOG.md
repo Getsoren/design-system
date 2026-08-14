@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.77.0](https://github.com/getsoren/design-system/compare/4.76.0...4.77.0) (2026-08-14)
+
+
+### Features
+
+* **component:** add ChipQuantityEditor with editing functionality and tests ([c70c8e8](https://github.com/getsoren/design-system/commit/c70c8e8d2193fa8698d10f3e2db9904853fd7486))
+
 ## [4.76.0](https://github.com/getsoren/design-system/compare/4.75.0...4.76.0) (2026-08-14)
 
 

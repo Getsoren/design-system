@@ -73,6 +73,8 @@ export * from "@/components/Inputs/CheckboxCard/CheckboxCard";
 export { default as CheckboxCard } from "@/components/Inputs/CheckboxCard/CheckboxCard";
 export * from "@/components/Inputs/ChipFilter/ChipFilter";
 export { default as ChipFilter } from "@/components/Inputs/ChipFilter/ChipFilter";
+export * from "@/components/Inputs/ChipQuantityEditor/ChipQuantityEditor";
+export { default as ChipQuantityEditor } from "@/components/Inputs/ChipQuantityEditor/ChipQuantityEditor";
 export * from "@/components/Inputs/CountryAutocomplete/CountryAutocomplete";
 export { default as CountryAutocomplete } from "@/components/Inputs/CountryAutocomplete/CountryAutocomplete";
 export * from "@/components/Inputs/File";

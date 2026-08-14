@@ -122,6 +122,8 @@ export { default as useMenu } from "@/hooks/useMenu";
 export * from "@/hooks/usePermission";
 // Hooks
 export { default as usePermission } from "@/hooks/usePermission";
+export * from "@/hooks/useScrollFadeMask/useScrollFadeMask";
+export { default as useScrollFadeMask } from "@/hooks/useScrollFadeMask/useScrollFadeMask";
 export * from "@/hooks/useSnackbar";
 export { default as useSnackbar } from "@/hooks/useSnackbar";
 export * from "@/hooks/useTabs";

@@ -1,0 +1,61 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Hooks/useScrollFadeMask"/>
+
+# `useScrollFadeMask`
+
+Fades the edges of a horizontally scrollable container to hint at hidden content. Only the edges
+that still overflow are faded: right while there is more to reveal, left once scrolled. The fade is
+a pure CSS mask, so it works over any background.
+
+###  Usage
+
+```typescript jsx
+import { Stack, useScrollFadeMask } from "@getsoren/design-system";
+
+const App = () => {
+  const { maskImage, onScroll, ref } = useScrollFadeMask();
+
+  return (
+    <Stack
+      direction="row"
+      ref={ref}
+      onScroll={onScroll}
+      sx={{ maskImage, overflowX: "auto", scrollbarWidth: "none", WebkitMaskImage: maskImage }}
+    >
+      {/* wide content */}
+    </Stack>
+  );
+};
+
+export default App;
+```
+
+### Available state & function
+
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td><code>ref</code></td>
+    <td>RefCallback</td>
+    <td>Attach to the scroll container. Also observes resizes of the container and its first child, so the mask is right on first paint even when the container mounts late</td>
+  </tr>
+  <tr>
+    <td><code>onScroll</code></td>
+    <td>Function</td>
+    <td>Spread on the scroll container to keep the fades in sync while scrolling</td>
+  </tr>
+  <tr>
+    <td><code>maskImage</code></td>
+    <td>string</td>
+    <td>CSS mask to apply as both <code>maskImage</code> and <code>WebkitMaskImage</code></td>
+  </tr>
+  </tbody>
+</table>

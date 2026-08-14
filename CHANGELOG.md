@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.76.0](https://github.com/getsoren/design-system/compare/4.75.0...4.76.0) (2026-08-14)
+
+
+### Features
+
+* **hook:** add useScrollFadeMask for fading edges in scrollable containers ([697f125](https://github.com/getsoren/design-system/commit/697f125769a8ee676094676eb894a20a31dc56dd))
+
 ## [4.75.0](https://github.com/getsoren/design-system/compare/4.74.0...4.75.0) (2026-08-13)
 
 

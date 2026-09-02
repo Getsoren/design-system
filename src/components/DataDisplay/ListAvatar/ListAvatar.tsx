@@ -256,7 +256,11 @@ const ListAvatarItemRow = ({
         "& .MuiListItemSecondaryAction-root": {
           alignItems: "center",
           display: "flex",
+          flexShrink: 0,
           justifyContent: "center",
+          // The text block takes every pixel it can, so a long title (or the chip that follows it)
+          // ran flush into the first action. One step keeps them apart whatever the title's length.
+          marginLeft: ({ spacing }: Theme) => spacing(1),
           opacity: hasPersistentSecondaryAction || (alwaysDisplaySecondaryAction ?? listAlwaysDisplaySecondaryAction) ? 1 : 0,
           position: "static",
           right: ({ spacing }: Theme) => spacing(0.5),

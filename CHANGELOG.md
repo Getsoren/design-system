@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.79.1](https://github.com/getsoren/design-system/compare/4.79.0...4.79.1) (2026-09-02)
+
+
+### Bug Fixes
+
+* **component:** fix layout of ListAvatar by adding flexShrink and margin adjustments ([5ad9ef4](https://github.com/getsoren/design-system/commit/5ad9ef4251e8fc9c4a41a6c3934ca0b59804d396))
+
 ## [4.79.0](https://github.com/getsoren/design-system/compare/4.78.0...4.79.0) (2026-08-14)
 
 

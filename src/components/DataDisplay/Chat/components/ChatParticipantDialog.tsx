@@ -21,6 +21,7 @@ const ChatParticipantDialog = ({
   isConfirmLoading,
   avatarSrcResolver,
   labels,
+  slotProps,
 }: ChatParticipantDialogProps) => {
   const [selectedParticipants, setSelectedParticipants] = useState<ChatSearchUser[]>([]);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -72,6 +73,7 @@ const ChatParticipantDialog = ({
       </DialogContent>
       <DialogActions>
         <Button
+          {...slotProps?.confirmButton}
           fullWidth
           variant="contained"
           onClick={handleConfirm}

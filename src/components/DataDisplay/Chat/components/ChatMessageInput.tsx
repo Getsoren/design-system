@@ -16,8 +16,9 @@ const ChatMessageInput = ({
   autoFocusKey,
   isSending,
   defaultMessage,
-  maxLength = 10000,
   startActions,
+  slotProps,
+  maxLength = 10000,
 }: ChatMessageInputProps) => {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -118,6 +119,7 @@ const ChatMessageInput = ({
           )}
           {/* Send: an upward arrow, like the note field of an order. */}
           <IconButton
+            {...slotProps?.sendButton}
             aria-label={labels?.send ?? "Send"}
             title={labels?.send ?? "Send"}
             onClick={handleSend}

@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { MouseEvent, ReactNode, useContext } from "react";
 import { NavigationMenuContext, NavLinkProps, ObjectNavigationItem } from "@/components/Navigation/NavigationMenu/NavigationMenu";
+import pickDataAttributes from "@/utils/pickDataAttributes";
 
 interface NavLinkItemProps extends Omit<ObjectNavigationItem, "label"> {
   children?: ReactNode;
@@ -9,8 +10,9 @@ interface NavLinkItemProps extends Omit<ObjectNavigationItem, "label"> {
   target?: string;
 }
 
-const NavLinkItem = ({ url, end, children, active, state, component, disabled, onClick, target }: NavLinkItemProps) => {
+const NavLinkItem = ({ url, end, children, active, state, component, disabled, onClick, target, ...rest }: NavLinkItemProps) => {
   const { closeDrawerMenu } = useContext(NavigationMenuContext);
+  const dataAttributes = pickDataAttributes(rest); // Only the `data-*` keys travel to the DOM: the rest of the item config (count, icon...) is rendering data
 
   const handleClick = (event?: MouseEvent) => {
     onClick?.(event);
@@ -19,7 +21,7 @@ const NavLinkItem = ({ url, end, children, active, state, component, disabled, o
 
   if (disabled) {
     return (
-      <Typography component="div" color="text.disabled" aria-disabled="true" onClick={handleClick}>
+      <Typography {...dataAttributes} component="div" color="text.disabled" aria-disabled="true" onClick={handleClick}>
         {children}
       </Typography>
     );
@@ -28,7 +30,7 @@ const NavLinkItem = ({ url, end, children, active, state, component, disabled, o
   if (component && url) {
     const Component = component;
     return (
-      <Component onClick={handleClick} to={url} end={end} state={state} target={target}>
+      <Component {...dataAttributes} onClick={handleClick} to={url} end={end} state={state} target={target}>
         {children}
       </Component>
     );
@@ -36,6 +38,7 @@ const NavLinkItem = ({ url, end, children, active, state, component, disabled, o
 
   return (
     <Box
+      {...dataAttributes}
       component="a"
       href={url}
       onClick={handleClick}

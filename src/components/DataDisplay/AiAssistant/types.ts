@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import type { DataAttributes } from "@/types/dataAttributes";
 
-export interface AiAssistantFabProps {
+/** Extra `data-*` props (e.g. an analytics feature id) land on the FAB button itself */
+export interface AiAssistantFabProps extends DataAttributes {
   /** Panel visibility — the FAB shows a close glyph and calms down when open */
   open: boolean;
   /** Toggles the panel — the FAB never owns the open state, the host app does */

@@ -12,6 +12,7 @@ import {
   type NavigationDensity,
   type NavigationDensityTokens,
 } from "@/components/Navigation/NavigationMenu/utils/navigationDensity";
+import pickDataAttributes from "@/utils/pickDataAttributes";
 
 export interface SideBarMenuProps {
   items?: NavigationItem[];
@@ -126,7 +127,16 @@ const SideBarNavRow = ({ item }: { item: ObjectNavigationItem }) => {
   const { count, countColor, tag, tagColor, url, label, icon, active, disabled, target, end, state } = item;
 
   return (
-    <NavLinkItem url={url} component={NavLink} active={active} disabled={disabled} target={target} end={end} state={state}>
+    <NavLinkItem
+      url={url}
+      component={NavLink}
+      active={active}
+      disabled={disabled}
+      target={target}
+      end={end}
+      state={state}
+      {...pickDataAttributes(item)}
+    >
       <Tooltip title={isCollapsed ? label : ""} placement="right">
         <Stack direction="row" component="span" spacing={1.5} width="100%" alignItems="center">
           {icon ? (

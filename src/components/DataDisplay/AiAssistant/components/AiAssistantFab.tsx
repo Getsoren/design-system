@@ -13,9 +13,10 @@ import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
  * the panel is open. The animations live on a ::before layer so the hit-box never
  * moves (reliable clicks, stable e2e).
  */
-const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab" }: AiAssistantFabProps) => (
+const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab", ...dataAttributes }: AiAssistantFabProps) => (
   <Tooltip title={tooltip} placement="left">
     <Fab
+      {...dataAttributes}
       size="medium"
       onClick={onClick}
       data-testid={dataTestId}

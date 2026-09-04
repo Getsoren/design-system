@@ -66,6 +66,10 @@ export type ObjectNavigationItem = {
    * Target attribute of the link (e.g. "_blank")
    */
   target?: string;
+  /**
+   * `data-*` attributes set on the rendered link element (analytics tags, test hooks), e.g. `"data-amp-track-feature"`
+   */
+  [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
 };
 
 export type NavigationGroupItem = {
@@ -135,6 +139,10 @@ export interface BottomLinkProps {
    * Target attribute of the link (e.g. "_blank")
    */
   target?: string;
+  /**
+   * `data-*` attributes set on the rendered link element (analytics tags, test hooks), e.g. `"data-amp-track-feature"`
+   */
+  [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
 }
 
 export interface NavLinkProps {
@@ -166,6 +174,10 @@ export interface NavLinkProps {
    * Target attribute of the link (e.g. "_blank")
    */
   target?: string;
+  /**
+   * `data-*` attributes written on the navigation item; a router link spreads them on its `<a>`
+   */
+  [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
 }
 
 export type NavigationItem = ObjectNavigationItem | NavigationGroupItem | ReactNode;

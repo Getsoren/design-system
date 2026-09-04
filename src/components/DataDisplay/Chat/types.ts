@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { DataAttributes } from "@/types/dataAttributes";
 
 export interface ChatMessage {
   id: string | number;
@@ -65,6 +66,11 @@ export interface ChatParticipantDialogLabels {
   noOptionsText?: string;
 }
 
+/** `data-*` attributes forwarded to the conversation list's inner controls */
+export interface ChatConversationListSlotProps {
+  newConversationButton?: DataAttributes;
+}
+
 export interface ChatConversationListProps {
   threads?: ChatThread[];
   isLoading?: boolean;
@@ -77,6 +83,15 @@ export interface ChatConversationListProps {
   formatParticipantName?: (participant: ChatParticipant) => string;
   onLoadMore?: () => void;
   hasMore?: boolean;
+  slotProps?: ChatConversationListSlotProps;
+}
+
+/** `data-*` attributes forwarded to the conversation detail's inner controls */
+export interface ChatConversationDetailSlotProps {
+  addParticipantsButton?: DataAttributes;
+  /** The empty-state CTA shown while no thread is selected */
+  newConversationButton?: DataAttributes;
+  sendButton?: DataAttributes;
 }
 
 export interface ChatConversationDetailProps {
@@ -102,6 +117,7 @@ export interface ChatConversationDetailProps {
   defaultMessage?: string;
   onAddParticipantDialogOpenChange?: (open: boolean) => void;
   messageMaxLength?: number;
+  slotProps?: ChatConversationDetailSlotProps;
 }
 
 export interface ChatMessageBubbleProps {
@@ -114,6 +130,11 @@ export interface ChatMessageBubbleProps {
   hideAvatar?: boolean;
 }
 
+/** `data-*` attributes forwarded to the message input's inner controls */
+export interface ChatMessageInputSlotProps {
+  sendButton?: DataAttributes;
+}
+
 export interface ChatMessageInputProps {
   onSend: (message: string) => void;
   labels?: ChatMessageInputLabels;
@@ -123,6 +144,7 @@ export interface ChatMessageInputProps {
   maxLength?: number;
   /** Rendered on the left of the bottom bar, facing the send button (e.g. ChatVoiceRecorder) */
   startActions?: ReactNode;
+  slotProps?: ChatMessageInputSlotProps;
 }
 
 export interface ChatVoiceRecorderLabels {
@@ -168,6 +190,11 @@ export interface ChatVoiceRecorderProps {
   labels?: ChatVoiceRecorderLabels;
 }
 
+/** `data-*` attributes forwarded to the participant dialog's inner controls */
+export interface ChatParticipantDialogSlotProps {
+  confirmButton?: DataAttributes;
+}
+
 export interface ChatParticipantDialogProps {
   open: boolean;
   onClose: () => void;
@@ -178,4 +205,5 @@ export interface ChatParticipantDialogProps {
   isConfirmLoading?: boolean;
   avatarSrcResolver?: (src?: string | null) => string | undefined;
   labels?: ChatParticipantDialogLabels;
+  slotProps?: ChatParticipantDialogSlotProps;
 }

@@ -63,6 +63,7 @@ const ChatConversationDetail = ({
   defaultMessage,
   onAddParticipantDialogOpenChange,
   messageMaxLength,
+  slotProps,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousThreadIdRef = useRef<string | undefined>(undefined);
@@ -100,7 +101,7 @@ const ChatConversationDetail = ({
         <Typography variant="body1" color="text.secondary">
           {labels?.createYourFirstConversation ?? "Create your first conversation"}
         </Typography>
-        <Button variant="contained" onClick={onNewConversation}>
+        <Button {...slotProps?.newConversationButton} variant="contained" onClick={onNewConversation}>
           {labels?.newConversation ?? "New Conversation"}
         </Button>
       </Stack>
@@ -122,6 +123,7 @@ const ChatConversationDetail = ({
         formatParticipantName={formatParticipantName}
         headerAction={headerAction}
         onAddParticipantDialogOpenChange={onAddParticipantDialogOpenChange}
+        slotProps={slotProps}
       />
       <Box
         ref={scrollContainerRef}
@@ -194,6 +196,7 @@ const ChatConversationDetail = ({
         isSending={isSending}
         defaultMessage={defaultMessage}
         maxLength={messageMaxLength}
+        slotProps={slotProps}
       />
     </Stack>
   );

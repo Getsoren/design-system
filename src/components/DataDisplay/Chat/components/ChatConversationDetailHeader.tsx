@@ -12,7 +12,12 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import Avatar from "@/components/DataDisplay/Avatar";
 import ChatParticipantDialog from "@/components/DataDisplay/Chat/components/ChatParticipantDialog";
-import type { ChatConversationDetailLabels, ChatParticipant, ChatSearchUser } from "@/components/DataDisplay/Chat/types";
+import type {
+  ChatConversationDetailLabels,
+  ChatConversationDetailSlotProps,
+  ChatParticipant,
+  ChatSearchUser,
+} from "@/components/DataDisplay/Chat/types";
 import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";
 import DeleteIcon from "@/components/DataDisplay/Icons/DeleteIcon";
 import MoreHorizIcon from "@/components/DataDisplay/Icons/MoreHorizIcon";
@@ -32,6 +37,7 @@ interface ChatConversationDetailHeaderProps {
   formatParticipantName?: (participant: ChatParticipant) => string;
   headerAction?: ReactNode;
   onAddParticipantDialogOpenChange?: (open: boolean) => void;
+  slotProps?: Pick<ChatConversationDetailSlotProps, "addParticipantsButton">;
 }
 
 const ChatConversationDetailHeader = ({
@@ -47,6 +53,7 @@ const ChatConversationDetailHeader = ({
   formatParticipantName,
   headerAction,
   onAddParticipantDialogOpenChange,
+  slotProps,
 }: ChatConversationDetailHeaderProps) => {
   const { isMenuOpen, anchorMenu, closeMenu, openMenu } = useMenu();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -93,6 +100,7 @@ const ChatConversationDetailHeader = ({
           <Stack direction="row" alignItems="center" spacing={1}>
             <Tooltip arrow title={labels?.addParticipant ?? "Add Participant"}>
               <IconButton
+                {...slotProps?.addParticipantsButton}
                 size="small"
                 aria-label={labels?.addParticipant ?? "Add Participant"}
                 onClick={handleOpenAddDialog}

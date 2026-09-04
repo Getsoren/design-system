@@ -1,6 +1,15 @@
-// MUI
+/**
+ * Public entry point of the design system.
+ *
+ * One block per category, alphabetical inside a block. A component ships as a pair: `export *` for its named
+ * exports (props types, helpers) and `export { default as X }` for the component itself.
+ */
+
+// MUI re-exports: every Material UI component and transition is available from the package
 export * from "@mui/material";
 export * from "@mui/material/transitions";
+
+// Data display
 export { default as AiAssistant } from "@/components/DataDisplay/AiAssistant/AiAssistant";
 export * from "@/components/DataDisplay/AiAssistant/types";
 export * from "@/components/DataDisplay/ArticleImage";
@@ -49,6 +58,8 @@ export * from "@/components/DataDisplay/TimeLine";
 export { default as TimeLine } from "@/components/DataDisplay/TimeLine";
 export * from "@/components/DataDisplay/TypographySkeleton";
 export { default as TypographySkeleton } from "@/components/DataDisplay/TypographySkeleton";
+
+// Feedback
 export * from "@/components/Feedback/Dialog/DialogCloseIcon";
 export { default as DialogCloseIcon } from "@/components/Feedback/Dialog/DialogCloseIcon";
 export * from "@/components/Feedback/Dialog/DialogForm/DialogForm";
@@ -63,6 +74,8 @@ export * from "@/components/Feedback/ErrorState/ErrorState";
 export { default as ErrorState } from "@/components/Feedback/ErrorState/ErrorState";
 export * from "@/components/Feedback/Lightbox";
 export { default as Lightbox } from "@/components/Feedback/Lightbox";
+
+// Inputs
 export * from "@/components/Inputs/ActionAppBar";
 export { default as ActionAppBar } from "@/components/Inputs/ActionAppBar";
 export * from "@/components/Inputs/ApiAutocomplete/ApiAutocomplete";
@@ -91,40 +104,50 @@ export * from "@/components/Inputs/TextFieldAutosize/TextFieldAutosize";
 export { default as TextFieldAutosize } from "@/components/Inputs/TextFieldAutosize/TextFieldAutosize";
 export * from "@/components/Inputs/TextFieldPassword";
 export { default as TextFieldPassword } from "@/components/Inputs/TextFieldPassword";
+
+// Layout
 export * from "@/components/Layout/Backoffice";
 export { default as Backoffice } from "@/components/Layout/Backoffice";
 export { default as CollapsingHeader } from "@/components/Layout/CollapsingHeader/CollapsingHeader";
 export * from "@/components/Layout/CollapsingHeader/types";
 export * from "@/components/Layout/PageHeader/PageHeader";
 export { default as PageHeader } from "@/components/Layout/PageHeader/PageHeader";
+
+// Navigation
 export * from "@/components/Navigation/NavigationMenu/NavigationMenu";
 export { default as NavigationMenu } from "@/components/Navigation/NavigationMenu/NavigationMenu";
 export * from "@/components/Navigation/TabPanel";
 export { default as TabPanel } from "@/components/Navigation/TabPanel";
 export * from "@/components/Navigation/Tabs/LinkTab";
 export { default as LinkTab } from "@/components/Navigation/Tabs/LinkTab";
+
+// Surface
 export * from "@/components/Surface/AppBar";
 export { default as AppBar } from "@/components/Surface/AppBar";
 export * from "@/components/Surface/BottomFixedPaper";
 export { default as BottomFixedPaper } from "@/components/Surface/BottomFixedPaper";
 export * from "@/components/Surface/CardModal";
 export { default as CardModal } from "@/components/Surface/CardModal";
+
+// Utility components
 export * from "@/components/Utils/HasPermission";
-// Components
 export { default as HasPermission } from "@/components/Utils/HasPermission";
+
 // Theme
 export { default as theme } from "@/config/theme";
+
+// Context providers
 export * from "@/context/Permission/PermissionProvider";
 export { default as PermissionProvider } from "@/context/Permission/PermissionProvider";
 export * from "@/context/Snackbar/SnackbarProvider";
 export { default as SnackbarProvider } from "@/context/Snackbar/SnackbarProvider";
 export type { ThemeProviderProps } from "@/context/Theme/ThemeProvider";
-// Context
 export { default as ThemeProvider } from "@/context/Theme/ThemeProvider";
+
+// Hooks
 export * from "@/hooks/useMenu";
 export { default as useMenu } from "@/hooks/useMenu";
 export * from "@/hooks/usePermission";
-// Hooks
 export { default as usePermission } from "@/hooks/usePermission";
 export * from "@/hooks/useScrollFadeMask/useScrollFadeMask";
 export { default as useScrollFadeMask } from "@/hooks/useScrollFadeMask/useScrollFadeMask";
@@ -132,9 +155,14 @@ export * from "@/hooks/useSnackbar";
 export { default as useSnackbar } from "@/hooks/useSnackbar";
 export * from "@/hooks/useTabs";
 export { default as useTabs } from "@/hooks/useTabs";
+
+// Shared types
+export type { DataAttributes } from "@/types/dataAttributes";
+
+// Utility functions
 export * from "@/utils/getBackgroundImageElevation";
-// Utils
 export { default as getBackgroundImageElevation } from "@/utils/getBackgroundImageElevation";
 export { default as isoToEmojiFlag } from "@/utils/isoToEmojiFlag";
+export { default as pickDataAttributes } from "@/utils/pickDataAttributes";
 export * from "@/utils/pxToRem";
 export { default as pxToRem } from "@/utils/pxToRem";

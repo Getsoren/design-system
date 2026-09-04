@@ -47,6 +47,7 @@ const ChatConversationList = ({
   formatParticipantName,
   onLoadMore,
   hasMore,
+  slotProps,
 }: ChatConversationListProps) => {
   const [search, setSearch] = useState("");
   const getDate = formatDate ?? defaultFormatDate;
@@ -101,7 +102,7 @@ const ChatConversationList = ({
         <Typography variant="h3" fontWeight={600}>
           {labels?.messages ?? "Messages"}
         </Typography>
-        <IconButton size="small" onClick={onNewConversation}>
+        <IconButton {...slotProps?.newConversationButton} size="small" onClick={onNewConversation}>
           <PenLineIcon />
         </IconButton>
       </Stack>

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.80.0](https://github.com/getsoren/design-system/compare/4.79.1...4.80.0) (2026-09-04)
+
+
+### Features
+
+* **component:** add support for data-* attributes in various components and tests ([ddb6b6e](https://github.com/getsoren/design-system/commit/ddb6b6e4c6b59be9cfc7cd663138b71592daf169))
+
 ## [4.79.1](https://github.com/getsoren/design-system/compare/4.79.0...4.79.1) (2026-09-02)
 
 

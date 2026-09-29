@@ -120,6 +120,11 @@ export interface BottomLinkProps {
    */
   label?: ReactNode;
   /**
+   * Shown right after the label (store marks, a badge…), and hidden with it on the collapsed rail,
+   * where the tooltip keeps the label alone
+   */
+  endAdornment?: ReactNode;
+  /**
    * Force the active state of the link
    */
   active?: boolean;
@@ -133,6 +138,11 @@ export interface BottomLinkProps {
    * @default false
    */
   iconOnlyWhenCollapsed?: boolean;
+  /**
+   * Leave the link out, so a list can declare every link and only toggle the ones shown
+   * @default false
+   */
+  hidden?: boolean;
   /**
    * Disable the link
    */
@@ -223,7 +233,8 @@ export interface NavigationMenuProps {
    */
   NavLink?: (props: NavLinkProps) => ReactNode;
   /**
-   * Logo component
+   * Heads the drawer (phones and tablets), next to its close button on phones. Not shown on desktop,
+   * where the brand lives in the app bar. Activating a link or a button in it closes the drawer.
    */
   Logo?: ReactNode;
   /**
@@ -389,7 +400,6 @@ const NavigationMenu = ({
       bottomLink,
       AppBar,
       Footer,
-      isCollapsed,
       toggleCollapse,
     ],
   );

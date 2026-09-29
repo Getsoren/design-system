@@ -1,5 +1,5 @@
 import { Box, Divider, Fade, IconButton, Stack, Theme, Tooltip, useTheme } from "@mui/material";
-import { ReactNode, useContext } from "react";
+import { MouseEvent, ReactNode, useContext } from "react";
 import ChevronLeftDoubleIcon from "@/components/DataDisplay/Icons/ChevronLeftDoubleIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import { BottomLinkProps, NavigationMenuContext, NavLinkProps } from "@/components/Navigation/NavigationMenu/NavigationMenu";
@@ -9,6 +9,7 @@ import {
   type NavigationDensity,
   type NavigationDensityTokens,
 } from "@/components/Navigation/NavigationMenu/utils/navigationDensity";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 export interface SideBarProps {
   children?: ReactNode;
@@ -74,14 +75,16 @@ const buildStyles = (tokens: NavigationDensityTokens) => ({
     justifyContent: "center",
     minWidth: 24,
   },
+  // Direct children only: a composite logo (a lockup next to a badge, say) keeps its own inner sizes
   logo: {
-    "& svg, & img": {
+    "& > span": {
+      width: "100% ! important",
+    },
+    "& > svg, & > img": {
       maxWidth: "100%",
     },
     flex: 1,
-    span: {
-      width: "100% ! important",
-    },
+    minWidth: 0,
   },
   logoContainer: {
     display: "flex",
@@ -118,8 +121,9 @@ const BottomNavLink = ({
           )}
           {link?.label && (
             <Fade in={!isCollapsed}>
-              <Box component="span" display="flex">
+              <Box component="span" display="flex" alignItems="center" gap={1}>
                 {link.label}
+                {link.endAdornment}
               </Box>
             </Fade>
           )}
@@ -143,20 +147,20 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
     bottomLink,
     NavLink,
     Footer,
-    Search = props.Logo,
+    Search = props.Search,
     Logo = props.Logo,
     density,
   } = useContext(NavigationMenuContext);
   const styles = STYLES[density];
   const { collapseButtonPaddingY, searchPaddingY } = NAVIGATION_DENSITY_TOKENS[density];
-
   const { palette } = useTheme();
+  const { t } = useTranslation();
   const borderRight = isMobile && isDrawerOpen ? "none" : `solid 1px ${palette.divider}`;
   const isDesktop = !(isMobile || isTablet);
   const isInDrawer = !(isDesktop || disableResponsive);
-  // On a phone the drawer takes the whole screen: nothing useful is left to show beside it.
   const width = isMobile && isInDrawer ? "100vw" : sideBarWidth || "auto";
   const displaySearch = hideSearchDesktop ? !isDesktop : true;
+  const bottomLinks = (Array.isArray(bottomLink) ? bottomLink : bottomLink ? [bottomLink] : []).filter((link) => !link.hidden);
 
   return (
     <Box
@@ -171,8 +175,8 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
         willChange: "width",
       }}
     >
-      {/* Logo */}
-      {Logo && (
+      {/* Logo: heads the drawer only, the desktop brand lives in the app bar */}
+      {Logo && !isDesktop && (
         <Stack
           sx={{
             ...styles.logoContainer,
@@ -183,11 +187,22 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
           spacing={3}
         >
           <Box
+            // Like the menu's links, whatever is activated in the drawer header (a logo link home,
+            // a badge opening a dialog) takes the user away from the menu: the drawer closes first
+            onClick={
+              isInDrawer
+                ? (event: MouseEvent) => {
+                    if ((event.target as Element).closest("a, button")) {
+                      closeDrawerMenu();
+                    }
+                  }
+                : undefined
+            }
             sx={{
               ...styles.logo,
               ...(isMobile && {
-                "& svg, & img": {
-                  ...styles.logo["& svg, & img"],
+                "& > svg, & > img": {
+                  ...styles.logo["& > svg, & > img"],
                   maxHeight: 25,
                   width: "auto",
                 },
@@ -197,7 +212,7 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
             {Logo}
           </Box>
           {isMobile && (
-            <IconButton onClick={closeDrawerMenu}>
+            <IconButton edge="end" onClick={closeDrawerMenu} aria-label={t("close")}>
               {/* The sidebar background (grey.A100) follows the theme: the text colour reads on it in both modes. */}
               <CloseIcon color={palette.text.primary} />
             </IconButton>
@@ -216,17 +231,17 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
       <Box flex={1}>{children}</Box>
 
       {/* Bottom Link */}
-      {bottomLink && (
+      {bottomLinks.length > 0 && (
         <Stack sx={styles.bottomLinkWrapper} spacing={1} whiteSpace="nowrap">
-          {Array.isArray(bottomLink) ? (
-            bottomLink.map((link, index) => {
-              const key = typeof link === "object" && "url" in link ? `$${link.url}-${index}` : index;
-
-              return <BottomNavLink key={key} link={link} NavLink={NavLink} isCollapsed={isCollapsed} sx={styles} />;
-            })
-          ) : (
-            <BottomNavLink link={bottomLink} NavLink={NavLink} isCollapsed={isCollapsed} sx={styles} />
-          )}
+          {bottomLinks.map((link, index) => (
+            <BottomNavLink
+              key={link.url ? `${link.url}-${index}` : index}
+              link={link}
+              NavLink={NavLink}
+              isCollapsed={isCollapsed}
+              sx={styles}
+            />
+          ))}
         </Stack>
       )}
 

@@ -138,12 +138,19 @@ WithSearch.args = {
   Search: <TextField label="Search" type="search" fullWidth size="small" />,
 };
 
+/** Both slots head the drawer: the logo, then the search field. */
 export const WithSearchAndLogo = Template.bind({});
 WithSearchAndLogo.args = {
   hideSearchDesktop: true,
   items: ITEMS,
-  Logo: <Logo colorShape="white" />,
+  Logo: <Logo />,
   Search: <TextField label="Search" type="search" fullWidth size="small" />,
+};
+WithSearchAndLogo.parameters = {
+  viewport: {
+    defaultViewport: "mobile",
+    viewports: VIEWPORTS,
+  },
 };
 
 export const WithIcon = Template.bind({});
@@ -151,16 +158,10 @@ WithIcon.args = {
   items: ITEMS_WITH_ICON,
 };
 
-export const WithLogo = Template.bind({});
-WithLogo.args = {
-  items: ITEMS_WITH_ICON,
-  Logo: <Logo colorShape="white" />,
-};
-
 export const Mobile = Template.bind({});
 Mobile.args = {
   items: ITEMS,
-  Logo: <Logo colorShape="white" />,
+  Logo: <Logo />,
 };
 Mobile.parameters = {
   viewport: {
@@ -172,7 +173,7 @@ Mobile.parameters = {
 export const MobileWithIcon = Template.bind({});
 MobileWithIcon.args = {
   items: ITEMS,
-  Logo: <Logo colorShape="white" />,
+  Logo: <Logo />,
 };
 MobileWithIcon.parameters = {
   viewport: {
@@ -204,7 +205,7 @@ MobileWithHideItem.args = {
       label: "Disabled link",
     },
   ],
-  Logo: <Logo colorShape="white" />,
+  Logo: <Logo />,
 };
 MobileWithHideItem.parameters = {
   viewport: {
@@ -216,7 +217,7 @@ MobileWithHideItem.parameters = {
 export const Tablet = Template.bind({});
 Tablet.args = {
   items: ITEMS,
-  Logo: <Logo colorShape="white" />,
+  Logo: <Logo />,
 };
 Tablet.parameters = {
   viewport: {
@@ -265,7 +266,7 @@ WithBottomLinkMenuMobile.args = {
     url: "#",
   },
   items: ITEMS.slice(0, -1),
-  Logo: <Logo colorShape="white" />,
+  Logo: <Logo />,
 };
 WithBottomLinkMenuMobile.parameters = {
   viewport: {
@@ -277,7 +278,7 @@ WithBottomLinkMenuMobile.parameters = {
 export const WithGroups = Template.bind({});
 WithGroups.args = {
   items: ITEMS_WITH_GROUPS,
-  Logo: <Logo colorShape="white" />,
+  Logo: <Logo />,
 };
 
 export const WithFooter = Template.bind({});
@@ -296,7 +297,7 @@ export const Compact = Template.bind({});
 Compact.args = {
   density: "compact",
   items: ITEMS_WITH_GROUPS,
-  Logo: <Logo colorShape="white" />,
+  Logo: <Logo />,
 };
 
 export default {

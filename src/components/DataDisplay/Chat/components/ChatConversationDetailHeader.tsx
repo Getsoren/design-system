@@ -10,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 import { useState } from "react";
-import Avatar from "@/components/DataDisplay/Avatar";
+import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import ChatParticipantDialog from "@/components/DataDisplay/Chat/components/ChatParticipantDialog";
 import type {
   ChatConversationDetailLabels,
@@ -22,7 +22,7 @@ import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatPa
 import DeleteIcon from "@/components/DataDisplay/Icons/DeleteIcon";
 import MoreHorizIcon from "@/components/DataDisplay/Icons/MoreHorizIcon";
 import PersonAddIcon from "@/components/DataDisplay/Icons/PersonAddIcon";
-import useMenu from "@/hooks/useMenu";
+import useMenu from "@/hooks/useMenu/useMenu";
 
 interface ChatConversationDetailHeaderProps {
   threadId: string;

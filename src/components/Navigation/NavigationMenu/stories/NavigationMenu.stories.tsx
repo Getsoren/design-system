@@ -1,6 +1,6 @@
 import { Alert, Box, SvgIcon, TextField, Typography } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import Logo from "@/components/DataDisplay/Logo";
+import Logo from "@/components/DataDisplay/Logo/Logo";
 import NavigationMenu from "./NavigationMenu";
 
 const RestoreIcon = () => (

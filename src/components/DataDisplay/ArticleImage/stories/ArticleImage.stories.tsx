@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import ArticleImage from "@/components/DataDisplay/ArticleImage";
+import ArticleImage from "@/components/DataDisplay/ArticleImage/ArticleImage";
 
 const Template: StoryFn<typeof ArticleImage> = (args) => (
   <Stack spacing={2} height="100%" alignItems="center" justifyContent="center">

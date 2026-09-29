@@ -5,7 +5,7 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
-import Avatar from "@/components/DataDisplay/Avatar";
+import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import type { ChatMessageBubbleProps } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import { extractUrls } from "@/components/DataDisplay/Chat/utils/extractUrls";

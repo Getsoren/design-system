@@ -23,7 +23,7 @@ import { blue } from "@mui/material/colors";
 import type { TransitionProps } from "@mui/material/transitions";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { forwardRef, ReactElement, Ref, useState } from "react";
-import DialogCloseIcon from "@/components/Feedback/Dialog/DialogCloseIcon";
+import DialogCloseIcon from "@/components/Feedback/Dialog/DialogCloseIcon/DialogCloseIcon";
 import DialogForm from "@/components/Feedback/Dialog/DialogForm/DialogForm";
 import Dialog from "./Dialog";
 

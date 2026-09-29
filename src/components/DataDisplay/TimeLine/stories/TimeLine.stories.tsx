@@ -1,6 +1,6 @@
 import { Link, Stack, Tooltip, Typography } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import TimeLine from "@/components/DataDisplay/TimeLine";
+import TimeLine from "@/components/DataDisplay/TimeLine/TimeLine";
 
 const items = [
   {

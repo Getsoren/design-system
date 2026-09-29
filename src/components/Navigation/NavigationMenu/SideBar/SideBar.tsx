@@ -3,7 +3,7 @@ import { ReactNode, useContext } from "react";
 import ChevronLeftDoubleIcon from "@/components/DataDisplay/Icons/ChevronLeftDoubleIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import { BottomLinkProps, NavigationMenuContext, NavLinkProps } from "@/components/Navigation/NavigationMenu/NavigationMenu";
-import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem";
+import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem/NavLinkItem";
 import {
   NAVIGATION_DENSITY_TOKENS,
   type NavigationDensity,

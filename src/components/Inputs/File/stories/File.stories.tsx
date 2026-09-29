@@ -1,8 +1,8 @@
 import { Stack } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { useRef, useState } from "react";
-import Button from "@/components/Inputs/Button";
-import File, { HTMLInputElementFile } from "@/components/Inputs/File";
+import Button from "@/components/Inputs/Button/Button";
+import File, { HTMLInputElementFile } from "@/components/Inputs/File/File";
 
 const Template: StoryFn<typeof File> = (args) => {
   const inputRef = useRef<HTMLInputElementFile>(null);

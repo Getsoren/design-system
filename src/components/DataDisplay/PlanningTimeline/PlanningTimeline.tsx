@@ -24,8 +24,8 @@ import {
   formatViewDateLabel,
   type ViewMode,
 } from "@/components/DataDisplay/PlanningTimeline/utils/timeScale";
-import Button from "@/components/Inputs/Button";
-import useTranslation from "@/hooks/useTranslation";
+import Button from "@/components/Inputs/Button/Button";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 import getBackgroundImageElevation from "@/utils/getBackgroundImageElevation";
 
 const HEADER_HEIGHT = 56;

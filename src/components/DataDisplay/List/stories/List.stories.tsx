@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { useState } from "react";
-import ListItemCard from "@/components/DataDisplay/ListItemCard";
+import ListItemCard from "@/components/DataDisplay/ListItemCard/ListItemCard";
 import List from "./List";
 
 const Template: StoryFn<typeof List> = (args) => (

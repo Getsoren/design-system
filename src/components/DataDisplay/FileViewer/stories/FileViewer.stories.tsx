@@ -1,8 +1,8 @@
 import { Grid, Stack } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { useState } from "react";
-import FileViewer from "@/components/DataDisplay/FileViewer";
-import Button from "@/components/Inputs/Button";
+import FileViewer from "@/components/DataDisplay/FileViewer/FileViewer";
+import Button from "@/components/Inputs/Button/Button";
 
 const testFilePDF = "https://pousses.fr/sites/default/files/2019-08/pdf_test_1.pdf";
 const testImage = "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e";

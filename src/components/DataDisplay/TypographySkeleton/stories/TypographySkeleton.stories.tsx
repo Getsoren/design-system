@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import TypographySkeleton from "@/components/DataDisplay/TypographySkeleton";
+import TypographySkeleton from "@/components/DataDisplay/TypographySkeleton/TypographySkeleton";
 
 const Template: StoryFn<typeof TypographySkeleton> = (args) => (
   <Stack spacing={2} height="100%" alignItems="center" justifyContent="center">

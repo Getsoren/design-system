@@ -1,8 +1,8 @@
 import { ChipProps, SwipeableDrawer, useMediaQuery, useTheme } from "@mui/material";
 import { createContext, MouseEvent, memo, ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import BurgerAppBar from "@/components/Navigation/NavigationMenu/BurgerAppBar";
-import SideBar from "@/components/Navigation/NavigationMenu/SideBar";
-import SideBarMenu from "@/components/Navigation/NavigationMenu/SideBarMenu";
+import BurgerAppBar from "@/components/Navigation/NavigationMenu/BurgerAppBar/BurgerAppBar";
+import SideBar from "@/components/Navigation/NavigationMenu/SideBar/SideBar";
+import SideBarMenu from "@/components/Navigation/NavigationMenu/SideBarMenu/SideBarMenu";
 import type { NavigationDensity } from "@/components/Navigation/NavigationMenu/utils/navigationDensity";
 
 export * from "@/components/Navigation/NavigationMenu/utils/navigationDensity";

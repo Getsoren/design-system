@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import usePermission, { DEFAULT_PERMISSION_CHECK_MODE, PermissionCheckMode } from "@/hooks/usePermission";
+import usePermission, { DEFAULT_PERMISSION_CHECK_MODE, PermissionCheckMode } from "@/hooks/usePermission/usePermission";
 
 export interface HasPermissionProps {
   /**

@@ -44,7 +44,7 @@ import {
 } from "react";
 import ChevronIcon from "@/components/DataDisplay/Icons/ChevronIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
-import useTranslation from "@/hooks/useTranslation";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 import pxToRem from "@/utils/pxToRem";
 
 type ItemPropsWithKey = {

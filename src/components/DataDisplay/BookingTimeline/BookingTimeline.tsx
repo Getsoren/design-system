@@ -9,7 +9,7 @@ import ArrowBackRoundedIcon from "@/components/DataDisplay/Icons/ArrowBackRounde
 import ArrowForwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowForwardRoundedIcon";
 import PlayArrowRoundedIcon from "@/components/DataDisplay/Icons/PlayArrowRoundedIcon";
 import SportsScoreIcon from "@/components/DataDisplay/Icons/SportsScoreIcon";
-import useTranslation from "@/hooks/useTranslation";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 /**
  * Rental timeline: a vertical rail carrying the Delivery / Start / End / Retrieval bookends,

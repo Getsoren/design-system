@@ -1,7 +1,13 @@
 import { Box, Skeleton, SxProps, useTheme } from "@mui/material";
 import { ForwardedRef, forwardRef, ReactElement, RefObject, useEffect, useState } from "react";
-import SorenLogo from "@/components/DataDisplay/Logo/SorenLogo";
 import useLogo from "@/components/DataDisplay/Logo/useLogo";
+import {
+  SOREN_LOCKUP_MARK_PATH,
+  SOREN_LOCKUP_VIEWBOX,
+  SOREN_MARK_PATH,
+  SOREN_MARK_VIEWBOX,
+  SOREN_WORDMARK_PATHS,
+} from "@/constants/sorenLogo";
 
 export type LogoBrand = "tracktor" | "soren";
 
@@ -132,17 +138,35 @@ const Logo = (
     );
   }
 
+  // Soren: both inks from props. Mark and wordmark are separate groups, so a caller can animate one after the other.
   if (brand === "soren") {
+    const colorMark = colorShape || (withoutText ? palette.secondary.main : colorTextLogo);
+    const viewBox = withoutText ? SOREN_MARK_VIEWBOX : SOREN_LOCKUP_VIEWBOX;
+
     return (
-      <SorenLogo
+      <Box
+        component="svg"
         ref={ref as RefObject<SVGSVGElement>}
-        height={logoHeight}
-        width={logoWidth}
-        color={colorTextLogo}
-        colorShape={colorShape || (withoutText ? palette.secondary.main : colorTextLogo)}
-        withoutText={withoutText}
-        sx={sx}
-      />
+        role="img"
+        aria-label="Soren"
+        viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}
+        sx={{ height: logoHeight, width: logoWidth, ...sx }}
+      >
+        {withoutText ? (
+          <path fill={colorMark} d={SOREN_MARK_PATH} />
+        ) : (
+          <>
+            <g className="sorenLogoMark">
+              <path fill={colorMark} d={SOREN_LOCKUP_MARK_PATH} />
+            </g>
+            <g className="sorenLogoWordmark">
+              {SOREN_WORDMARK_PATHS.map((path) => (
+                <path key={path} fill={colorTextLogo} d={path} />
+              ))}
+            </g>
+          </>
+        )}
+      </Box>
     );
   }
 

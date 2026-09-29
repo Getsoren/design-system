@@ -10,7 +10,7 @@ import ChatMessageInput from "@/components/DataDisplay/Chat/components/ChatMessa
 import type { ChatConversationDetailProps } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import ChatBubbleIcon from "@/components/DataDisplay/Icons/ChatBubbleIcon";
-import Button from "@/components/Inputs/Button";
+import Button from "@/components/Inputs/Button/Button";
 
 const defaultFormatDayLabel = (date: string): string => {
   const d = new Date(ensureUtc(date));

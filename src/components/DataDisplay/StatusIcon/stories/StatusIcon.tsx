@@ -1,4 +1,4 @@
-import Component, { StatusIconProps } from "@/components/DataDisplay/StatusIcon";
+import Component, { StatusIconProps } from "@/components/DataDisplay/StatusIcon/StatusIcon";
 
 const StatusIcon = (props: StatusIconProps) => <Component {...props} />;
 

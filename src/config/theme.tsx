@@ -28,7 +28,7 @@ type OverridesStyleRules<
   >
 >;
 
-import { ButtonProps } from "@/components/Inputs/Button";
+import { ButtonProps } from "@/components/Inputs/Button/Button";
 import { dark, light } from "@/constants/colors";
 import { defaultFontFamily } from "@/constants/fonts";
 import pxToRem from "@/utils/pxToRem";

@@ -1,10 +1,10 @@
 import { AvatarGroup, Box, ListItemButton, Avatar as MuiAvatar, Stack, Tooltip, Typography } from "@mui/material";
 import { MouseEvent, ReactNode, useState } from "react";
-import Avatar from "@/components/DataDisplay/Avatar";
+import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import { RailSegment } from "@/components/DataDisplay/BookingTimeline/components/Rail";
 import { ANCHOR_COL, EVENT_NODE_GAP, NODE_SIZE } from "@/components/DataDisplay/BookingTimeline/constants";
 import { BookingTimelineEvent, BookingTimelineLabels } from "@/components/DataDisplay/BookingTimeline/types";
-import Chip from "@/components/DataDisplay/Chip";
+import Chip from "@/components/DataDisplay/Chip/Chip";
 import FlagOutlinedIcon from "@/components/DataDisplay/Icons/FlagOutlinedIcon";
 import KeyboardArrowRightRoundedIcon from "@/components/DataDisplay/Icons/KeyboardArrowRightRoundedIcon";
 

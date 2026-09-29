@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { NavLinkProps } from "@/components/Navigation/NavigationMenu/NavigationMenu";
-import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem";
+import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem/NavLinkItem";
 
 const TAG = "data-amp-track-feature";
 

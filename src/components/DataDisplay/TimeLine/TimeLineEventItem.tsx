@@ -1,10 +1,10 @@
 import { isString } from "@getsoren/react-utils";
 import { Box, Chip, Collapse as CollapseMui, Divider, Stack, Tooltip, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import FileViewer from "@/components/DataDisplay/FileViewer";
+import FileViewer from "@/components/DataDisplay/FileViewer/FileViewer";
 import ArrowRightIcon from "@/components/DataDisplay/Icons/ArrowRightIcon";
 import ChevronIcon from "@/components/DataDisplay/Icons/ChevronIcon";
-import StatusIcon from "@/components/DataDisplay/StatusIcon";
+import StatusIcon from "@/components/DataDisplay/StatusIcon/StatusIcon";
 import { TimeLineProps } from "@/components/DataDisplay/TimeLine/TimeLine";
 
 type TimeLineEventItemProps = NonNullable<TimeLineProps["items"]>[number] & {

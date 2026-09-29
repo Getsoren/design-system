@@ -1,6 +1,6 @@
 import { Chip, Stack, TextField } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import Button from "@/components/Inputs/Button";
+import Button from "@/components/Inputs/Button/Button";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 
 const Template: StoryFn<typeof PageHeader> = (args) => <PageHeader title="Worksites" {...args} />;

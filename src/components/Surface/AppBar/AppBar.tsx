@@ -17,14 +17,14 @@ import {
   useTheme,
 } from "@mui/material";
 import { cloneElement, isValidElement, MouseEventHandler, PropsWithChildren, ReactNode } from "react";
-import AvatarAppBar from "@/components/DataDisplay/AvatarAppBar";
+import AvatarAppBar from "@/components/DataDisplay/AvatarAppBar/AvatarAppBar";
 import MenuIcon from "@/components/DataDisplay/Icons/MenuIcon";
-import Logo, { LogoProps } from "@/components/DataDisplay/Logo";
-import ActionAppBar from "@/components/Inputs/ActionAppBar";
-import TextFieldAppBar from "@/components/Inputs/TextFieldAppBar";
+import Logo, { LogoProps } from "@/components/DataDisplay/Logo/Logo";
+import ActionAppBar from "@/components/Inputs/ActionAppBar/ActionAppBar";
+import TextFieldAppBar from "@/components/Inputs/TextFieldAppBar/TextFieldAppBar";
 import { NavigationItem, NavLinkProps } from "@/components/Navigation/NavigationMenu/NavigationMenu";
-import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem";
-import useMenu from "@/hooks/useMenu";
+import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem/NavLinkItem";
+import useMenu from "@/hooks/useMenu/useMenu";
 
 interface AppBarProps extends PropsWithChildren {
   NavLink?: (props: NavLinkProps) => ReactNode;

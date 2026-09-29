@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.81.1](https://github.com/getsoren/design-system/compare/4.81.0...4.81.1) (2026-09-29)
+
+
+### Bug Fixes
+
+* **AutocompleteFilter, SideBar:** improve placeholder handling and update comments for clarity ([7c00890](https://github.com/getsoren/design-system/commit/7c008905ccba9724cdcb839a820371c7b6c7de80))
+
 ## [4.81.0](https://github.com/getsoren/design-system/compare/4.80.1...4.81.0) (2026-09-29)
 
 

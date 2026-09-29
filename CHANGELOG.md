@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.82.0](https://github.com/getsoren/design-system/compare/4.81.1...4.82.0) (2026-09-29)
+
+
+### Features
+
+* **SideBar, NavigationMenu:** enhance logo handling and add endAdornment support for bottom links ([38fc32a](https://github.com/getsoren/design-system/commit/38fc32acc1d59ba3f9986170c39c784d6cc20cbd))
+
 ## [4.81.1](https://github.com/getsoren/design-system/compare/4.81.0...4.81.1) (2026-09-29)
 
 

@@ -1,0 +1,1 @@
+import{i as e}from"./preload-helper-xPQekRTU.js";var t;e((()=>{t=``+new URL(`soren-light-CAPBJCje.svg`,import.meta.url).href}))();export{t as default};

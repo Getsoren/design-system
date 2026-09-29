@@ -943,11 +943,13 @@ const AutocompleteFilter = <
                         (multiple || showsSummary) && {
                           marginLeft: isChipVariant || isFilledVariant ? 0.75 : "1px",
                         }),
-                      // Keep the placeholder label from being clipped by the min-width floor.
+                      // The placeholder label takes its natural width from the input's `size`, but may
+                      // shrink below it: in a filter narrower than its label (e.g. a fixed width on
+                      // phones) it then ellipsises instead of running under the chevron.
                       // Once open, keep enough width for the blinking text caret: squeezed
                       // to zero by the summary, nothing shows the field accepts typing
                       minWidth: showsLabelInPlaceholder
-                        ? "max-content"
+                        ? 0
                         : isChipVariant || isFilledVariant
                           ? hasValue && (multiple || showsSummary)
                             ? 12

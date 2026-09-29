@@ -198,7 +198,7 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
           </Box>
           {isMobile && (
             <IconButton onClick={closeDrawerMenu}>
-              {/* The sidebar is light (grey.A100) in both modes: the text colour reads on it. */}
+              {/* The sidebar background (grey.A100) follows the theme: the text colour reads on it in both modes. */}
               <CloseIcon color={palette.text.primary} />
             </IconButton>
           )}

@@ -29,6 +29,25 @@ CustomSize.args = {
   width: 404,
 };
 
+export const Soren = Template.bind({});
+Soren.args = {
+  brand: "soren",
+};
+
+export const SorenSvgWithOrangeMark = Template.bind({});
+SorenSvgWithOrangeMark.args = {
+  brand: "soren",
+  colorShape: "#FF4F12",
+  component: "svg",
+};
+
+export const SorenMark = Template.bind({});
+SorenMark.args = {
+  brand: "soren",
+  component: "svg",
+  withoutText: true,
+};
+
 export const Pricing = Template.bind({});
 Pricing.args = {
   variant: "pricing",

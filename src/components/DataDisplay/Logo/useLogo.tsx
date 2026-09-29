@@ -9,6 +9,9 @@ const DEFAULT_HEIGHT_SUPPLIER_VARIANT = 24;
 const DEFAULT_WIDTH_SUPPLIER_VARIANT = 195;
 const DEFAULT_HEIGHT_OTHER_VARIANT = 44;
 const DEFAULT_WIDTH__OTHER_VARIANT = 147;
+const DEFAULT_HEIGHT_SOREN = 24;
+// Width over height of the Soren signature (1373 × 351).
+const SOREN_LOCKUP_RATIO = 1373 / 351;
 
 const useLogo = () => {
   const { palette } = useTheme();
@@ -54,28 +57,41 @@ const useLogo = () => {
     [palette.text.primary],
   );
 
-  const getImageModule = useCallback((variant: LogoProps["variant"], mode: string, withoutText: LogoProps["withoutText"]) => {
-    if (withoutText) {
-      return import("@/assets/img/tracktor-logo.svg");
-    }
+  const getImageModule = useCallback(
+    (brand: LogoProps["brand"], variant: LogoProps["variant"], mode: string, withoutText: LogoProps["withoutText"]) => {
+      if (brand === "soren") {
+        if (withoutText) {
+          return import("@/assets/img/soren-logo.svg");
+        }
 
-    switch (variant) {
-      case "supplier":
-        return mode === "dark" ? import("@/assets/img/tracktor-supplier-dark.svg") : import("@/assets/img/tracktor-supplier-light.svg");
-      case "pricing":
-        return import("@/assets/img/tracktor-pricing.svg");
-      default:
-        return mode === "dark" ? import("@/assets/img/tracktor-dark.svg") : import("@/assets/img/tracktor-light.svg");
-    }
-  }, []);
+        return mode === "dark" ? import("@/assets/img/soren-dark.svg") : import("@/assets/img/soren-light.svg");
+      }
+
+      if (withoutText) {
+        return import("@/assets/img/tracktor-logo.svg");
+      }
+
+      switch (variant) {
+        case "supplier":
+          return mode === "dark" ? import("@/assets/img/tracktor-supplier-dark.svg") : import("@/assets/img/tracktor-supplier-light.svg");
+        case "pricing":
+          return import("@/assets/img/tracktor-pricing.svg");
+        default:
+          return mode === "dark" ? import("@/assets/img/tracktor-dark.svg") : import("@/assets/img/tracktor-light.svg");
+      }
+    },
+    [],
+  );
 
   const getSize = useCallback(
     ({
+      brand,
       variant,
       width,
       height,
       withoutText,
     }: {
+      brand?: LogoProps["brand"];
       variant: LogoProps["variant"];
       width: LogoProps["width"];
       height: LogoProps["height"];
@@ -85,6 +101,16 @@ const useLogo = () => {
         return {
           height: height || DEFAULT_SIZE_SHAPE,
           width: width || DEFAULT_SIZE_SHAPE,
+        };
+      }
+
+      if (brand === "soren") {
+        const sorenHeight = height || DEFAULT_HEIGHT_SOREN;
+
+        // Only the height given: the width follows the signature's proportions.
+        return {
+          height: sorenHeight,
+          width: width || (typeof sorenHeight === "number" ? Math.round(sorenHeight * SOREN_LOCKUP_RATIO) : "auto"),
         };
       }
 

@@ -1,8 +1,16 @@
 import { Box, Skeleton, SxProps, useTheme } from "@mui/material";
 import { ForwardedRef, forwardRef, ReactElement, RefObject, useEffect, useState } from "react";
+import SorenLogo from "@/components/DataDisplay/Logo/SorenLogo";
 import useLogo from "@/components/DataDisplay/Logo/useLogo";
 
+export type LogoBrand = "tracktor" | "soren";
+
 interface CommonLogoProps {
+  /**
+   * The brand drawn. Soren has a single signature: `variant` only applies to Tracktor.
+   * @default "tracktor"
+   */
+  brand?: LogoBrand;
   /**
    * Style props
    */
@@ -31,7 +39,8 @@ interface CommonLogoProps {
 
 type SvgLogoProps = CommonLogoProps & {
   /**
-   * The color of logo shape, available only for svg variant
+   * The color of logo shape, available only for svg variant.
+   * Soren: the mark's colour, defaults to the wordmark's ink (the secondary orange for the mark alone).
    */
   colorShape?: string;
   /**
@@ -59,13 +68,25 @@ type ImgLogoProps = CommonLogoProps & {
 export type LogoProps = SvgLogoProps | ImgLogoProps;
 
 const Logo = (
-  { colorShape, shapeBackgroundColor, color, height, width, withoutText, mode, sx, variant = "default", component = "img" }: LogoProps,
+  {
+    brand = "tracktor",
+    colorShape,
+    shapeBackgroundColor,
+    color,
+    height,
+    width,
+    withoutText,
+    mode,
+    sx,
+    variant = "default",
+    component = "img",
+  }: LogoProps,
   ref: ForwardedRef<SVGSVGElement | HTMLImageElement | HTMLDivElement>,
 ): ReactElement => {
   const [logoSrc, setLogoSrc] = useState("");
   const { palette } = useTheme();
   const { getTextColor, getImageModule, getSize, getShapeColor, getShapeBackgroundColor } = useLogo();
-  const { height: logoHeight, width: logoWidth } = getSize({ height, variant, width, withoutText });
+  const { height: logoHeight, width: logoWidth } = getSize({ brand, height, variant, width, withoutText });
   const colorTextLogo = getTextColor(color);
   const colorShapeLogo = getShapeColor(colorShape);
   const backgroundShape = getShapeBackgroundColor(shapeBackgroundColor);
@@ -77,19 +98,19 @@ const Logo = (
     }
 
     (async () => {
-      const module = await getImageModule(variant, mode || palette.mode, withoutText);
+      const module = await getImageModule(brand, variant, mode || palette.mode, withoutText);
       if (module?.default && typeof module.default === "string") {
         setLogoSrc(module.default);
       }
     })();
-  }, [component, getImageModule, mode, palette.mode, variant, withoutText]);
+  }, [brand, component, getImageModule, mode, palette.mode, variant, withoutText]);
 
   if (component === "img") {
     return logoSrc ? (
       <Box
         component="img"
         src={logoSrc}
-        alt="Tracktor"
+        alt={brand === "soren" ? "Soren" : "Tracktor"}
         height={logoHeight}
         width={logoWidth}
         ref={ref as RefObject<HTMLImageElement>}
@@ -107,6 +128,20 @@ const Logo = (
           maxWidth: logoWidth,
           width: logoWidth,
         }}
+      />
+    );
+  }
+
+  if (brand === "soren") {
+    return (
+      <SorenLogo
+        ref={ref as RefObject<SVGSVGElement>}
+        height={logoHeight}
+        width={logoWidth}
+        color={colorTextLogo}
+        colorShape={colorShape || (withoutText ? palette.secondary.main : colorTextLogo)}
+        withoutText={withoutText}
+        sx={sx}
       />
     );
   }

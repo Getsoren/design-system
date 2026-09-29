@@ -1,0 +1,17 @@
+import{i as e,s as t}from"./preload-helper-xPQekRTU.js";import{$a as n,Ti as r,Vr as i,at as a,d as o,f as s,g as c,m as l,na as u,p as d}from"./iframe-BnMlKthA.js";import{n as f,t as p}from"./NavigationMenu-DQGYIep0.js";import{n as m,t as h}from"./AppBar-arMW77oH.js";var g,_=e((()=>{m(),m(),g=h})),v,y,b=e((()=>{l(),v=t(n(),1),o(),y=({Main:e,Sidebar:t,AppBar:n})=>{let{breakpoints:r}=u(),o=(0,v.useRef)(null),l=c(r.down(`md`)),f=(0,v.isValidElement)(t)?(0,v.cloneElement)(t,{AppBar:n}):t;return d(a,{height:`100%`,children:[!l&&n,d(a,{height:`100%`,direction:l?`column`:`row`,minHeight:0,children:[f,s(i,{flex:1,sx:{maxHeight:`100%`,overflow:`auto`},ref:o,children:s(i,{component:`main`,height:`100%`,children:e})})]})]})};try{y.displayName=`Backoffice`,y.__docgenInfo={description:``,displayName:`Backoffice`,filePath:`/home/runner/work/design-system/design-system/src/components/Layout/Backoffice/Backoffice.tsx`,methods:[],props:{AppBar:{defaultValue:null,declarations:[{fileName:`design-system/src/components/Layout/Backoffice/Backoffice.tsx`,name:`BackofficeProps`}],description:``,name:`AppBar`,parent:{fileName:`design-system/src/components/Layout/Backoffice/Backoffice.tsx`,name:`BackofficeProps`},required:!1,tags:{},type:{name:`ReactNode`}},Main:{defaultValue:null,declarations:[{fileName:`design-system/src/components/Layout/Backoffice/Backoffice.tsx`,name:`BackofficeProps`}],description:``,name:`Main`,parent:{fileName:`design-system/src/components/Layout/Backoffice/Backoffice.tsx`,name:`BackofficeProps`},required:!1,tags:{},type:{name:`ReactNode`}},Sidebar:{defaultValue:null,declarations:[{fileName:`design-system/src/components/Layout/Backoffice/Backoffice.tsx`,name:`BackofficeProps`}],description:``,name:`Sidebar`,parent:{fileName:`design-system/src/components/Layout/Backoffice/Backoffice.tsx`,name:`BackofficeProps`},required:!1,tags:{},type:{name:`ReactNode`}}},tags:{}}}catch{}})),x,S,C,w,T,E,D;e((()=>{l(),f(),_(),b(),o(),x=[{active:!0,icon:`🏠`,label:`Dashboard`,url:`#`},{icon:`📦`,label:`Booking`,url:`#`}],S=e=>s(i,{sx:{height:`100%`,width:`100%`},children:s(y,{AppBar:s(g,{actionProps:{children:`Action`}}),Sidebar:s(p,{items:x}),Main:s(i,{p:3,children:s(r,{variant:`h1`,children:`This is main`})}),...e})}),C=e=>s(i,{sx:{height:`100%`,width:`100%`},children:s(y,{Sidebar:s(p,{items:x}),Main:s(i,{p:3,children:s(r,{variant:`h1`,children:`This is main`})}),...e})}),w=S.bind({}),w.args={},T=C.bind({}),T.args={},E={component:y,title:`Components/Layout/Backoffice`},w.parameters={...w.parameters,docs:{...w.parameters?.docs,source:{originalSource:`args => <Box sx={{
+  height: "100%",
+  width: "100%"
+}}>
+    <Backoffice AppBar={<AppBar actionProps={{
+    children: "Action"
+  }} />} Sidebar={<NavigationMenu items={menuItems} />} Main={<Box p={3}>
+          <Typography variant="h1">This is main</Typography>
+        </Box>} {...args} />
+  </Box>`,...w.parameters?.docs?.source}}},T.parameters={...T.parameters,docs:{...T.parameters?.docs,source:{originalSource:`args => <Box sx={{
+  height: "100%",
+  width: "100%"
+}}>
+    <Backoffice Sidebar={<NavigationMenu items={menuItems} />} Main={<Box p={3}>
+          <Typography variant="h1">This is main</Typography>
+        </Box>} {...args} />
+  </Box>`,...T.parameters?.docs?.source}}},D=[`Basic`,`WithoutAppBar`]}))();export{w as Basic,T as WithoutAppBar,D as __namedExportsOrder,E as default};

@@ -1,7 +1,7 @@
 import { InputLabel, Stack, Typography, useTheme } from "@mui/material";
 import { ChangeEvent, ComponentRef, DragEvent, forwardRef, ReactNode, useImperativeHandle, useRef, useState } from "react";
 import UploadIcon from "@/components/DataDisplay/Icons/UploadIcon";
-import useTranslation from "@/hooks/useTranslation";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 export interface FileUploadProps {
   size?: "small" | "medium";

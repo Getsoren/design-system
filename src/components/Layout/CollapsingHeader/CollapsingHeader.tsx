@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import ArrowBackIosRoundedIcon from "@/components/DataDisplay/Icons/ArrowBackIosRoundedIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import ExpandIcon from "@/components/DataDisplay/Icons/ExpandIcon";
-import Button from "@/components/Inputs/Button";
+import Button from "@/components/Inputs/Button/Button";
 import type { CollapsingHeaderLabels, CollapsingHeaderProps } from "@/components/Layout/CollapsingHeader/types";
-import useTranslation from "@/hooks/useTranslation";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 // Uber-style collapsing header: the full header is regular flow content that scrolls away with the
 // page (1:1 finger tracking), while an always-mounted compact bar slides in over the content once

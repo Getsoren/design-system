@@ -1,7 +1,7 @@
 import { Alert, Button, IconButton, SnackbarOrigin, Stack } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { SyntheticEvent, useState } from "react";
-import useSnackbar from "@/hooks/useSnackbar";
+import useSnackbar from "@/hooks/useSnackbar/useSnackbar";
 import Snackbar from "./Snackbar";
 
 export interface State extends SnackbarOrigin {

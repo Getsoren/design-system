@@ -1,9 +1,9 @@
 import { Box, Divider, Stack, Typography } from "@mui/material";
 import { ReactNode } from "react";
 import RefreshIcon from "@/components/DataDisplay/Icons/RefreshIcon";
-import Logo from "@/components/DataDisplay/Logo";
-import Button from "@/components/Inputs/Button";
-import useTranslation from "@/hooks/useTranslation";
+import Logo from "@/components/DataDisplay/Logo/Logo";
+import Button from "@/components/Inputs/Button/Button";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 export interface ErrorStateProps {
   /** Shows the brand logo above the message (full-page crash screens) */

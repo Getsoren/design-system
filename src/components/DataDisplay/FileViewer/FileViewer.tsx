@@ -2,7 +2,7 @@ import { Box, SxProps, Theme, Tooltip, Typography } from "@mui/material";
 import { PropsWithChildren, useState } from "react";
 import downloadFile from "@/components/DataDisplay/FileViewer/utils/downloadFile";
 import getThumbnailPath from "@/components/DataDisplay/FileViewer/utils/getThumbnailPath";
-import Lightbox from "@/components/Feedback/Lightbox";
+import Lightbox from "@/components/Feedback/Lightbox/Lightbox";
 import getBrowser, { Browser } from "@/utils/getBrowser";
 import isDocumentType from "@/utils/isDocumentType";
 

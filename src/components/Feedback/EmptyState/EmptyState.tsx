@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { ElementType, ReactNode } from "react";
 import EmptyStateIcon from "@/components/DataDisplay/Icons/EmptyStateIcon";
-import Button, { ButtonProps } from "@/components/Inputs/Button";
+import Button, { ButtonProps } from "@/components/Inputs/Button/Button";
 
 export interface EmptyStateProps<RootComponent extends ElementType = "button"> {
   /** Illustration displayed above the description. Defaults to the empty state illustration. */

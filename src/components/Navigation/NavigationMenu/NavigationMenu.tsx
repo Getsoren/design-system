@@ -1,8 +1,8 @@
 import { ChipProps, SwipeableDrawer, useMediaQuery, useTheme } from "@mui/material";
 import { createContext, MouseEvent, memo, ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import BurgerAppBar from "@/components/Navigation/NavigationMenu/BurgerAppBar";
-import SideBar from "@/components/Navigation/NavigationMenu/SideBar";
-import SideBarMenu from "@/components/Navigation/NavigationMenu/SideBarMenu";
+import BurgerAppBar from "@/components/Navigation/NavigationMenu/BurgerAppBar/BurgerAppBar";
+import SideBar from "@/components/Navigation/NavigationMenu/SideBar/SideBar";
+import SideBarMenu from "@/components/Navigation/NavigationMenu/SideBarMenu/SideBarMenu";
 import type { NavigationDensity } from "@/components/Navigation/NavigationMenu/utils/navigationDensity";
 
 export * from "@/components/Navigation/NavigationMenu/utils/navigationDensity";
@@ -127,6 +127,12 @@ export interface BottomLinkProps {
    * Icon displayed before the label
    */
   icon?: ReactNode;
+  /**
+   * Show the icon on the collapsed rail only: expanded, the label stands alone, flush left.
+   * The icon is still needed, the collapsed rail has nothing else to show.
+   * @default false
+   */
+  iconOnlyWhenCollapsed?: boolean;
   /**
    * Disable the link
    */
@@ -313,9 +319,12 @@ const NavigationMenu = ({
 }: NavigationMenuProps) => {
   const { breakpoints } = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(DEFAULT_CONTEXT_VALUE.isDrawerOpen);
-  const [isCollapsed, setIsCollapsed] = useState(() => getStoredCollapsed(storageKey));
+  // The user's choice, persisted; `isCollapsed` below is what the menu actually shows.
+  const [isCollapsedPreference, setIsCollapsedPreference] = useState(() => getStoredCollapsed(storageKey));
   const isMobile = useMediaQuery(breakpoints.down("sm"));
   const isTablet = useMediaQuery(breakpoints.between("sm", "md"));
+  const isInDrawer = (isMobile || isTablet) && !disableResponsive;
+  const isCollapsed = isCollapsedPreference && !isInDrawer;
 
   const closeDrawerMenu = useCallback(() => {
     setIsDrawerOpen(false);
@@ -326,7 +335,7 @@ const NavigationMenu = ({
   }, []);
 
   const toggleCollapse = useCallback(() => {
-    setIsCollapsed((prev) => !prev);
+    setIsCollapsedPreference((prev) => !prev);
   }, []);
 
   /**
@@ -334,11 +343,11 @@ const NavigationMenu = ({
    */
   useEffect(() => {
     try {
-      globalThis.localStorage?.setItem(storageKey, String(isCollapsed));
+      globalThis.localStorage?.setItem(storageKey, String(isCollapsedPreference));
     } catch {
       // localStorage unavailable (SSR, privacy mode...)
     }
-  }, [isCollapsed, storageKey]);
+  }, [isCollapsedPreference, storageKey]);
 
   const value = useMemo(
     () => ({

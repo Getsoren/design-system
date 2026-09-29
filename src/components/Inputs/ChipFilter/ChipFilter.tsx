@@ -17,8 +17,8 @@ import { MouseEvent, ReactNode, useEffect, useState } from "react";
 import ChevronIcon from "@/components/DataDisplay/Icons/ChevronIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import InfoIcon from "@/components/DataDisplay/Icons/InfoIcon";
-import useMenu from "@/hooks/useMenu";
-import useTranslation from "@/hooks/useTranslation";
+import useMenu from "@/hooks/useMenu/useMenu";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 import pxToRem from "@/utils/pxToRem";
 
 export type OptionValue = string | number;

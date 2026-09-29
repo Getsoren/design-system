@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { SyntheticEvent, useState } from "react";
-import AutocompleteFilter, { AutocompleteFilterOption } from "@/components/Inputs/AutocompleteFilter";
+import AutocompleteFilter, { AutocompleteFilterOption } from "@/components/Inputs/AutocompleteFilter/AutocompleteFilter";
 
 const data = [
   { id: "1", label: "Oliver Hansen", value: "oliver-hansen" },

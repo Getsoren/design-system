@@ -5,9 +5,9 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { type Ref, useImperativeHandle, useRef } from "react";
-import Avatar from "@/components/DataDisplay/Avatar";
+import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import type { ChatSearchUser } from "@/components/DataDisplay/Chat/types";
-import Chip from "@/components/DataDisplay/Chip";
+import Chip from "@/components/DataDisplay/Chip/Chip";
 
 export interface ChatParticipantAutocompleteHandle {
   focus: () => void;

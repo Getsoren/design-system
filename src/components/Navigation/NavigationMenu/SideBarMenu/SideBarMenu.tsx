@@ -6,7 +6,7 @@ import {
   NavigationMenuContext,
   ObjectNavigationItem,
 } from "@/components/Navigation/NavigationMenu/NavigationMenu";
-import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem";
+import NavLinkItem from "@/components/Navigation/NavigationMenu/NavLinkItem/NavLinkItem";
 import {
   NAVIGATION_DENSITY_TOKENS,
   type NavigationDensity,

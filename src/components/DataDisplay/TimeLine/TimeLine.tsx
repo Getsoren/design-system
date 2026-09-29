@@ -1,8 +1,8 @@
 import { Alert, Card, CardContent, ChipProps, Skeleton, Stack, SxProps, Typography } from "@mui/material";
 import { PropsWithChildren, ReactNode, useState } from "react";
-import StatusIcon from "@/components/DataDisplay/StatusIcon";
+import StatusIcon from "@/components/DataDisplay/StatusIcon/StatusIcon";
 import TimeLineEventItem from "@/components/DataDisplay/TimeLine/TimeLineEventItem";
-import Lightbox from "@/components/Feedback/Lightbox";
+import Lightbox from "@/components/Feedback/Lightbox/Lightbox";
 
 export interface TimeLineCollapseItems {
   title?: string | null;

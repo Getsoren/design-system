@@ -13,7 +13,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
-import Avatar from "@/components/DataDisplay/Avatar";
+import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import type { ChatConversationListProps } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";

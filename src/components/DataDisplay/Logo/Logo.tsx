@@ -1,8 +1,22 @@
 import { Box, Skeleton, SxProps, useTheme } from "@mui/material";
 import { ForwardedRef, forwardRef, ReactElement, RefObject, useEffect, useState } from "react";
 import useLogo from "@/components/DataDisplay/Logo/useLogo";
+import {
+  SOREN_LOCKUP_MARK_PATH,
+  SOREN_LOCKUP_VIEWBOX,
+  SOREN_MARK_PATH,
+  SOREN_MARK_VIEWBOX,
+  SOREN_WORDMARK_PATHS,
+} from "@/constants/sorenLogo";
+
+export type LogoBrand = "tracktor" | "soren";
 
 interface CommonLogoProps {
+  /**
+   * The brand drawn. Soren has a single signature: `variant` only applies to Tracktor.
+   * @default "tracktor"
+   */
+  brand?: LogoBrand;
   /**
    * Style props
    */
@@ -31,7 +45,8 @@ interface CommonLogoProps {
 
 type SvgLogoProps = CommonLogoProps & {
   /**
-   * The color of logo shape, available only for svg variant
+   * The color of logo shape, available only for svg variant.
+   * Soren: the mark's colour, defaults to the wordmark's ink (the secondary orange for the mark alone).
    */
   colorShape?: string;
   /**
@@ -59,13 +74,25 @@ type ImgLogoProps = CommonLogoProps & {
 export type LogoProps = SvgLogoProps | ImgLogoProps;
 
 const Logo = (
-  { colorShape, shapeBackgroundColor, color, height, width, withoutText, mode, sx, variant = "default", component = "img" }: LogoProps,
+  {
+    brand = "tracktor",
+    colorShape,
+    shapeBackgroundColor,
+    color,
+    height,
+    width,
+    withoutText,
+    mode,
+    sx,
+    variant = "default",
+    component = "img",
+  }: LogoProps,
   ref: ForwardedRef<SVGSVGElement | HTMLImageElement | HTMLDivElement>,
 ): ReactElement => {
   const [logoSrc, setLogoSrc] = useState("");
   const { palette } = useTheme();
   const { getTextColor, getImageModule, getSize, getShapeColor, getShapeBackgroundColor } = useLogo();
-  const { height: logoHeight, width: logoWidth } = getSize({ height, variant, width, withoutText });
+  const { height: logoHeight, width: logoWidth } = getSize({ brand, height, variant, width, withoutText });
   const colorTextLogo = getTextColor(color);
   const colorShapeLogo = getShapeColor(colorShape);
   const backgroundShape = getShapeBackgroundColor(shapeBackgroundColor);
@@ -77,19 +104,19 @@ const Logo = (
     }
 
     (async () => {
-      const module = await getImageModule(variant, mode || palette.mode, withoutText);
+      const module = await getImageModule(brand, variant, mode || palette.mode, withoutText);
       if (module?.default && typeof module.default === "string") {
         setLogoSrc(module.default);
       }
     })();
-  }, [component, getImageModule, mode, palette.mode, variant, withoutText]);
+  }, [brand, component, getImageModule, mode, palette.mode, variant, withoutText]);
 
   if (component === "img") {
     return logoSrc ? (
       <Box
         component="img"
         src={logoSrc}
-        alt="Tracktor"
+        alt={brand === "soren" ? "Soren" : "Tracktor"}
         height={logoHeight}
         width={logoWidth}
         ref={ref as RefObject<HTMLImageElement>}
@@ -108,6 +135,38 @@ const Logo = (
           width: logoWidth,
         }}
       />
+    );
+  }
+
+  // Soren: both inks from props. Mark and wordmark are separate groups, so a caller can animate one after the other.
+  if (brand === "soren") {
+    const colorMark = colorShape || (withoutText ? palette.secondary.main : colorTextLogo);
+    const viewBox = withoutText ? SOREN_MARK_VIEWBOX : SOREN_LOCKUP_VIEWBOX;
+
+    return (
+      <Box
+        component="svg"
+        ref={ref as RefObject<SVGSVGElement>}
+        role="img"
+        aria-label="Soren"
+        viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}
+        sx={{ height: logoHeight, width: logoWidth, ...sx }}
+      >
+        {withoutText ? (
+          <path fill={colorMark} d={SOREN_MARK_PATH} />
+        ) : (
+          <>
+            <g className="sorenLogoMark">
+              <path fill={colorMark} d={SOREN_LOCKUP_MARK_PATH} />
+            </g>
+            <g className="sorenLogoWordmark">
+              {SOREN_WORDMARK_PATHS.map((path) => (
+                <path key={path} fill={colorTextLogo} d={path} />
+              ))}
+            </g>
+          </>
+        )}
+      </Box>
     );
   }
 

@@ -1,9 +1,9 @@
 import { Box, SvgIcon, Tab, useTheme } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { SyntheticEvent, useState } from "react";
-import TabPanel from "@/components/Navigation/TabPanel";
+import TabPanel from "@/components/Navigation/TabPanel/TabPanel";
 import LinkTabComponent from "@/components/Navigation/Tabs/LinkTab/LinkTab";
-import useTabs from "@/hooks/useTabs";
+import useTabs from "@/hooks/useTabs/useTabs";
 import Tabs from "./Tabs";
 
 const Template: StoryFn<typeof Tabs> = (args, { name }) => {

@@ -1,6 +1,6 @@
 import { Box, Card, Divider, Stack, useTheme } from "@mui/material";
 import { isValidElement, memo, ReactNode } from "react";
-import ArticleImage from "@/components/DataDisplay/ArticleImage";
+import ArticleImage from "@/components/DataDisplay/ArticleImage/ArticleImage";
 import Chip from "@/components/DataDisplay/Chip/Chip";
 import { KanbanCardVariant, KanbanDataItemProps, SubtitleDataItemProps } from "@/components/DataDisplay/Kanban/types";
 import { Tooltip } from "@/components/DataDisplay/Tooltip/stories/Tooltip";

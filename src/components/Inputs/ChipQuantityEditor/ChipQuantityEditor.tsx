@@ -1,6 +1,6 @@
 import { TextField } from "@mui/material";
 import { KeyboardEvent, useState } from "react";
-import Chip from "@/components/DataDisplay/Chip";
+import Chip from "@/components/DataDisplay/Chip/Chip";
 
 export interface ChipQuantityEditorProps {
   /**

@@ -18,7 +18,7 @@ import type { ListProps } from "@mui/material/List";
 import { isValidElement, MouseEvent, ReactNode, useState } from "react";
 import sheetsImage from "@/assets/img/sheets.png";
 import Avatar from "@/components/DataDisplay/Avatar/Avatar";
-import FileViewer from "@/components/DataDisplay/FileViewer";
+import FileViewer from "@/components/DataDisplay/FileViewer/FileViewer";
 import getBrowser, { Browser } from "@/utils/getBrowser";
 import isDocumentType from "@/utils/isDocumentType";
 import isValidUrl from "@/utils/isValidUrl";

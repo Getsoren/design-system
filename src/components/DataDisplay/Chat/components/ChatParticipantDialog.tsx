@@ -8,8 +8,8 @@ import ChatParticipantAutocomplete, {
   type ChatParticipantAutocompleteHandle,
 } from "@/components/DataDisplay/Chat/components/ChatParticipantAutocomplete";
 import type { ChatParticipantDialogProps, ChatSearchUser } from "@/components/DataDisplay/Chat/types";
-import DialogCloseIcon from "@/components/Feedback/Dialog/DialogCloseIcon";
-import Button from "@/components/Inputs/Button";
+import DialogCloseIcon from "@/components/Feedback/Dialog/DialogCloseIcon/DialogCloseIcon";
+import Button from "@/components/Inputs/Button/Button";
 
 const ChatParticipantDialog = ({
   open,

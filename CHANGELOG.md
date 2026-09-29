@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.81.0](https://github.com/getsoren/design-system/compare/4.80.1...4.81.0) (2026-09-29)
+
+
+### Features
+
+* **Logo:** add Soren brand support with SVG rendering and associated tests ([c1203e4](https://github.com/getsoren/design-system/commit/c1203e423cb9ecd2a4a71485b7853ad84f68ab1a))
+* **NavigationMenu:** add iconOnlyWhenCollapsed prop and adjust layout for drawer responsiveness ([4065398](https://github.com/getsoren/design-system/commit/40653988f7aaa9709285415a01d5ab94a7149224))
+
 ## [4.80.1](https://github.com/getsoren/design-system/compare/4.80.0...4.80.1) (2026-09-15)
 
 ## [4.80.0](https://github.com/getsoren/design-system/compare/4.79.1...4.80.0) (2026-09-04)

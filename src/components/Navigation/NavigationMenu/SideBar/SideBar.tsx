@@ -111,7 +111,7 @@ const BottomNavLink = ({
     <NavLinkItem component={NavLink} {...link}>
       <Tooltip title={isCollapsed ? link?.label : ""} placement="right">
         <Stack alignItems="center" spacing={1} direction="row">
-          {link?.icon && (
+          {link?.icon && (isCollapsed || !link.iconOnlyWhenCollapsed) && (
             <Box component="span" sx={sx.iconWrapper}>
               {link.icon}
             </Box>
@@ -133,6 +133,7 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
   const {
     hideSearchDesktop,
     closeDrawerMenu,
+    disableResponsive,
     isMobile,
     isTablet,
     isDrawerOpen,
@@ -150,9 +151,11 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
   const { collapseButtonPaddingY, searchPaddingY } = NAVIGATION_DENSITY_TOKENS[density];
 
   const { palette } = useTheme();
-  const backgroundColor = palette.mode === "dark" ? palette.background.default : palette.primary.black;
   const borderRight = isMobile && isDrawerOpen ? "none" : `solid 1px ${palette.divider}`;
   const isDesktop = !(isMobile || isTablet);
+  const isInDrawer = !(isDesktop || disableResponsive);
+  // On a phone the drawer takes the whole screen: nothing useful is left to show beside it.
+  const width = isMobile && isInDrawer ? "100vw" : sideBarWidth || "auto";
   const displaySearch = hideSearchDesktop ? !isDesktop : true;
 
   return (
@@ -164,7 +167,7 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
         overflowX: "hidden",
         transform: "translateZ(0)",
         transition: "width 0.3s ease-in-out",
-        width: isCollapsed ? 80 : sideBarWidth || "auto",
+        width: isCollapsed ? 80 : width,
         willChange: "width",
       }}
     >
@@ -195,7 +198,8 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
           </Box>
           {isMobile && (
             <IconButton onClick={closeDrawerMenu}>
-              <CloseIcon color={palette.getContrastText(backgroundColor)} />
+              {/* The sidebar is light (grey.A100) in both modes: the text colour reads on it. */}
+              <CloseIcon color={palette.text.primary} />
             </IconButton>
           )}
         </Stack>
@@ -226,30 +230,31 @@ const SideBar = ({ children, ...props }: SideBarProps) => {
         </Stack>
       )}
 
-      <Divider />
-
-      {/* Collapse button */}
-      <Box display="flex" justifyContent="flex-end">
-        <IconButton
-          onClick={toggleCollapse}
-          disableFocusRipple
-          disableTouchRipple
-          sx={{
-            borderRadius: 0,
-            justifyContent: "flex-end",
-
-            paddingX: 3,
-            paddingY: collapseButtonPaddingY,
-            width: "100%",
-          }}
-        >
-          <ChevronLeftDoubleIcon
+      {/* Collapse button: desktop only, the drawer is never collapsed */}
+      {!isInDrawer && <Divider />}
+      {!isInDrawer && (
+        <Box display="flex" justifyContent="flex-end">
+          <IconButton
+            onClick={toggleCollapse}
+            disableFocusRipple
+            disableTouchRipple
             sx={{
-              transform: isCollapsed ? "rotate(180deg) translateX(2px)" : "rotate(0deg)",
+              borderRadius: 0,
+              justifyContent: "flex-end",
+
+              paddingX: 3,
+              paddingY: collapseButtonPaddingY,
+              width: "100%",
             }}
-          />
-        </IconButton>
-      </Box>
+          >
+            <ChevronLeftDoubleIcon
+              sx={{
+                transform: isCollapsed ? "rotate(180deg) translateX(2px)" : "rotate(0deg)",
+              }}
+            />
+          </IconButton>
+        </Box>
+      )}
       {Footer}
     </Box>
   );

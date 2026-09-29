@@ -128,6 +128,12 @@ export interface BottomLinkProps {
    */
   icon?: ReactNode;
   /**
+   * Show the icon on the collapsed rail only: expanded, the label stands alone, flush left.
+   * The icon is still needed, the collapsed rail has nothing else to show.
+   * @default false
+   */
+  iconOnlyWhenCollapsed?: boolean;
+  /**
    * Disable the link
    */
   disabled?: boolean;
@@ -313,9 +319,12 @@ const NavigationMenu = ({
 }: NavigationMenuProps) => {
   const { breakpoints } = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(DEFAULT_CONTEXT_VALUE.isDrawerOpen);
-  const [isCollapsed, setIsCollapsed] = useState(() => getStoredCollapsed(storageKey));
+  // The user's choice, persisted; `isCollapsed` below is what the menu actually shows.
+  const [isCollapsedPreference, setIsCollapsedPreference] = useState(() => getStoredCollapsed(storageKey));
   const isMobile = useMediaQuery(breakpoints.down("sm"));
   const isTablet = useMediaQuery(breakpoints.between("sm", "md"));
+  const isInDrawer = (isMobile || isTablet) && !disableResponsive;
+  const isCollapsed = isCollapsedPreference && !isInDrawer;
 
   const closeDrawerMenu = useCallback(() => {
     setIsDrawerOpen(false);
@@ -326,7 +335,7 @@ const NavigationMenu = ({
   }, []);
 
   const toggleCollapse = useCallback(() => {
-    setIsCollapsed((prev) => !prev);
+    setIsCollapsedPreference((prev) => !prev);
   }, []);
 
   /**
@@ -334,11 +343,11 @@ const NavigationMenu = ({
    */
   useEffect(() => {
     try {
-      globalThis.localStorage?.setItem(storageKey, String(isCollapsed));
+      globalThis.localStorage?.setItem(storageKey, String(isCollapsedPreference));
     } catch {
       // localStorage unavailable (SSR, privacy mode...)
     }
-  }, [isCollapsed, storageKey]);
+  }, [isCollapsedPreference, storageKey]);
 
   const value = useMemo(
     () => ({

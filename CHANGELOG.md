@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.83.1](https://github.com/getsoren/design-system/compare/4.83.0...4.83.1) (2026-09-30)
+
 ## [4.83.0](https://github.com/getsoren/design-system/compare/4.82.0...4.83.0) (2026-09-30)
 
 

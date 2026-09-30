@@ -1,4 +1,4 @@
-import { Box, IconButton, Skeleton, Stack, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Skeleton, Stack, ToggleButton, ToggleButtonGroup, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChevronIcon from "@/components/DataDisplay/Icons/ChevronIcon";
@@ -31,6 +31,7 @@ import getBackgroundImageElevation from "@/utils/getBackgroundImageElevation";
 const HEADER_HEIGHT = 56;
 const ZOOM_GESTURE_IDLE_MS = 150;
 const ZOOM_DELTA_THRESHOLD = 24;
+const NARROW_SIDEBAR_MAX_WIDTH = 160;
 const DEFAULT_LOCAL_STORAGE_KEYS: PlanningTimelineLocalStorageKeys = { viewMode: "soren-planning-timeline-view-mode" };
 const VIEW_MODES: ViewMode[] = ["day", "week", "month", "year"];
 
@@ -67,18 +68,18 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
   labels,
   localStorageKeys,
   defaultViewMode = "day",
-  sidebarWidth = 300,
+  sidebarWidth: sidebarWidthProp = 300,
   rowHeight = 36,
 }: PlanningTimelineProps<G, R, T>) => {
   // One virtualized line of the grid: a group header, or a resource carrying its task bars.
   type DisplayItem = { key: string } & ({ type: "group"; group: G; childCount: number } | { type: "resource"; resource: R; tasks: T[] });
-
-  // Declared before the useState below — its lazy initializer runs synchronously and reads this key.
   const viewModeStorageKey = localStorageKeys?.viewMode ?? DEFAULT_LOCAL_STORAGE_KEYS.viewMode;
   const [viewMode, setViewMode] = useState<ViewMode>(() => getStoredViewMode(viewModeStorageKey) ?? defaultViewMode);
   const [viewDate, setViewDate] = useState<Date>(() => new Date());
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { palette, shape, typography } = useTheme();
+  const { breakpoints, palette, shape, typography } = useTheme();
+  const isNarrow = useMediaQuery(breakpoints.down("sm"), { noSsr: true });
+  const sidebarWidth = isNarrow ? Math.min(sidebarWidthProp, NARROW_SIDEBAR_MAX_WIDTH) : sidebarWidthProp;
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(isNarrow);
   const { t } = useTranslation();
   const didInitRef = useRef(false);
   const lastModeRef = useRef(viewMode);
@@ -315,7 +316,8 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
   useEffect(() => {
     const element = scrollRef.current;
 
-    if (!element) {
+    // While loading, the skeleton replaces the grid: the listener attaches once the real node is mounted.
+    if (isLoading || !element) {
       return undefined;
     }
 
@@ -368,7 +370,6 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
 
     element.addEventListener("wheel", handleWheel, { passive: false });
     return () => element.removeEventListener("wheel", handleWheel);
-    // `isLoading` swaps the whole grid: without it the listener would stay on the unmounted node.
   }, [isLoading, scale, viewMode, visibleSidebarWidth]);
 
   /**
@@ -400,8 +401,11 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
         alignItems="center"
         direction="row"
         flexShrink={0}
+        flexWrap="wrap"
         justifyContent="space-between"
-        spacing={2}
+        useFlexGap
+        columnGap={2}
+        rowGap={1.5}
         sx={{
           backgroundColor: palette.background.paper,
           backgroundImage: getBackgroundImageElevation(1),
@@ -447,12 +451,28 @@ const PlanningTimeline = <G extends PlanningTimelineGroup, R extends PlanningTim
               {label("today")}
             </Typography>
           </Button>
-          {/* Slot for the view's own controls (filters…): right after the date navigation rather than
-              on the right, where they would crowd the scale picker. */}
-          {toolbarLeadingActions}
         </Stack>
 
-        <Stack direction="row" alignItems="center" spacing={2}>
+        {/* Slot for the view's own controls (filters…): right after the date navigation rather than
+            on the right, where they would crowd the scale picker. It takes the space left between both
+            (zero basis: it never pushes the scale picker to a new line); on a narrow screen it moves
+            to a full-width line of its own, under the navigation and the scale picker. */}
+        {toolbarLeadingActions && (
+          <Box
+            sx={{
+              display: "flex",
+              flexBasis: { md: 0, xs: "100%" },
+              flexGrow: 1,
+              minWidth: 0,
+              order: { md: 0, xs: 1 },
+            }}
+          >
+            {toolbarLeadingActions}
+          </Box>
+        )}
+
+        {/* Wraps too: with the view's own actions next to it, the scale picker alone may not fit a phone. */}
+        <Stack direction="row" alignItems="center" flexWrap="wrap" useFlexGap columnGap={2} rowGap={1.5} sx={{ minWidth: 0 }}>
           {toolbarActions}
           <ToggleButtonGroup exclusive value={viewMode} size="small" onChange={handleViewModeChange}>
             <ToggleButton value="day" sx={{ textTransform: "capitalize" }}>

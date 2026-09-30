@@ -20,6 +20,7 @@ import type {
 } from "@/components/DataDisplay/Chat/types";
 import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";
 import DeleteIcon from "@/components/DataDisplay/Icons/DeleteIcon";
+import KeyboardArrowLeftRoundedIcon from "@/components/DataDisplay/Icons/KeyboardArrowLeftRoundedIcon";
 import MoreHorizIcon from "@/components/DataDisplay/Icons/MoreHorizIcon";
 import PersonAddIcon from "@/components/DataDisplay/Icons/PersonAddIcon";
 import useMenu from "@/hooks/useMenu/useMenu";
@@ -38,6 +39,7 @@ interface ChatConversationDetailHeaderProps {
   headerAction?: ReactNode;
   onAddParticipantDialogOpenChange?: (open: boolean) => void;
   slotProps?: Pick<ChatConversationDetailSlotProps, "addParticipantsButton">;
+  onBack?: () => void;
 }
 
 const ChatConversationDetailHeader = ({
@@ -54,6 +56,7 @@ const ChatConversationDetailHeader = ({
   headerAction,
   onAddParticipantDialogOpenChange,
   slotProps,
+  onBack,
 }: ChatConversationDetailHeaderProps) => {
   const { isMenuOpen, anchorMenu, closeMenu, openMenu } = useMenu();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -78,7 +81,18 @@ const ChatConversationDetailHeader = ({
         justifyContent="space-between"
         sx={{ borderBottom: ({ palette }) => `1px solid ${palette.divider}`, px: 3, py: 1.5 }}
       >
-        <Stack direction="row" alignItems="center" spacing={1.5}>
+        <Stack direction="row" alignItems="center" spacing={1.5} minWidth={0}>
+          {/* Only on a phone, where the list is hidden while a conversation is open. */}
+          {onBack && (
+            <IconButton
+              size="small"
+              aria-label={labels?.back ?? "Back"}
+              onClick={onBack}
+              sx={{ display: { sm: "none", xs: "inline-flex" } }}
+            >
+              <KeyboardArrowLeftRoundedIcon />
+            </IconButton>
+          )}
           <AvatarGroup max={3}>
             {participants?.map(({ userId, avatar, firstName, lastName }) => (
               <Avatar
@@ -90,7 +104,7 @@ const ChatConversationDetailHeader = ({
               </Avatar>
             ))}
           </AvatarGroup>
-          <Typography variant="subtitle2" fontWeight={600}>
+          <Typography variant="subtitle2" fontWeight={600} noWrap>
             {participantNames}
           </Typography>
         </Stack>

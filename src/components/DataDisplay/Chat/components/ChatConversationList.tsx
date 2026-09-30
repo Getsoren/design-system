@@ -90,12 +90,14 @@ const ChatConversationList = ({
 
   return (
     <Stack
+      data-chat-pane="list"
+      data-selected={!!selectedThreadId}
       sx={{
         backgroundColor: "grey.A100",
         borderRight: ({ palette }) => `1px solid ${palette.divider}`,
         height: "100%",
-        minWidth: 300,
-        width: 300,
+        minWidth: { sm: 300, xs: 0 },
+        width: { sm: 300, xs: "100%" },
       }}
     >
       <Stack direction="row" alignItems="center" justifyContent="space-between" px={2} py={1.5}>

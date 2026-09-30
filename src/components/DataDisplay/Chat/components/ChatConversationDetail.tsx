@@ -64,6 +64,7 @@ const ChatConversationDetail = ({
   onAddParticipantDialogOpenChange,
   messageMaxLength,
   slotProps,
+  onBack,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousThreadIdRef = useRef<string | undefined>(undefined);
@@ -86,7 +87,7 @@ const ChatConversationDetail = ({
 
   if (!threadId && isLoading) {
     return (
-      <Stack flex={1} alignItems="center" justifyContent="center">
+      <Stack data-chat-pane="detail" data-selected={false} flex={1} alignItems="center" justifyContent="center">
         <Skeleton variant="circular" width={48} height={48} sx={{ mb: 2 }} />
         <Skeleton variant="text" width={200} />
         <Skeleton variant="rounded" width={140} height={36} sx={{ borderRadius: 2, mt: 2 }} />
@@ -96,7 +97,7 @@ const ChatConversationDetail = ({
 
   if (!threadId) {
     return (
-      <Stack flex={1} alignItems="center" justifyContent="center" spacing={2}>
+      <Stack data-chat-pane="detail" data-selected={false} flex={1} alignItems="center" justifyContent="center" spacing={2}>
         <ChatBubbleIcon sx={{ color: "text.secondary", fontSize: 48 }} />
         <Typography variant="body1" color="text.secondary">
           {labels?.createYourFirstConversation ?? "Create your first conversation"}
@@ -109,9 +110,10 @@ const ChatConversationDetail = ({
   }
 
   return (
-    <Stack flex={1} height="100%" minWidth={300}>
+    <Stack data-chat-pane="detail" data-selected flex={1} height="100%" minWidth={{ sm: 300, xs: 0 }}>
       <ChatConversationDetailHeader
         threadId={threadId}
+        onBack={onBack}
         participants={participants}
         onDeleteConversation={onDeleteConversation}
         onAddParticipants={onAddParticipants}

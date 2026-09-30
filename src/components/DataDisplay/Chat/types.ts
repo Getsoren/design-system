@@ -50,6 +50,7 @@ export interface ChatConversationDetailLabels {
   participants?: string;
   searchContacts?: string;
   add?: string;
+  back?: string;
 }
 
 export interface ChatMessageInputLabels {
@@ -118,6 +119,7 @@ export interface ChatConversationDetailProps {
   onAddParticipantDialogOpenChange?: (open: boolean) => void;
   messageMaxLength?: number;
   slotProps?: ChatConversationDetailSlotProps;
+  onBack?: () => void;
 }
 
 export interface ChatMessageBubbleProps {

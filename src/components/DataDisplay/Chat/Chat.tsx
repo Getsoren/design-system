@@ -17,8 +17,23 @@ interface ChatBodyProps {
   children: ReactNode;
 }
 
+/**
+ * On a phone the list and the conversation cannot sit side by side: the body shows one pane at a
+ * time — the list until a thread is selected, then the conversation (its header offers the way back).
+ */
 const ChatBody = ({ children }: ChatBodyProps) => (
-  <Stack direction="row" sx={{ flex: 1, minHeight: 0 }}>
+  <Stack
+    direction="row"
+    sx={({ breakpoints }) => ({
+      flex: 1,
+      minHeight: 0,
+      [breakpoints.down("sm")]: {
+        '& > [data-chat-pane="list"][data-selected="true"], & > [data-chat-pane="detail"][data-selected="false"]': {
+          display: "none",
+        },
+      },
+    })}
+  >
     {children}
   </Stack>
 );

@@ -400,6 +400,7 @@ const NavigationMenu = ({
       bottomLink,
       AppBar,
       Footer,
+      isCollapsed,
       toggleCollapse,
     ],
   );

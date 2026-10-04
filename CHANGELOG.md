@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.83.3](https://github.com/getsoren/design-system/compare/4.83.2...4.83.3) (2026-10-04)
+
+
+### Bug Fixes
+
+* **navigation-menu:** the collapse toggle applies at once ([c6cd718](https://github.com/getsoren/design-system/commit/c6cd718b32d142c0d24eb278d5d1d785d8f8cc3b))
+
 ## [4.83.2](https://github.com/getsoren/design-system/compare/4.83.1...4.83.2) (2026-09-30)
 
 ## [4.83.1](https://github.com/getsoren/design-system/compare/4.83.0...4.83.1) (2026-09-30)

@@ -76,6 +76,29 @@ describe("Chat voice messages", () => {
     expect(screen.queryByText("Link to an order")).toBeNull();
   });
 
+  it("reads the length of a MediaRecorder webm from the file, its header having none", () => {
+    const { container } = render(<ChatMessageBubble isOwn message={{ ...voiceMessage, attachments: [{ ...voice, durationMs: null }] }} />);
+    const audio = container.querySelector("audio") as HTMLAudioElement;
+    let duration = Number.POSITIVE_INFINITY;
+    let currentTime = 0;
+    Object.defineProperty(audio, "duration", { configurable: true, get: () => duration });
+    Object.defineProperty(audio, "currentTime", {
+      configurable: true,
+      get: () => currentTime,
+      set: (value: number) => {
+        currentTime = value;
+      },
+    });
+
+    fireEvent.loadedMetadata(audio);
+    expect(currentTime).toBe(1e101);
+
+    duration = 9.4;
+    fireEvent.timeUpdate(audio);
+    expect(currentTime).toBe(0);
+    expect(screen.getByText("0:09")).toBeInTheDocument();
+  });
+
   it("uploads a validated take and sends it at once, alone and with an empty body", async () => {
     const onSendMessage = vi.fn();
     const onUploadAttachment = vi.fn((file: File) =>

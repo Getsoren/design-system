@@ -73,7 +73,7 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
         isResolvingDurationRef.current = false;
         audio.currentTime = 0;
       }
-    } else if (!isResolvingDurationRef.current) {
+    } else if (audio.duration === Number.POSITIVE_INFINITY && !isResolvingDurationRef.current) {
       isResolvingDurationRef.current = true;
       audio.currentTime = 1e101;
     }
@@ -93,6 +93,12 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
 
     if (playingAudio && playingAudio !== audio) {
       playingAudio.pause();
+    }
+
+    // Still parked at the far end by the duration workaround: play from the start
+    if (isResolvingDurationRef.current) {
+      isResolvingDurationRef.current = false;
+      audio.currentTime = 0;
     }
 
     playingAudio = audio;
@@ -240,9 +246,12 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
         onDurationChange={readDuration}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        // Keeps the playhead moving where animation frames are throttled (background tab)
+        // The seek of the duration workaround lands here; otherwise keeps the playhead moving where animation
+        // frames are throttled (background tab)
         onTimeUpdate={(e) => {
-          if (!e.currentTarget.paused) {
+          if (isResolvingDurationRef.current) {
+            readDuration();
+          } else if (!e.currentTarget.paused) {
             setCurrentTime(e.currentTarget.currentTime);
           }
         }}

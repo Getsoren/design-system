@@ -46,6 +46,41 @@ export interface ChatMessageEvent {
   details?: string[];
 }
 
+export interface ChatMessageActionStatus {
+  /** e.g. "Acceptée par Kiloutou · 14:32" */
+  label: string;
+  tone: "pending" | "success" | "neutral" | "error";
+}
+
+export interface ChatMessageActionResponse {
+  id: string;
+  label: string;
+  /** Default "primary": filled in ink */
+  variant?: "primary" | "secondary";
+}
+
+/** A request on an order (extend, pick up, send a document…), shown as a card with one-tap answers */
+export interface ChatMessageAction {
+  /** e.g. "Demande de prolongation" */
+  title: string;
+  /** e.g. "N° 34126 · Nacelle 16 m", with the machine's photo */
+  booking?: ChatMessageBooking;
+  /** e.g. ["Jusqu'au 12 oct."], one line each */
+  details?: string[];
+  status?: ChatMessageActionStatus;
+  /** Buttons for the recipient only */
+  responses?: ChatMessageActionResponse[];
+  /** Comment typed with the request */
+  note?: string;
+}
+
+/** An entry of the composer's "+" menu: the app opens its own dialog */
+export interface ChatQuickAction {
+  id: string;
+  label: string;
+  icon?: ReactNode;
+}
+
 export interface ChatMessage {
   id: string | number;
   authorId: string;
@@ -54,7 +89,11 @@ export interface ChatMessage {
   attachments?: ChatAttachment[] | null;
   reactions?: ChatReaction[] | null;
   event?: ChatMessageEvent | null;
+  action?: ChatMessageAction | null;
 }
+
+/** May return a promise: the button then spins until it settles */
+export type ChatActionResponseHandler = (messageId: ChatMessage["id"], responseId: string) => void | Promise<unknown>;
 
 /** Resolves with the stored file; report the upload progress (0-100) through `onProgress` */
 export type ChatUploadAttachment = (file: File, onProgress: (percent: number) => void) => Promise<ChatAttachment>;
@@ -154,12 +193,20 @@ export interface ChatEventLabels {
   eventBy?: string;
 }
 
+export interface ChatQuickActionLabels {
+  /** The composer's "+" button */
+  moreActions?: string;
+  /** First entry of its menu, the former paperclip */
+  fileOrPhoto?: string;
+}
+
 export interface ChatConversationDetailLabels
   extends ChatAttachmentLabels,
     ChatReactionLabels,
     ChatVoiceMessageLabels,
     ChatReadReceiptLabels,
-    ChatEventLabels {
+    ChatEventLabels,
+    ChatQuickActionLabels {
   today?: string;
   yesterday?: string;
   createYourFirstConversation?: string;
@@ -175,7 +222,7 @@ export interface ChatConversationDetailLabels
   back?: string;
 }
 
-export interface ChatMessageInputLabels extends ChatAttachmentLabels, ChatVoiceMessageLabels {
+export interface ChatMessageInputLabels extends ChatAttachmentLabels, ChatVoiceMessageLabels, ChatQuickActionLabels {
   writeAMessage?: string;
   send?: string;
   enterToSend?: string;
@@ -270,6 +317,11 @@ export interface ChatConversationDetailProps {
   showReadReceipts?: boolean;
   /** "All · Messages · Updates" pills above a conversation that holds automatic messages (`message.event`). Default true */
   eventsFilter?: boolean;
+  /** Turns the paperclip into a "+" opening a menu: "File or photo" first, then these actions */
+  quickActions?: ChatQuickAction[];
+  onQuickAction?: (actionId: string) => void;
+  /** Answer to an action card (`message.action`), from its recipient */
+  onActionResponse?: ChatActionResponseHandler;
 }
 
 export interface ChatMessageBubbleLabels
@@ -296,6 +348,8 @@ export interface ChatMessageBubbleProps {
   labels?: ChatMessageBubbleLabels;
   /** Ticks next to the time of my messages, read from the participants' `lastReadAt`. Default true */
   showReadReceipts?: boolean;
+  /** Answer to an action card (`message.action`): its buttons only show to the recipient */
+  onActionResponse?: ChatActionResponseHandler;
 }
 
 /** `data-*` attributes forwarded to the message input's inner controls */
@@ -327,6 +381,9 @@ export interface ChatMessageInputProps {
   enableVoiceMessages?: boolean;
   /** Opens `onLinkAttachment` as soon as files join the composer. Default true */
   linkAttachmentsOnAdd?: boolean;
+  /** Turns the paperclip into a "+" opening a menu: "File or photo" first, then these actions */
+  quickActions?: ChatQuickAction[];
+  onQuickAction?: (actionId: string) => void;
 }
 
 export interface ChatVoiceRecorderLabels {

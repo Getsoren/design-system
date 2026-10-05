@@ -1,15 +1,18 @@
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, SvgIcon } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Chat from "@/components/DataDisplay/Chat/Chat";
 import type {
+  ChatActionResponseHandler,
   ChatAttachment,
   ChatAttachmentLink,
   ChatLinkAttachment,
   ChatMessage,
+  ChatMessageAction,
   ChatMessageBooking,
   ChatMessageInputHandle,
   ChatParticipant,
+  ChatQuickAction,
   ChatSearchUser,
   ChatThread,
   ChatUploadAttachment,
@@ -694,6 +697,161 @@ export const AutomaticMessages: StoryFn = () => {
             ])
           }
           onAddParticipants={() => {}}
+          labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
+        />
+      </Chat>
+    </ThemeContext.Provider>
+  );
+};
+
+// Lucide-like strokes, standing for the app's own icons
+const strokeIcon = (d: string) => (
+  <SvgIcon viewBox="0 0 24 24" fontSize="inherit">
+    <path d={d} fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
+  </SvgIcon>
+);
+
+const clientQuickActions: ChatQuickAction[] = [
+  {
+    icon: strokeIcon("M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM12 14v4M10 16h4"),
+    id: "extend",
+    label: "Prolonger la location",
+  },
+  {
+    icon: strokeIcon(
+      "M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62L18.3 9.38a1 1 0 0 0-.78-.38H14M7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z",
+    ),
+    id: "pickup",
+    label: "Demander la reprise",
+  },
+  {
+    icon: strokeIcon(
+      "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5M16 2v4M8 2v4M3 10h5M17.5 17.5 16 16.3V14M22 16a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z",
+    ),
+    id: "reschedule",
+    label: "Décaler la livraison",
+  },
+  {
+    icon: strokeIcon("m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3ZM12 9v4M12 17h.01"),
+    id: "breakdown",
+    label: "Signaler une panne",
+  },
+  { icon: <FileTextIcon fontSize="inherit" />, id: "document", label: "Demander un document" },
+];
+
+const nacelle: ChatMessageBooking = { ...nacelleBooking, label: "N° 34126 · Nacelle 16 m" };
+const minipelle: ChatMessageBooking = { image: "https://picsum.photos/seed/minipelle/96/96", label: "N° 34188 · Mini-pelle 2,5 t" };
+
+/**
+ * The composer's "+" opens the quick actions (the app's dialog is simulated: the request leaves at once). Requests
+ * show as cards; the ones addressed to me carry one-tap answers.
+ */
+export const QuickActions: StoryFn = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      action: {
+        booking: minipelle,
+        details: ["Mardi 14 oct.", "Matin"],
+        status: { label: "Acceptée par Kiloutou · 09:12", tone: "success" },
+        title: "Demande de reprise",
+      },
+      authorId: CURRENT_USER_ID,
+      body: "Demande de reprise le 14 oct. au matin",
+      createdAt: minutesAgo(180),
+      id: "qa-1",
+    },
+    {
+      action: {
+        booking: nacelle,
+        responses: [{ id: "upload", label: "Déposer le document" }],
+        status: { label: "En attente", tone: "pending" },
+        title: "Demande du bon de commande",
+      },
+      authorId: SUPPLIER.userId,
+      body: "Pouvez-vous déposer le bon de commande ?",
+      createdAt: minutesAgo(60),
+      id: "qa-2",
+    },
+    {
+      action: {
+        booking: nacelle,
+        details: ["Fin prévue le 12 oct."],
+        responses: [
+          { id: "stop", label: "Oui, arrêter" },
+          { id: "extend", label: "Non, prolonger", variant: "secondary" },
+        ],
+        status: { label: "En attente", tone: "pending" },
+        title: "Confirmer la fin de location ?",
+      },
+      authorId: SUPPLIER.userId,
+      body: "Confirmez-vous la fin de location le 12 oct. ?",
+      createdAt: minutesAgo(40),
+      id: "qa-3",
+    },
+  ]);
+
+  const updateAction = (messageId: ChatMessage["id"], update: Partial<ChatMessageAction>) =>
+    setMessages((previous) =>
+      previous.map((message) =>
+        message.id === messageId && message.action ? { ...message, action: { ...message.action, responses: [], ...update } } : message,
+      ),
+    );
+
+  const handleActionResponse: ChatActionResponseHandler = async (messageId, responseId) => {
+    await wait(800);
+    const time = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+
+    if (responseId === "upload") {
+      updateAction(messageId, { status: { label: `Déposé · ${time}`, tone: "success" } });
+    } else {
+      updateAction(messageId, {
+        status: { label: responseId === "stop" ? `Fin confirmée · ${time}` : `Prolongation demandée · ${time}`, tone: "neutral" },
+      });
+    }
+  };
+
+  const handleQuickAction = (actionId: string) => {
+    const label = clientQuickActions.find(({ id }) => id === actionId)?.label ?? "";
+
+    setMessages((previous) => [
+      ...previous,
+      {
+        action: {
+          booking: nacelle,
+          details: actionId === "extend" ? ["Jusqu'au 19 oct."] : undefined,
+          note: actionId === "extend" ? "Le chantier a pris une semaine de retard." : undefined,
+          status: { label: "En attente", tone: "pending" },
+          title: label,
+        },
+        authorId: CURRENT_USER_ID,
+        body: label,
+        createdAt: new Date().toISOString(),
+        id: `qa-${Date.now()}`,
+      },
+    ]);
+  };
+
+  return (
+    <ThemeContext.Provider value={{ language: "fr" }}>
+      <Chat height="100vh">
+        <Chat.ConversationDetail
+          threadId="thread-1"
+          participants={[{ ...SUPPLIER, lastReadAt: minutesAgo(30) }]}
+          messages={messages}
+          currentUserId={CURRENT_USER_ID}
+          onDeleteConversation={() => {}}
+          onNewConversation={() => {}}
+          onSendMessage={(_threadId, body) =>
+            setMessages((previous) => [
+              ...previous,
+              { authorId: CURRENT_USER_ID, body, createdAt: new Date().toISOString(), id: `msg-${Date.now()}` },
+            ])
+          }
+          onAddParticipants={() => {}}
+          onUploadAttachment={simulateUpload}
+          quickActions={clientQuickActions}
+          onQuickAction={handleQuickAction}
+          onActionResponse={handleActionResponse}
           labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
         />
       </Chat>

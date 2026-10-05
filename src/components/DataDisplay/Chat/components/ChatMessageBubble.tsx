@@ -11,6 +11,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { type MouseEvent, type PointerEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import Avatar from "@/components/DataDisplay/Avatar/Avatar";
+import ChatActionCard from "@/components/DataDisplay/Chat/components/ChatActionCard";
 import ChatEmojiPicker from "@/components/DataDisplay/Chat/components/ChatEmojiPicker";
 import ChatEventMessage from "@/components/DataDisplay/Chat/components/ChatEventMessage";
 import ChatMessageAttachments from "@/components/DataDisplay/Chat/components/ChatMessageAttachments";
@@ -130,6 +131,7 @@ const ChatMessageBubble = ({
   quickReactions = DEFAULT_QUICK_REACTIONS,
   labels,
   showReadReceipts = true,
+  onActionResponse,
 }: ChatMessageBubbleProps) => {
   const chatLabels = useChatLabels(labels);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -146,8 +148,8 @@ const ChatMessageBubble = ({
   const reactions = message.reactions ?? [];
   const hasReactions = reactions.some(({ userIds }) => userIds.length > 0);
   const canReact = !!onToggleReaction;
-  // A message made of files only gets no empty text bubble
-  const hasTextBubble = !!message.body.trim() || !attachments.length;
+  // A message made of files only gets no empty text bubble; an action's body only stands for it in previews
+  const hasTextBubble = !message.action && (!!message.body.trim() || !attachments.length);
   const myEmojis = currentUserId ? reactions.filter(({ userIds }) => userIds.includes(currentUserId)).map(({ emoji }) => emoji) : [];
 
   const getReadReceipt = (): { status: ChatReadReceiptStatus; label: string } => {
@@ -271,6 +273,12 @@ const ChatMessageBubble = ({
                 {renderMessageBody(message.body)}
               </Typography>
             </Bubble>
+          )}
+          {message.action && (
+            <ChatActionCard
+              action={message.action}
+              onRespond={!isOwn && onActionResponse ? (responseId) => onActionResponse(message.id, responseId) : undefined}
+            />
           )}
           {attachments.length > 0 && (
             <ChatMessageAttachments

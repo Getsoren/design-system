@@ -15,6 +15,7 @@ import {
   useState,
 } from "react";
 import ChatAttachmentTray from "@/components/DataDisplay/Chat/components/ChatAttachmentTray";
+import ChatQuickActionMenu from "@/components/DataDisplay/Chat/components/ChatQuickActionMenu";
 import ChatVoiceRecorder from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
 import { DEFAULT_ATTACHMENT_ACCEPT, DEFAULT_MAX_ATTACHMENT_SIZE, DEFAULT_MAX_ATTACHMENTS } from "@/components/DataDisplay/Chat/constants";
 import useChatAttachmentUploads, { type ChatPendingAttachment } from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
@@ -23,6 +24,7 @@ import type { ChatMessageInputHandle, ChatMessageInputProps } from "@/components
 import createVoiceFile from "@/components/DataDisplay/Chat/utils/createVoiceFile";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
 import AttachFileIcon from "@/components/DataDisplay/Icons/AttachFileIcon";
+import PlusIcon from "@/components/DataDisplay/Icons/PlusIcon";
 
 const RADIUS = 15;
 const COUNTER_VISIBLE_FROM = 40;
@@ -50,6 +52,8 @@ const ChatMessageInput = (
     onLinkAttachment,
     enableVoiceMessages = true,
     linkAttachmentsOnAdd = true,
+    quickActions,
+    onQuickAction,
   }: ChatMessageInputProps,
   ref: ForwardedRef<ChatMessageInputHandle>,
 ) => {
@@ -59,6 +63,8 @@ const ChatMessageInput = (
   const voiceRequestRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [quickActionsAnchor, setQuickActionsAnchor] = useState<HTMLElement | null>(null);
+  const hasQuickActions = !!quickActions?.length;
   const chatLabels = useChatLabels(labels);
   const uploads = useChatAttachmentUploads({ accept: attachmentAccept, maxAttachmentSize, maxAttachments, onUploadAttachment });
   // Files alone make a message; an upload still running blocks the send so nothing leaves half-way
@@ -264,18 +270,45 @@ const ChatMessageInput = (
         }}
       >
         <Stack direction="row" alignItems="center" spacing={1}>
-          {onUploadAttachment && (
+          {/* With quick actions the paperclip becomes a "+" whose menu starts with "File or photo" */}
+          {hasQuickActions && (
             <>
-              <Tooltip title={chatLabels.attachFile}>
+              <Tooltip title={chatLabels.moreActions}>
                 <IconButton
-                  aria-label={chatLabels.attachFile}
-                  onClick={() => fileInputRef.current?.click()}
-                  data-test="chatAttachFile"
+                  aria-label={chatLabels.moreActions}
+                  aria-haspopup="menu"
+                  aria-expanded={!!quickActionsAnchor}
+                  onClick={(e) => setQuickActionsAnchor(e.currentTarget)}
+                  data-test="chatQuickActions"
                   sx={{ height: 44, width: 44 }}
                 >
-                  <AttachFileIcon />
+                  <PlusIcon />
                 </IconButton>
               </Tooltip>
+              <ChatQuickActionMenu
+                anchorEl={quickActionsAnchor}
+                onClose={() => setQuickActionsAnchor(null)}
+                actions={quickActions}
+                onAction={(actionId) => onQuickAction?.(actionId)}
+                onPickFile={onUploadAttachment ? () => fileInputRef.current?.click() : undefined}
+                labels={chatLabels}
+              />
+            </>
+          )}
+          {onUploadAttachment && (
+            <>
+              {!hasQuickActions && (
+                <Tooltip title={chatLabels.attachFile}>
+                  <IconButton
+                    aria-label={chatLabels.attachFile}
+                    onClick={() => fileInputRef.current?.click()}
+                    data-test="chatAttachFile"
+                    sx={{ height: 44, width: 44 }}
+                  >
+                    <AttachFileIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
               <input
                 ref={fileInputRef}
                 type="file"

@@ -1,9 +1,9 @@
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import SvgIcon from "@mui/material/SvgIcon";
 import Tooltip from "@mui/material/Tooltip";
 import { EMOJI_FONT_FAMILY } from "@/components/DataDisplay/Chat/constants";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
+import PlusIcon from "@/components/DataDisplay/Icons/PlusIcon";
 
 interface ChatReactionBarProps {
   quickReactions: string[];
@@ -13,13 +13,6 @@ interface ChatReactionBarProps {
   onToggle: (emoji: string) => void;
   onAdd: (anchor: HTMLElement) => void;
 }
-
-// A plain "+", as on Instagram
-const PlusIcon = () => (
-  <SvgIcon viewBox="0 0 24 24" sx={{ fontSize: 20 }}>
-    <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
-  </SvgIcon>
-);
 
 // Pill 48px high (40px buttons + 4px inset): every round button inside is concentric with its ends
 const emojiButtonSx = {
@@ -87,7 +80,8 @@ const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: 
           width: 36,
         }}
       >
-        <PlusIcon />
+        {/* A plain "+", as on Instagram */}
+        <PlusIcon sx={{ fontSize: 20 }} />
       </IconButton>
     </Tooltip>
   </Paper>

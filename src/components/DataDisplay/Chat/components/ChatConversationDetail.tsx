@@ -110,6 +110,9 @@ const ChatConversationDetail = ({
   linkAttachmentsOnAdd,
   showReadReceipts,
   eventsFilter = true,
+  quickActions,
+  onQuickAction,
+  onActionResponse,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<{ threadId?: string; value: MessagesFilter }>({ value: "all" });
@@ -199,6 +202,7 @@ const ChatConversationDetail = ({
       quickReactions={quickReactions}
       labels={chatLabels}
       showReadReceipts={showReadReceipts}
+      onActionResponse={onActionResponse}
     />
   );
 
@@ -349,6 +353,8 @@ const ChatConversationDetail = ({
         onLinkAttachment={onLinkAttachment}
         enableVoiceMessages={enableVoiceMessages}
         linkAttachmentsOnAdd={linkAttachmentsOnAdd}
+        quickActions={quickActions}
+        onQuickAction={onQuickAction}
       />
       {isDraggingFiles && <ChatDropOverlay label={chatLabels.dropFilesHere} />}
     </Stack>

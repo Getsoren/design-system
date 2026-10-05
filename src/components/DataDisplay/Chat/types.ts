@@ -217,6 +217,11 @@ export interface ChatConversationDetailProps {
    * message (empty body, the audio as its only attachment). Default true
    */
   enableVoiceMessages?: boolean;
+  /**
+   * With `onLinkAttachment`: every file joining the composer opens the link dialog at once, one after the other
+   * (cancelling one skips the rest of the batch). Default true
+   */
+  linkAttachmentsOnAdd?: boolean;
 }
 
 export interface ChatMessageBubbleLabels extends ChatAttachmentLabels, ChatReactionLabels, ChatVoiceMessageLabels {}
@@ -265,6 +270,8 @@ export interface ChatMessageInputProps {
   onLinkAttachment?: ChatLinkAttachment;
   /** Mic next to the paperclip, with `onUploadAttachment`. Default true */
   enableVoiceMessages?: boolean;
+  /** Opens `onLinkAttachment` as soon as files join the composer. Default true */
+  linkAttachmentsOnAdd?: boolean;
 }
 
 export interface ChatVoiceRecorderLabels {

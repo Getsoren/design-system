@@ -17,7 +17,7 @@ import {
 import ChatAttachmentTray from "@/components/DataDisplay/Chat/components/ChatAttachmentTray";
 import ChatVoiceRecorder from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
 import { DEFAULT_ATTACHMENT_ACCEPT, DEFAULT_MAX_ATTACHMENT_SIZE, DEFAULT_MAX_ATTACHMENTS } from "@/components/DataDisplay/Chat/constants";
-import useChatAttachmentUploads from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
+import useChatAttachmentUploads, { type ChatPendingAttachment } from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatMessageInputHandle, ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
 import createVoiceFile from "@/components/DataDisplay/Chat/utils/createVoiceFile";
@@ -49,6 +49,7 @@ const ChatMessageInput = (
     maxAttachmentSize = DEFAULT_MAX_ATTACHMENT_SIZE,
     onLinkAttachment,
     enableVoiceMessages = true,
+    linkAttachmentsOnAdd = true,
   }: ChatMessageInputProps,
   ref: ForwardedRef<ChatMessageInputHandle>,
 ) => {
@@ -63,7 +64,51 @@ const ChatMessageInput = (
   // Files alone make a message; an upload still running blocks the send so nothing leaves half-way
   const canSend = (!!message.trim() || uploads.hasUploaded) && !isSending && !uploads.isUploading;
 
-  useImperativeHandle(ref, () => ({ addFiles: uploads.addFiles }));
+  // Files waiting for the link dialog, opened one at a time
+  const linkQueueRef = useRef<ChatPendingAttachment[]>([]);
+  const isLinkingRef = useRef(false);
+
+  const promptLinks = async () => {
+    if (isLinkingRef.current || !onLinkAttachment) {
+      return;
+    }
+
+    isLinkingRef.current = true;
+
+    while (linkQueueRef.current.length) {
+      const [item] = linkQueueRef.current.splice(0, 1);
+      // The upload may still be running: the dialog gets the local file, it only needs to read it back
+      const url = item.previewUrl ?? URL.createObjectURL(item.file);
+      const link = await onLinkAttachment(
+        { fileName: item.file.name, id: item.key, mimeType: item.file.type || "application/octet-stream", size: item.file.size, url },
+        {},
+      ).catch(() => null);
+
+      if (!item.previewUrl) {
+        URL.revokeObjectURL(url);
+      }
+
+      if (link) {
+        uploads.setLink(item.key, link);
+      } else {
+        // "Later" on one file skips the rest of the batch: the link stays one click away on each card
+        linkQueueRef.current = [];
+      }
+    }
+
+    isLinkingRef.current = false;
+  };
+
+  const addFiles = (files: File[]) => {
+    const accepted = uploads.addFiles(files);
+
+    if (linkAttachmentsOnAdd && onLinkAttachment && accepted.length) {
+      linkQueueRef.current.push(...accepted);
+      void promptLinks();
+    }
+  };
+
+  useImperativeHandle(ref, () => ({ addFiles }));
 
   /**
    * A voice message leaves on its own, right after its upload: empty body, the audio as its only attachment
@@ -112,7 +157,7 @@ const ChatMessageInput = (
 
     if (onUploadAttachment && files.length) {
       e.preventDefault();
-      uploads.addFiles(files);
+      addFiles(files);
     }
   };
 
@@ -239,7 +284,7 @@ const ChatMessageInput = (
                 accept={attachmentAccept}
                 data-test="chatAttachFileInput"
                 onChange={(e) => {
-                  uploads.addFiles(Array.from(e.target.files ?? []));
+                  addFiles(Array.from(e.target.files ?? []));
                   // Picking the same file again after removing it must fire a new change
                   e.target.value = "";
                 }}

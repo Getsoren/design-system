@@ -15,7 +15,7 @@ import ChatEmojiPicker from "@/components/DataDisplay/Chat/components/ChatEmojiP
 import ChatMessageAttachments from "@/components/DataDisplay/Chat/components/ChatMessageAttachments";
 import ChatReactionBar from "@/components/DataDisplay/Chat/components/ChatReactionBar";
 import ChatReactionSummary from "@/components/DataDisplay/Chat/components/ChatReactionSummary";
-import { DEFAULT_QUICK_REACTIONS } from "@/components/DataDisplay/Chat/constants";
+import { DEFAULT_QUICK_REACTIONS, getOwnBubbleBackground } from "@/components/DataDisplay/Chat/constants";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatMessageBubbleProps } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
@@ -38,7 +38,7 @@ const defaultFormatTime = (date: string): string => {
 // "👍️" and "👍" are the same reaction
 const stripVariationSelectors = (emoji: string) => emoji.replace(/️/g, "");
 
-const renderMessageBody = (body: string, isOwn?: boolean): ReactNode => {
+const renderMessageBody = (body: string): ReactNode => {
   const urls = body.match(URL_REGEX) || [];
 
   if (!urls.length) {
@@ -62,7 +62,6 @@ const renderMessageBody = (body: string, isOwn?: boolean): ReactNode => {
           underline="always"
           sx={{
             "&:hover": { opacity: 0.8 },
-            color: isOwn ? "primary.contrastText" : undefined,
             textDecorationColor: "inherit",
             wordBreak: "break-all",
           }}
@@ -84,13 +83,12 @@ interface BubbleProps {
 const Bubble = ({ children, isOwn }: BubbleProps) => (
   <Paper
     sx={{
-      backgroundColor: isOwn ? "primary.main" : "tertiary.light",
+      backgroundColor: isOwn ? getOwnBubbleBackground : "tertiary.light",
       border: 0,
       borderBottomLeftRadius: isOwn ? undefined : "5px ! important",
       borderBottomRightRadius: isOwn ? "5px ! important" : undefined,
       borderRadius: 2,
       boxShadow: "0 0 #0000, 0 0 #0000, 0 0 #0000, 0 0 #0000, 0 1px 3px rgba(0,0,0,0.1)",
-      color: isOwn ? "primary.contrastText" : undefined,
       px: 2,
       py: 1.3,
     }}
@@ -224,7 +222,7 @@ const ChatMessageBubble = ({
           {hasTextBubble && (
             <Bubble isOwn={isOwn}>
               <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-                {renderMessageBody(message.body, isOwn)}
+                {renderMessageBody(message.body)}
               </Typography>
             </Bubble>
           )}

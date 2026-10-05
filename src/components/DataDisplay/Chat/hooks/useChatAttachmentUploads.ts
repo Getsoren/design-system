@@ -52,9 +52,9 @@ const useChatAttachmentUploads = ({ onUploadAttachment, accept, maxAttachments, 
       .catch(() => updateItem(key, { status: "error" }));
   };
 
-  const addFiles = (files: File[]) => {
+  const addFiles = (files: File[]): ChatPendingAttachment[] => {
     if (!(onUploadAttachment && files.length)) {
-      return;
+      return [];
     }
 
     const rejected: ChatRejectedFile[] = [];
@@ -82,6 +82,8 @@ const useChatAttachmentUploads = ({ onUploadAttachment, accept, maxAttachments, 
         upload(key, file);
       });
     }
+
+    return accepted;
   };
 
   const retry = (key: string) => {

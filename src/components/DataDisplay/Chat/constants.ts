@@ -1,3 +1,4 @@
+import type { Theme } from "@mui/material/styles";
 export const DEFAULT_ATTACHMENT_ACCEPT = [
   "image/jpeg",
   "image/png",
@@ -29,3 +30,9 @@ export const EMOJI_CELL_SIZE = 44;
 
 /** Cells plus the side paddings and the scrollbar gutter */
 export const getEmojiPickerWidth = (columns: number) => columns * EMOJI_CELL_SIZE + 32;
+
+/** My messages in grey, the others' in white */
+export const getOwnBubbleBackground = ({ palette }: Theme) =>
+  palette.mode === "dark"
+    ? palette.grey[900]
+    : ((palette.tertiary as unknown as Partial<Record<string, string>> | undefined)?.["12p"] ?? palette.grey[200]);

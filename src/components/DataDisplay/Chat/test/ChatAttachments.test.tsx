@@ -146,24 +146,40 @@ describe("Chat attachments", () => {
     expect(onUploadAttachment).toHaveBeenCalledTimes(2);
   });
 
-  it("passes the order link picked in the composer back with the file", async () => {
+  it("opens the order link as soon as a file joins the composer and sends it with the file", async () => {
     const onSend = vi.fn();
     const pdf = createFile("bl.pdf", "application/pdf");
     const link = { label: "Commande #24817 · Bon de livraison" };
+    const onLinkAttachment = vi.fn(() => Promise.resolve(link));
     const { container } = render(
       <ChatMessageInput
         onSend={onSend}
         onUploadAttachment={(file) => Promise.resolve(toAttachment(file))}
-        onLinkAttachment={() => Promise.resolve(link)}
+        onLinkAttachment={onLinkAttachment}
       />,
     );
 
     selectFiles(container, [pdf]);
-    fireEvent.click(await screen.findByText("Link to an order"));
     await screen.findByText(link.label);
+    expect(onLinkAttachment).toHaveBeenCalledWith(expect.objectContaining({ fileName: "bl.pdf", mimeType: "application/pdf" }), {});
     fireEvent.click(screen.getByLabelText("Send"));
 
     expect(onSend).toHaveBeenCalledWith("", [{ ...toAttachment(pdf), link }]);
+  });
+
+  it("keeps the link one click away when the dialog is dismissed", async () => {
+    const pdf = createFile("bl.pdf", "application/pdf");
+    const { container } = render(
+      <ChatMessageInput
+        onSend={vi.fn()}
+        onUploadAttachment={(file) => Promise.resolve(toAttachment(file))}
+        onLinkAttachment={() => Promise.resolve(null)}
+      />,
+    );
+
+    selectFiles(container, [pdf]);
+
+    expect(await screen.findByText("Link to an order")).toBeInTheDocument();
   });
 });
 

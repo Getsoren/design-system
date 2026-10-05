@@ -3,6 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { getOwnBubbleBackground } from "@/components/DataDisplay/Chat/constants";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatAttachment } from "@/components/DataDisplay/Chat/types";
 import PauseRoundedIcon from "@/components/DataDisplay/Icons/PauseRoundedIcon";
@@ -10,6 +11,14 @@ import PlayArrowRoundedIcon from "@/components/DataDisplay/Icons/PlayArrowRounde
 
 const BAR_COUNT = 32;
 const KEYBOARD_STEP = 0.05;
+// Same shape as the text bubble: 16px corners, the 5px tail on the author's side
+const BUBBLE_RADIUS = 16;
+const TAIL_RADIUS = 5;
+// Even inset around the button, so its corners are concentric with the bubble's (inner = outer - inset)
+const BUTTON_INSET = 6;
+const BUTTON_SIZE = 44;
+const BUTTON_RADIUS = BUBBLE_RADIUS - BUTTON_INSET;
+const BUTTON_TAIL_RADIUS = Math.max(TAIL_RADIUS - BUTTON_INSET, 2);
 
 interface ChatVoiceMessageProps {
   attachment: ChatAttachment;
@@ -45,7 +54,7 @@ const getWaveform = (id: string): number[] => {
 };
 
 /**
- * A voice message as a bubble: round play / pause button, waveform filling up with the playback (a click moves the
+ * A voice message as a bubble: play / pause button, waveform filling up with the playback (a click moves the
  * playhead), the duration then the elapsed time.
  */
 const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) => {
@@ -162,8 +171,6 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
     [],
   );
 
-  const barColor = isOwn ? "primary.contrastText" : "text.primary";
-
   return (
     <Paper
       role="group"
@@ -171,18 +178,17 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
       data-test="chatVoiceMessage"
       sx={{
         alignItems: "center",
-        backgroundColor: isOwn ? "primary.main" : "tertiary.light",
+        backgroundColor: isOwn ? getOwnBubbleBackground : "tertiary.light",
         border: 0,
-        borderBottomLeftRadius: isOwn ? undefined : "5px ! important",
-        borderBottomRightRadius: isOwn ? "5px ! important" : undefined,
-        borderRadius: 2,
+        borderRadius: `${BUBBLE_RADIUS}px`,
+        ...(isOwn ? { borderBottomRightRadius: `${TAIL_RADIUS}px` } : { borderBottomLeftRadius: `${TAIL_RADIUS}px` }),
         boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-        color: isOwn ? "primary.contrastText" : "text.primary",
+        color: "text.primary",
         display: "flex",
-        gap: 1,
+        gap: 1.25,
         maxWidth: "100%",
-        px: 1,
-        py: 0.5,
+        p: `${BUTTON_INSET}px`,
+        pr: 1.5,
         width: 260,
       }}
     >
@@ -190,12 +196,15 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
         aria-label={isPlaying ? labels.pause : labels.play}
         onClick={togglePlayback}
         sx={{
-          "&:hover": { backgroundColor: isOwn ? "primary.contrastText" : "primary.main", opacity: 0.85 },
-          backgroundColor: isOwn ? "primary.contrastText" : "primary.main",
-          color: isOwn ? "primary.main" : "primary.contrastText",
+          "&:hover": { backgroundColor: "primary.main", opacity: 0.85 },
+          backgroundColor: "primary.main",
+          // The corner next to the bubble's tail follows it, the others follow the bubble's 16px
+          borderRadius: `${BUTTON_RADIUS}px`,
+          color: "primary.contrastText",
+          ...(!isOwn && { borderBottomLeftRadius: `${BUTTON_TAIL_RADIUS}px` }),
           flexShrink: 0,
-          height: 44,
-          width: 44,
+          height: BUTTON_SIZE,
+          width: BUTTON_SIZE,
         }}
       >
         {isPlaying ? <PauseRoundedIcon /> : <PlayArrowRoundedIcon />}
@@ -210,13 +219,21 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
         aria-valuetext={formatDuration(currentTime)}
         onClick={handleWaveformClick}
         onKeyDown={handleWaveformKeyDown}
-        sx={{ alignItems: "center", cursor: "pointer", display: "flex", flex: 1, height: 44, justifyContent: "space-between", minWidth: 0 }}
+        sx={{
+          alignItems: "center",
+          cursor: "pointer",
+          display: "flex",
+          flex: 1,
+          height: BUTTON_SIZE,
+          justifyContent: "space-between",
+          minWidth: 0,
+        }}
       >
         {waveform.map((height, index) => (
           <Box
             key={index}
             sx={{
-              backgroundColor: barColor,
+              backgroundColor: "text.primary",
               borderRadius: 1,
               flexShrink: 0,
               height: 4 + height * 24,
@@ -229,7 +246,7 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
       <Typography
         variant="caption"
         sx={{
-          color: isOwn ? "primary.contrastText" : "text.secondary",
+          color: "text.secondary",
           fontVariantNumeric: "tabular-nums",
           minWidth: 32,
           textAlign: "right",

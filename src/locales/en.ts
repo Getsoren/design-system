@@ -3,6 +3,7 @@ export default {
   anErrorOccurred: "An error occurred",
   apply: "Apply",
   attachFile: "Attach a file",
+  callNumber: "Call",
   cancelRecording: "Cancel",
   clear: "Clear",
   clickToUpload: "Click to upload",

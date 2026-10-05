@@ -1,6 +1,7 @@
 import type {
   ChatAttachmentLabels,
   ChatEventLabels,
+  ChatPhoneLabels,
   ChatQuickActionLabels,
   ChatQuickReplyLabels,
   ChatReactionLabels,
@@ -17,13 +18,14 @@ type ChatLabelOverrides = ChatAttachmentLabels &
   ChatEventLabels &
   ChatQuickActionLabels &
   ChatTeamLabels &
-  ChatQuickReplyLabels;
+  ChatQuickReplyLabels &
+  ChatPhoneLabels;
 
 export type ChatLabels = Required<ChatLabelOverrides>;
 
 /**
  * Chat labels (attachments, reactions, voice messages, read receipts, automatic messages, quick actions, team view,
- * quick replies):
+ * quick replies, phone numbers):
  * the caller's strings first, the design system locale otherwise.
  */
 const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
@@ -32,6 +34,7 @@ const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
   return {
     addReaction: labels?.addReaction ?? t("addReaction"),
     attachFile: labels?.attachFile ?? t("attachFile"),
+    callNumber: labels?.callNumber ?? t("callNumber"),
     cancelRecording: labels?.cancelRecording ?? t("cancelRecording"),
     close: labels?.close ?? t("close"),
     download: labels?.download ?? t("download"),

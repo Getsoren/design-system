@@ -217,6 +217,11 @@ export interface ChatQuickActionLabels {
   fileOrPhoto?: string;
 }
 
+export interface ChatPhoneLabels {
+  /** Title of a phone number link, before the number */
+  callNumber?: string;
+}
+
 export interface ChatQuickReplyLabels {
   /** Name of the group of one-tap replies above the field */
   quickReplies?: string;
@@ -235,7 +240,8 @@ export interface ChatConversationDetailLabels
     ChatEventLabels,
     ChatQuickActionLabels,
     ChatTeamLabels,
-    ChatQuickReplyLabels {
+    ChatQuickReplyLabels,
+    ChatPhoneLabels {
   today?: string;
   yesterday?: string;
   createYourFirstConversation?: string;
@@ -367,7 +373,8 @@ export interface ChatMessageBubbleLabels
     ChatReactionLabels,
     ChatVoiceMessageLabels,
     ChatReadReceiptLabels,
-    ChatEventLabels {}
+    ChatEventLabels,
+    ChatPhoneLabels {}
 
 export interface ChatMessageBubbleProps {
   isOwn: boolean;

@@ -26,6 +26,7 @@ import { extractUrls } from "@/components/DataDisplay/Chat/utils/extractUrls";
 import formatMessageTime from "@/components/DataDisplay/Chat/utils/formatMessageTime";
 import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";
 import { addRecentEmoji } from "@/components/DataDisplay/Chat/utils/recentEmojis";
+import splitPhoneNumbers from "@/components/DataDisplay/Chat/utils/splitPhoneNumbers";
 import AddReactionIcon from "@/components/DataDisplay/Icons/AddReactionIcon";
 
 const URL_REGEX = /https?:\/\/\S+/g;
@@ -46,17 +47,36 @@ const getReaders = (message: ChatMessage, participants?: ChatParticipant[] | nul
 // "👍️" and "👍" are the same reaction
 const stripVariationSelectors = (emoji: string) => emoji.replace(/️/g, "");
 
-const renderMessageBody = (body: string): ReactNode => {
+const linkSx = {
+  "&:hover": { opacity: 0.8 },
+  textDecorationColor: "inherit",
+};
+
+/**
+ * Phone numbers as `tel:` links: a tap calls from a phone or a tablet, a click opens the calling app on a computer
+ */
+const renderPhoneNumbers = (text: string, key: number, callLabel: string): ReactNode[] =>
+  splitPhoneNumbers(text).map(({ text: part, href }, index) =>
+    href ? (
+      <Link key={`${key}-${index}`} href={href} title={`${callLabel} ${part}`} underline="always" sx={{ ...linkSx, whiteSpace: "nowrap" }}>
+        {part}
+      </Link>
+    ) : (
+      part
+    ),
+  );
+
+const renderMessageBody = (body: string, callLabel: string): ReactNode => {
   const urls = body.match(URL_REGEX) || [];
 
   if (!urls.length) {
-    return body;
+    return renderPhoneNumbers(body, 0, callLabel);
   }
 
   const parts = body.split(URL_REGEX);
 
   return parts.reduce<ReactNode[]>((acc, part, index) => {
-    acc.push(part);
+    acc.push(...renderPhoneNumbers(part, index, callLabel));
 
     if (index < urls.length) {
       const url = urls[index];
@@ -69,8 +89,7 @@ const renderMessageBody = (body: string): ReactNode => {
           rel="noopener noreferrer"
           underline="always"
           sx={{
-            "&:hover": { opacity: 0.8 },
-            textDecorationColor: "inherit",
+            ...linkSx,
             wordBreak: "break-all",
           }}
         >
@@ -270,7 +289,7 @@ const ChatMessageBubble = ({
           {hasTextBubble && (
             <Bubble isOwn={isOwn}>
               <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-                {renderMessageBody(message.body)}
+                {renderMessageBody(message.body, chatLabels.callNumber)}
               </Typography>
             </Bubble>
           )}

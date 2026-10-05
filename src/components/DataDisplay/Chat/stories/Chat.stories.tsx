@@ -1003,6 +1003,41 @@ export const QuickReplies: StoryFn = () => {
   );
 };
 
+/**
+ * French phone numbers in a message become `tel:` links, underlined like the URLs: a tap calls from a tablet.
+ */
+export const PhoneNumbers: StoryFn = () => (
+  <ThemeContext.Provider value={{ language: "fr" }}>
+    <Chat height="100vh">
+      <Chat.ConversationDetail
+        threadId="thread-1"
+        participants={[{ ...participants[0], lastReadAt: minutesAgo(1) }]}
+        messages={[
+          { authorId: CURRENT_USER_ID, body: "Je suis absent demain, qui me remplace ?", createdAt: minutesAgo(30), id: "tel-1" },
+          {
+            authorId: "user-1",
+            body: "Julien prend le relais : 06 12 34 56 78.\nLe dépôt de Lyon répond aussi au 04.72.00.00.00 de 7 h à 17 h.",
+            createdAt: minutesAgo(20),
+            id: "tel-2",
+          },
+          {
+            authorId: CURRENT_USER_ID,
+            body: "Merci ! Le chef de chantier est joignable au +33 6 98 76 54 32. Plan d'accès : https://example.com/acces",
+            createdAt: minutesAgo(5),
+            id: "tel-3",
+          },
+        ]}
+        currentUserId={CURRENT_USER_ID}
+        onDeleteConversation={() => {}}
+        onNewConversation={() => {}}
+        onSendMessage={() => {}}
+        onAddParticipants={() => {}}
+        labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
+      />
+    </Chat>
+  </ThemeContext.Provider>
+);
+
 const createSampleImage = (): Promise<File> =>
   new Promise((resolve) => {
     const canvas = document.createElement("canvas");

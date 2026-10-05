@@ -3,6 +3,7 @@ export default {
   anErrorOccurred: "Une erreur est survenue",
   apply: "Appliquer",
   attachFile: "Joindre un fichier",
+  callNumber: "Appeler",
   cancelRecording: "Annuler",
   clear: "Effacer",
   clickToUpload: "Cliquez pour parcourir",

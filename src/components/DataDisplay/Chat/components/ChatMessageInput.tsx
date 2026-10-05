@@ -2,33 +2,80 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { type KeyboardEvent, useEffect, useRef, useState } from "react";
-import type { ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
+import {
+  type ClipboardEvent,
+  type ForwardedRef,
+  forwardRef,
+  type KeyboardEvent,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import ChatAttachmentTray from "@/components/DataDisplay/Chat/components/ChatAttachmentTray";
+import { DEFAULT_ATTACHMENT_ACCEPT, DEFAULT_MAX_ATTACHMENT_SIZE, DEFAULT_MAX_ATTACHMENTS } from "@/components/DataDisplay/Chat/constants";
+import useChatAttachmentUploads from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
+import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
+import type { ChatMessageInputHandle, ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
+import AttachFileIcon from "@/components/DataDisplay/Icons/AttachFileIcon";
 
 const RADIUS = 15;
 const COUNTER_VISIBLE_FROM = 40;
 
-const ChatMessageInput = ({
-  onSend,
-  labels,
-  autoFocusKey,
-  isSending,
-  defaultMessage,
-  startActions,
-  slotProps,
-  maxLength = 10000,
-}: ChatMessageInputProps) => {
+const ChatMessageInput = (
+  {
+    onSend,
+    labels,
+    autoFocusKey,
+    isSending,
+    defaultMessage,
+    startActions,
+    slotProps,
+    maxLength = 10000,
+    onUploadAttachment,
+    attachmentAccept = DEFAULT_ATTACHMENT_ACCEPT,
+    maxAttachments = DEFAULT_MAX_ATTACHMENTS,
+    maxAttachmentSize = DEFAULT_MAX_ATTACHMENT_SIZE,
+    onLinkAttachment,
+  }: ChatMessageInputProps,
+  ref: ForwardedRef<ChatMessageInputHandle>,
+) => {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatLabels = useChatLabels(labels);
+  const uploads = useChatAttachmentUploads({ accept: attachmentAccept, maxAttachmentSize, maxAttachments, onUploadAttachment });
+  // Files alone make a message; an upload still running blocks the send so nothing leaves half-way
+  const canSend = (!!message.trim() || uploads.hasUploaded) && !isSending && !uploads.isUploading;
+
+  useImperativeHandle(ref, () => ({ addFiles: uploads.addFiles }));
 
   const handleSend = () => {
-    if (!message.trim() || isSending) {
+    if (!canSend) {
       return;
     }
-    onSend(message.trim());
+
+    const attachments = uploads.takeUploaded();
+
+    // Same call as before when there is no file, for the consumers asserting on the arguments
+    if (attachments.length) {
+      onSend(message.trim(), attachments);
+    } else {
+      onSend(message.trim());
+    }
     setMessage("");
+  };
+
+  const handlePaste = (e: ClipboardEvent<HTMLDivElement>) => {
+    const files = Array.from(e.clipboardData?.files ?? []);
+
+    if (onUploadAttachment && files.length) {
+      e.preventDefault();
+      uploads.addFiles(files);
+    }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -47,6 +94,14 @@ const ChatMessageInput = ({
     }
   }, [defaultMessage]);
 
+  /**
+   * Files are uploaded for one thread: switching thread drops the ones still in the composer
+   */
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only the thread change matters
+  useEffect(() => {
+    uploads.clear();
+  }, [autoFocusKey]);
+
   return (
     <Box
       sx={{
@@ -56,6 +111,17 @@ const ChatMessageInput = ({
         p: 2,
       }}
     >
+      <ChatAttachmentTray
+        items={uploads.items}
+        rejectedFiles={uploads.rejectedFiles}
+        labels={chatLabels}
+        maxAttachments={maxAttachments}
+        maxAttachmentSize={maxAttachmentSize}
+        onRemove={uploads.remove}
+        onRetry={uploads.retry}
+        onLinkAttachment={onLinkAttachment}
+        onLinked={uploads.setLink}
+      />
       <TextField
         fullWidth
         multiline
@@ -67,6 +133,7 @@ const ChatMessageInput = ({
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
         slotProps={{ htmlInput: { maxLength } }}
         sx={{
           // body1 (16px) is a step above every other field: align the composer on body2 like the rest.
@@ -107,6 +174,33 @@ const ChatMessageInput = ({
         }}
       >
         <Stack direction="row" alignItems="center" spacing={1}>
+          {onUploadAttachment && (
+            <>
+              <Tooltip title={chatLabels.attachFile}>
+                <IconButton
+                  aria-label={chatLabels.attachFile}
+                  onClick={() => fileInputRef.current?.click()}
+                  data-test="chatAttachFile"
+                  sx={{ height: 44, width: 44 }}
+                >
+                  <AttachFileIcon />
+                </IconButton>
+              </Tooltip>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                hidden
+                accept={attachmentAccept}
+                data-test="chatAttachFileInput"
+                onChange={(e) => {
+                  uploads.addFiles(Array.from(e.target.files ?? []));
+                  // Picking the same file again after removing it must fire a new change
+                  e.target.value = "";
+                }}
+              />
+            </>
+          )}
           {startActions}
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1}>
@@ -123,7 +217,7 @@ const ChatMessageInput = ({
             aria-label={labels?.send ?? "Send"}
             title={labels?.send ?? "Send"}
             onClick={handleSend}
-            disabled={!message.trim() || isSending}
+            disabled={!canSend}
             sx={{
               "&:hover": { backgroundColor: "primary.dark" },
               "&.Mui-disabled": { backgroundColor: "action.disabledBackground", color: "action.disabled" },
@@ -148,4 +242,4 @@ const ChatMessageInput = ({
   );
 };
 
-export default ChatMessageInput;
+export default forwardRef(ChatMessageInput);

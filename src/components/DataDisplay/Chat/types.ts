@@ -1,12 +1,49 @@
 import type { ReactNode } from "react";
 import type { DataAttributes } from "@/types/dataAttributes";
 
+export interface ChatAttachmentLink {
+  /** Display label, e.g. "Commande #1234 · Bon de livraison" */
+  label: string;
+  onClick?: () => void;
+}
+
+export interface ChatAttachment {
+  id: string;
+  fileName: string;
+  mimeType: string;
+  /** Bytes */
+  size: number;
+  url: string;
+  thumbnailUrl?: string | null;
+  width?: number | null;
+  height?: number | null;
+  /** Business object the file is filed under (an order on Soren) */
+  link?: ChatAttachmentLink | null;
+}
+
+export interface ChatReaction {
+  /** A single unicode emoji */
+  emoji: string;
+  userIds: string[];
+}
+
 export interface ChatMessage {
   id: string | number;
   authorId: string;
   body: string;
   createdAt: string;
+  attachments?: ChatAttachment[] | null;
+  reactions?: ChatReaction[] | null;
 }
+
+/** Resolves with the stored file; report the upload progress (0-100) through `onProgress` */
+export type ChatUploadAttachment = (file: File, onProgress: (percent: number) => void) => Promise<ChatAttachment>;
+
+/**
+ * Opens the app's own dialog and resolves with the link to display, or null if cancelled. `message` is set
+ * for a file already sent (the app then updates its own message data), absent for a file still in the composer.
+ */
+export type ChatLinkAttachment = (attachment: ChatAttachment, context: { message?: ChatMessage }) => Promise<ChatAttachmentLink | null>;
 
 export interface ChatParticipant {
   userId: string;
@@ -37,7 +74,32 @@ export interface ChatConversationListLabels {
   search?: string;
 }
 
-export interface ChatConversationDetailLabels {
+export interface ChatAttachmentLabels {
+  attachFile?: string;
+  dropFilesHere?: string;
+  removeAttachment?: string;
+  retryUpload?: string;
+  uploadFailed?: string;
+  fileTooLarge?: string;
+  unsupportedFileType?: string;
+  tooManyFiles?: string;
+  linkAttachment?: string;
+  download?: string;
+  openFile?: string;
+  previous?: string;
+  next?: string;
+  close?: string;
+}
+
+export interface ChatReactionLabels {
+  addReaction?: string;
+  searchEmoji?: string;
+  /** Header of the recently used emojis in the picker */
+  recentEmojis?: string;
+  you?: string;
+}
+
+export interface ChatConversationDetailLabels extends ChatAttachmentLabels, ChatReactionLabels {
   today?: string;
   yesterday?: string;
   createYourFirstConversation?: string;
@@ -53,7 +115,7 @@ export interface ChatConversationDetailLabels {
   back?: string;
 }
 
-export interface ChatMessageInputLabels {
+export interface ChatMessageInputLabels extends ChatAttachmentLabels {
   writeAMessage?: string;
   send?: string;
   enterToSend?: string;
@@ -103,7 +165,7 @@ export interface ChatConversationDetailProps {
   currentUserId: string;
   onDeleteConversation: (threadId: string) => void;
   onNewConversation: () => void;
-  onSendMessage: (threadId: string, body: string) => void;
+  onSendMessage: (threadId: string, body: string, attachments?: ChatAttachment[]) => void;
   onAddParticipants: (participants: ChatSearchUser[]) => void | Promise<unknown>;
   onSearchParticipants?: (query: string) => void;
   searchResults?: ChatSearchUser[];
@@ -120,7 +182,23 @@ export interface ChatConversationDetailProps {
   messageMaxLength?: number;
   slotProps?: ChatConversationDetailSlotProps;
   onBack?: () => void;
+  /** Enables the paperclip, drag & drop and paste */
+  onUploadAttachment?: ChatUploadAttachment;
+  /** Default: images (jpeg, png, webp, heic), pdf, word, excel */
+  attachmentAccept?: string;
+  /** Default 10 per message */
+  maxAttachments?: number;
+  /** Bytes, default 25 MB */
+  maxAttachmentSize?: number;
+  /** Enables "link to an order" on a file, in the composer (once uploaded) and on a sent message */
+  onLinkAttachment?: ChatLinkAttachment;
+  /** Enables reactions: "mine" is derived from `currentUserId` being in `reaction.userIds` */
+  onToggleReaction?: (messageId: ChatMessage["id"], emoji: string) => void;
+  /** Default ["👍", "✅", "👀", "🙏", "😂", "❤️"] */
+  quickReactions?: string[];
 }
+
+export interface ChatMessageBubbleLabels extends ChatAttachmentLabels, ChatReactionLabels {}
 
 export interface ChatMessageBubbleProps {
   isOwn: boolean;
@@ -130,6 +208,13 @@ export interface ChatMessageBubbleProps {
   renderAfterBubble?: (urls: string[]) => ReactNode;
   formatTime?: (date: string) => string;
   hideAvatar?: boolean;
+  /** Required to tell "my" reactions apart */
+  currentUserId?: string;
+  formatParticipantName?: (participant: ChatParticipant) => string;
+  onLinkAttachment?: ChatLinkAttachment;
+  onToggleReaction?: (messageId: ChatMessage["id"], emoji: string) => void;
+  quickReactions?: string[];
+  labels?: ChatMessageBubbleLabels;
 }
 
 /** `data-*` attributes forwarded to the message input's inner controls */
@@ -137,8 +222,13 @@ export interface ChatMessageInputSlotProps {
   sendButton?: DataAttributes;
 }
 
+/** Imperative handle of the message input, e.g. to feed it files dropped elsewhere */
+export interface ChatMessageInputHandle {
+  addFiles: (files: File[]) => void;
+}
+
 export interface ChatMessageInputProps {
-  onSend: (message: string) => void;
+  onSend: (message: string, attachments?: ChatAttachment[]) => void;
   labels?: ChatMessageInputLabels;
   autoFocusKey?: string;
   isSending?: boolean;
@@ -147,6 +237,11 @@ export interface ChatMessageInputProps {
   /** Rendered on the left of the bottom bar, facing the send button (e.g. ChatVoiceRecorder) */
   startActions?: ReactNode;
   slotProps?: ChatMessageInputSlotProps;
+  onUploadAttachment?: ChatUploadAttachment;
+  attachmentAccept?: string;
+  maxAttachments?: number;
+  maxAttachmentSize?: number;
+  onLinkAttachment?: ChatLinkAttachment;
 }
 
 export interface ChatVoiceRecorderLabels {

@@ -5,9 +5,12 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef } from "react";
 import ChatConversationDetailHeader from "@/components/DataDisplay/Chat/components/ChatConversationDetailHeader";
+import ChatDropOverlay from "@/components/DataDisplay/Chat/components/ChatDropOverlay";
 import ChatMessageBubble from "@/components/DataDisplay/Chat/components/ChatMessageBubble";
 import ChatMessageInput from "@/components/DataDisplay/Chat/components/ChatMessageInput";
-import type { ChatConversationDetailProps } from "@/components/DataDisplay/Chat/types";
+import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
+import useFileDrop from "@/components/DataDisplay/Chat/hooks/useFileDrop";
+import type { ChatConversationDetailProps, ChatMessageInputHandle } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import ChatBubbleIcon from "@/components/DataDisplay/Icons/ChatBubbleIcon";
 import Button from "@/components/Inputs/Button/Button";
@@ -65,15 +68,32 @@ const ChatConversationDetail = ({
   messageMaxLength,
   slotProps,
   onBack,
+  onUploadAttachment,
+  attachmentAccept,
+  maxAttachments,
+  maxAttachmentSize,
+  onLinkAttachment,
+  onToggleReaction,
+  quickReactions,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousThreadIdRef = useRef<string | undefined>(undefined);
+  const messageInputRef = useRef<ChatMessageInputHandle>(null);
+  const chatLabels = useChatLabels(labels);
+  // Files dropped anywhere on the conversation join the composer
+  const { isDraggingFiles, dropZoneProps } = useFileDrop(
+    onUploadAttachment ? (files) => messageInputRef.current?.addFiles(files) : undefined,
+  );
 
   const getDayLabel = formatDayLabel ?? defaultFormatDayLabel;
 
   /**
-   * Auto-scroll to the bottom of the conversation when messages change
+   * Auto-scroll to the bottom of the conversation when a message arrives. Keyed on the last message rather than
+   * the array: a reaction or a link on an older message must not pull the reader down.
    */
+  const lastMessageId = messages?.[messages.length - 1]?.id;
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the last message stands for the list
   useEffect(() => {
     if (!messages || isLoading) {
       return;
@@ -83,7 +103,7 @@ const ChatConversationDetail = ({
     previousThreadIdRef.current = threadId;
 
     scrollContainerRef.current?.scrollTo({ behavior: isNewThread ? "instant" : "smooth", top: scrollContainerRef.current.scrollHeight });
-  }, [messages, threadId, isLoading]);
+  }, [lastMessageId, messages?.length, threadId, isLoading]);
 
   if (!threadId && isLoading) {
     return (
@@ -110,7 +130,15 @@ const ChatConversationDetail = ({
   }
 
   return (
-    <Stack data-chat-pane="detail" data-selected flex={1} height="100%" minWidth={{ sm: 300, xs: 0 }}>
+    <Stack
+      data-chat-pane="detail"
+      data-selected
+      flex={1}
+      height="100%"
+      minWidth={{ sm: 300, xs: 0 }}
+      position="relative"
+      {...dropZoneProps}
+    >
       <ChatConversationDetailHeader
         threadId={threadId}
         onBack={onBack}
@@ -184,6 +212,12 @@ const ChatConversationDetail = ({
                     participants={participants}
                     avatarSrcResolver={avatarSrcResolver}
                     renderAfterBubble={renderAfterBubble ? (urls) => renderAfterBubble(message, urls) : undefined}
+                    currentUserId={currentUserId}
+                    formatParticipantName={formatParticipantName}
+                    onLinkAttachment={onLinkAttachment}
+                    onToggleReaction={onToggleReaction}
+                    quickReactions={quickReactions}
+                    labels={chatLabels}
                   />
                 </Stack>
               );
@@ -192,14 +226,22 @@ const ChatConversationDetail = ({
         )}
       </Box>
       <ChatMessageInput
-        onSend={(body) => onSendMessage(threadId, body)}
-        labels={{ enterToSend: labels?.enterToSend, send: labels?.send, writeAMessage: labels?.writeAMessage }}
+        ref={messageInputRef}
+        // Without files, the exact same call as before: (threadId, body)
+        onSend={(body, attachments) => (attachments ? onSendMessage(threadId, body, attachments) : onSendMessage(threadId, body))}
+        labels={{ ...chatLabels, enterToSend: labels?.enterToSend, send: labels?.send, writeAMessage: labels?.writeAMessage }}
         autoFocusKey={threadId}
         isSending={isSending}
         defaultMessage={defaultMessage}
         maxLength={messageMaxLength}
         slotProps={slotProps}
+        onUploadAttachment={onUploadAttachment}
+        attachmentAccept={attachmentAccept}
+        maxAttachments={maxAttachments}
+        maxAttachmentSize={maxAttachmentSize}
+        onLinkAttachment={onLinkAttachment}
       />
+      {isDraggingFiles && <ChatDropOverlay label={chatLabels.dropFilesHere} />}
     </Stack>
   );
 };

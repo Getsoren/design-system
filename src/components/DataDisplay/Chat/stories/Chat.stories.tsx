@@ -1,8 +1,19 @@
 import { Box, Stack } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Chat from "@/components/DataDisplay/Chat/Chat";
-import type { ChatMessage, ChatParticipant, ChatSearchUser, ChatThread } from "@/components/DataDisplay/Chat/types";
+import type {
+  ChatAttachment,
+  ChatAttachmentLink,
+  ChatLinkAttachment,
+  ChatMessage,
+  ChatMessageInputHandle,
+  ChatParticipant,
+  ChatSearchUser,
+  ChatThread,
+  ChatUploadAttachment,
+} from "@/components/DataDisplay/Chat/types";
+import { ThemeContext } from "@/context/Theme/ThemeProvider";
 
 const now = new Date();
 const yesterday = new Date(now.getTime() - 86400000);
@@ -282,6 +293,256 @@ const MessageBubbleTemplate: StoryFn = () => (
 );
 
 export const MessageBubble = MessageBubbleTemplate.bind({});
+
+const photo = (seed: string, width = 1200, height = 900): ChatAttachment => ({
+  fileName: `${seed}.jpg`,
+  height,
+  id: `photo-${seed}`,
+  mimeType: "image/jpeg",
+  size: 1_850_000,
+  thumbnailUrl: `https://picsum.photos/seed/${seed}/480/${Math.round((480 * height) / width)}`,
+  url: `https://picsum.photos/seed/${seed}/${width}/${height}`,
+  width,
+});
+
+const ORDER_LINK_LABEL = "Commande #24817 · Bon de livraison";
+
+const attachmentMessages: ChatMessage[] = [
+  {
+    attachments: [photo("livraison-benne", 1200, 900)],
+    authorId: "user-1",
+    body: "Benne livrée ce matin, voici la photo",
+    createdAt: yesterday.toISOString(),
+    id: "att-1",
+    reactions: [{ emoji: "👍", userIds: ["current-user", "user-2"] }],
+  },
+  {
+    attachments: [photo("acces-chantier", 900, 1200), photo("portail", 1200, 900), photo("zone-stockage", 1200, 900)],
+    authorId: CURRENT_USER_ID,
+    body: "",
+    createdAt: yesterday.toISOString(),
+    id: "att-2",
+    reactions: [{ emoji: "✅", userIds: ["user-1"] }],
+  },
+  {
+    attachments: ["dalle", "coffrage", "grue", "toupie", "pompe", "ferraillage"].map((seed) => photo(seed)),
+    authorId: "user-2",
+    body: "Le reste du chantier",
+    createdAt: now.toISOString(),
+    id: "att-3",
+    reactions: [
+      { emoji: "👀", userIds: ["user-1", "user-2", "current-user"] },
+      { emoji: "🙏", userIds: ["user-1"] },
+    ],
+  },
+  {
+    attachments: [
+      {
+        fileName: "Bon de livraison 24817.pdf",
+        id: "pdf-1",
+        link: { label: ORDER_LINK_LABEL },
+        mimeType: "application/pdf",
+        size: 1_258_291,
+        url: "https://pousses.fr/sites/default/files/2019-08/pdf_test_1.pdf",
+      },
+    ],
+    authorId: "user-1",
+    body: "",
+    createdAt: now.toISOString(),
+    id: "att-4",
+  },
+  {
+    attachments: [
+      {
+        fileName: "Devis chantier Lyon 7e - version signée.xlsx",
+        id: "xlsx-1",
+        mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        size: 48_300,
+        url: "https://example.com/devis.xlsx",
+      },
+    ],
+    authorId: CURRENT_USER_ID,
+    body: "Et le devis signé",
+    createdAt: now.toISOString(),
+    id: "att-5",
+    reactions: [
+      { emoji: "😂", userIds: ["user-2"] },
+      { emoji: "❤️", userIds: ["user-1", "user-2"] },
+    ],
+  },
+];
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const failedOnce = new Set<string>();
+
+/**
+ * Progress in steps; a file named "echec…" fails on its first try (the retry goes through).
+ */
+const simulateUpload: ChatUploadAttachment = async (file, onProgress) => {
+  const shouldFail = /^echec/i.test(file.name) && !failedOnce.has(file.name);
+  const dimensions = await createImageBitmap(file).then(
+    ({ width, height }) => ({ height, width }),
+    () => ({ height: null, width: null }),
+  );
+
+  for (let progress = 0; progress < 100; progress += 15) {
+    onProgress(progress);
+    await wait(500);
+
+    if (shouldFail && progress >= 45) {
+      failedOnce.add(file.name);
+      throw new Error("Network error");
+    }
+  }
+
+  const url = URL.createObjectURL(file);
+
+  return { ...dimensions, fileName: file.name, id: `upload-${Date.now()}-${file.name}`, mimeType: file.type, size: file.size, url };
+};
+
+/**
+ * Stands for the app's dialog (pick the order and the document type).
+ */
+const simulateLinkDialog = async (): Promise<ChatAttachmentLink> => {
+  await wait(600);
+
+  return { label: ORDER_LINK_LABEL, onClick: () => console.info("Open order #24817") };
+};
+
+const toggleUser = (userIds: string[], userId: string) =>
+  userIds.includes(userId) ? userIds.filter((id) => id !== userId) : [...userIds, userId];
+
+/**
+ * Paperclip, drag & drop or paste: the upload is simulated (progress, a file named "echec…" fails once).
+ * Reactions on hover or long press, emoji picker in French with search.
+ */
+export const Attachments: StoryFn = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>(attachmentMessages);
+
+  const handleSendMessage = (_threadId: string, body: string, attachments?: ChatAttachment[]) => {
+    setMessages((previous) => [
+      ...previous,
+      { attachments, authorId: CURRENT_USER_ID, body, createdAt: new Date().toISOString(), id: `msg-${Date.now()}` },
+    ]);
+  };
+
+  const handleToggleReaction = (messageId: ChatMessage["id"], emoji: string) => {
+    setMessages((previous) =>
+      previous.map((message) => {
+        if (message.id !== messageId) {
+          return message;
+        }
+
+        const reactions = message.reactions ?? [];
+        const existing = reactions.find((reaction) => reaction.emoji === emoji);
+
+        return {
+          ...message,
+          reactions: existing
+            ? reactions.map((reaction) =>
+                reaction === existing ? { ...reaction, userIds: toggleUser(reaction.userIds, CURRENT_USER_ID) } : reaction,
+              )
+            : [...reactions, { emoji, userIds: [CURRENT_USER_ID] }],
+        };
+      }),
+    );
+  };
+
+  const handleLinkAttachment: ChatLinkAttachment = async (attachment, { message }) => {
+    const link = await simulateLinkDialog();
+
+    // A sent file: the app updates its own message data
+    if (message) {
+      setMessages((previous) =>
+        previous.map((current) =>
+          current.id === message.id
+            ? { ...current, attachments: current.attachments?.map((file) => (file.id === attachment.id ? { ...file, link } : file)) }
+            : current,
+        ),
+      );
+    }
+
+    return link;
+  };
+
+  return (
+    <ThemeContext.Provider value={{ language: "fr" }}>
+      <Chat height="100vh">
+        <Chat.ConversationDetail
+          threadId="thread-1"
+          participants={[participants[0], participants[1]]}
+          messages={messages}
+          currentUserId={CURRENT_USER_ID}
+          onDeleteConversation={() => {}}
+          onNewConversation={() => {}}
+          onSendMessage={handleSendMessage}
+          onAddParticipants={() => {}}
+          onUploadAttachment={simulateUpload}
+          onLinkAttachment={handleLinkAttachment}
+          onToggleReaction={handleToggleReaction}
+          labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
+        />
+      </Chat>
+    </ThemeContext.Provider>
+  );
+};
+
+const createSampleImage = (): Promise<File> =>
+  new Promise((resolve) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 640;
+    canvas.height = 480;
+    const context = canvas.getContext("2d");
+
+    if (context) {
+      context.fillStyle = "#8a9a5b";
+      context.fillRect(0, 0, 640, 480);
+      context.fillStyle = "#c2b280";
+      context.fillRect(0, 300, 640, 180);
+    }
+
+    canvas.toBlob((blob) => resolve(new File([blob ?? new Blob()], "photo-chantier.jpg", { type: "image/jpeg" })), "image/jpeg");
+  });
+
+/**
+ * The composer with files already picked: an image and a PDF uploading, a failing one, a refused one.
+ */
+export const MessageInputAttachments: StoryFn = () => {
+  const inputRef = useRef<ChatMessageInputHandle>(null);
+  const [sent, setSent] = useState<string>("");
+
+  useEffect(() => {
+    createSampleImage().then((image) => {
+      const pdf = new File([new Uint8Array(1_258_291)], "Bon de livraison 24817.pdf", { type: "application/pdf" });
+      const failing = new File([new Uint8Array(820_000)], "echec-plan-acces.pdf", { type: "application/pdf" });
+      const video = new File([new Uint8Array(1000)], "visite.mov", { type: "video/quicktime" });
+
+      inputRef.current?.addFiles([image, pdf, failing, video]);
+    });
+  }, []);
+
+  return (
+    <ThemeContext.Provider value={{ language: "fr" }}>
+      <Box maxWidth={720}>
+        <Chat.MessageInput
+          ref={inputRef}
+          onSend={(body, attachments) =>
+            setSent(
+              `${body} · ${attachments?.map(({ fileName, link }) => `${fileName}${link ? ` (${link.label})` : ""}`).join(", ") ?? ""}`,
+            )
+          }
+          onUploadAttachment={simulateUpload}
+          onLinkAttachment={simulateLinkDialog}
+          labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
+        />
+        <Box p={2} fontSize={12} color="text.secondary">
+          {sent}
+        </Box>
+      </Box>
+    </ThemeContext.Provider>
+  );
+};
 
 export default {
   parameters: {

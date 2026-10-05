@@ -65,6 +65,8 @@
     "@vitest/ui": "^0.34.4",
     "chromatic": "^13.3.0",
     "commit-and-tag-version": "^12.6.0",
+    "emojibase-data": "^17.0.0",
+    "frimousse": "^0.4.0",
     "husky": "^8.0.3",
     "jsdom": "^22.1.0",
     "react": "^19.0.0",

@@ -259,6 +259,7 @@ const ChatConversationDetail = ({
         headerAction={headerAction}
         onAddParticipantDialogOpenChange={onAddParticipantDialogOpenChange}
         slotProps={slotProps}
+        readOnly={!!readOnly}
       />
       {showFilter && !isLoading && (
         <Stack direction="row" spacing={1} sx={{ overflowX: "auto", px: 3, py: 1.5 }} data-test="chatMessagesFilter">

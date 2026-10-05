@@ -46,6 +46,8 @@ describe("Chat team view", () => {
     render(<ChatConversationDetail {...detailProps} readOnly={{ label: "Vous consultez la conversation de Sophie et Julie", onAction }} />);
 
     expect(screen.queryByPlaceholderText("Write a message...")).toBeNull();
+    // Someone else's conversation: no adding people to it, no deleting it
+    expect(screen.queryByLabelText("Add Participant")).toBeNull();
     expect(screen.getByText("Vous consultez la conversation de Sophie et Julie")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Join the conversation" }));
 

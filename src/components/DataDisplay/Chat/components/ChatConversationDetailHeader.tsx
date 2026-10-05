@@ -40,6 +40,8 @@ interface ChatConversationDetailHeaderProps {
   onAddParticipantDialogOpenChange?: (open: boolean) => void;
   slotProps?: Pick<ChatConversationDetailSlotProps, "addParticipantsButton">;
   onBack?: () => void;
+  /** A colleague's conversation read without being part of it: no add, no delete */
+  readOnly?: boolean;
 }
 
 const ChatConversationDetailHeader = ({
@@ -57,6 +59,7 @@ const ChatConversationDetailHeader = ({
   onAddParticipantDialogOpenChange,
   slotProps,
   onBack,
+  readOnly,
 }: ChatConversationDetailHeaderProps) => {
   const { isMenuOpen, anchorMenu, closeMenu, openMenu } = useMenu();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -110,42 +113,44 @@ const ChatConversationDetailHeader = ({
         </Stack>
         {/* Adding a participant is the frequent action, so it gets a button of its own; the menu
             keeps what stays rare and destructive. */}
-        {headerAction ?? (
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <Tooltip arrow title={labels?.addParticipant ?? "Add Participant"}>
-              <IconButton
-                {...slotProps?.addParticipantsButton}
-                size="small"
-                aria-label={labels?.addParticipant ?? "Add Participant"}
-                onClick={handleOpenAddDialog}
-                sx={{
-                  "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.400" : "grey.200") },
-                  backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
-                  color: "text.primary",
-                }}
-              >
-                <PersonAddIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <IconButton size="small" onClick={openMenu}>
-              <MoreHorizIcon fontSize="small" />
-            </IconButton>
-            <Menu
-              open={isMenuOpen}
-              onClose={closeMenu}
-              anchorEl={anchorMenu}
-              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-              transformOrigin={{ horizontal: "right", vertical: "top" }}
-            >
-              <MenuItem onClick={handleDelete}>
-                <ListItemIcon>
-                  <DeleteIcon fontSize="small" color="error" />
-                </ListItemIcon>
-                <Typography color="error">{labels?.deleteConversation ?? "Delete Conversation"}</Typography>
-              </MenuItem>
-            </Menu>
-          </Stack>
-        )}
+        {readOnly
+          ? null
+          : (headerAction ?? (
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Tooltip arrow title={labels?.addParticipant ?? "Add Participant"}>
+                  <IconButton
+                    {...slotProps?.addParticipantsButton}
+                    size="small"
+                    aria-label={labels?.addParticipant ?? "Add Participant"}
+                    onClick={handleOpenAddDialog}
+                    sx={{
+                      "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.400" : "grey.200") },
+                      backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
+                      color: "text.primary",
+                    }}
+                  >
+                    <PersonAddIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <IconButton size="small" onClick={openMenu}>
+                  <MoreHorizIcon fontSize="small" />
+                </IconButton>
+                <Menu
+                  open={isMenuOpen}
+                  onClose={closeMenu}
+                  anchorEl={anchorMenu}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                >
+                  <MenuItem onClick={handleDelete}>
+                    <ListItemIcon>
+                      <DeleteIcon fontSize="small" color="error" />
+                    </ListItemIcon>
+                    <Typography color="error">{labels?.deleteConversation ?? "Delete Conversation"}</Typography>
+                  </MenuItem>
+                </Menu>
+              </Stack>
+            ))}
       </Stack>
       <ChatParticipantDialog
         open={addDialogOpen}

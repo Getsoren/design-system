@@ -2,8 +2,11 @@ import { getInitials } from "@getsoren/react-utils";
 import { Theme } from "@mui/material";
 import Box from "@mui/material/Box";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
+import Grow from "@mui/material/Grow";
+import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
+import Popper from "@mui/material/Popper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { type MouseEvent, type PointerEvent, type ReactNode, useEffect, useRef, useState } from "react";
@@ -11,13 +14,14 @@ import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import ChatEmojiPicker from "@/components/DataDisplay/Chat/components/ChatEmojiPicker";
 import ChatMessageAttachments from "@/components/DataDisplay/Chat/components/ChatMessageAttachments";
 import ChatReactionBar from "@/components/DataDisplay/Chat/components/ChatReactionBar";
-import ChatReactionChips from "@/components/DataDisplay/Chat/components/ChatReactionChips";
+import ChatReactionSummary from "@/components/DataDisplay/Chat/components/ChatReactionSummary";
 import { DEFAULT_QUICK_REACTIONS } from "@/components/DataDisplay/Chat/constants";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatMessageBubbleProps } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import { extractUrls } from "@/components/DataDisplay/Chat/utils/extractUrls";
 import { addRecentEmoji } from "@/components/DataDisplay/Chat/utils/recentEmojis";
+import AddReactionIcon from "@/components/DataDisplay/Icons/AddReactionIcon";
 
 const URL_REGEX = /https?:\/\/\S+/g;
 const LONG_PRESS_MS = 400;
@@ -95,32 +99,14 @@ const Bubble = ({ children, isOwn }: BubbleProps) => (
   </Paper>
 );
 
-const TOOLBAR = "[data-chat-reaction-toolbar]";
-const ADD_CHIP = "[data-chat-reaction-add]";
-const visible = { opacity: 1, pointerEvents: "auto", visibility: "visible" } as const;
+const TRIGGER = "[data-chat-reaction-trigger]";
+const visible = { opacity: 1, pointerEvents: "auto" } as const;
 
-// Hover is pure CSS (no timers, no repositioning): the row lights up and its toolbar fades in, like Slack
+// Instagram-like: hovering a message only reveals a discreet smiley next to its bubble (pure CSS, no timers)
 const rowSx = {
-  "&::before": {
-    borderRadius: 2,
-    content: '""',
-    inset: "-6px -12px",
-    position: "absolute",
-    transition: "background-color 80ms",
-    zIndex: -1,
-  },
-  "&[data-active]::before": { backgroundColor: "action.hover" },
-  [`&[data-active] ${TOOLBAR}`]: visible,
-  [`& ${TOOLBAR}`]: { opacity: 0, pointerEvents: "none", transition: "opacity 80ms, visibility 80ms", visibility: "hidden" },
-  "@media (hover: hover)": {
-    "&:hover::before": { backgroundColor: "action.hover" },
-    [`&:hover ${TOOLBAR}, &:has(:focus-visible) ${TOOLBAR}`]: visible,
-    // The "+" pill only shows on the hovered row, as on Slack
-    [`& ${ADD_CHIP}`]: { opacity: 0, transition: "opacity 80ms" },
-    [`&:hover ${ADD_CHIP}, & ${ADD_CHIP}:focus-visible`]: { opacity: 1 },
-  },
-  isolation: "isolate",
-  position: "relative",
+  [`& ${TRIGGER}`]: { opacity: 0, pointerEvents: "none", transition: "opacity 100ms" },
+  [`&[data-active] ${TRIGGER}, & ${TRIGGER}:focus-visible`]: visible,
+  "@media (hover: hover)": { [`&:hover ${TRIGGER}`]: visible },
   WebkitTouchCallout: "none",
 };
 
@@ -140,7 +126,8 @@ const ChatMessageBubble = ({
   labels,
 }: ChatMessageBubbleProps) => {
   const chatLabels = useChatLabels(labels);
-  const [isLongPressed, setIsLongPressed] = useState(false);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [barAnchor, setBarAnchor] = useState<HTMLElement | null>(null);
   const [pickerAnchor, setPickerAnchor] = useState<HTMLElement | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pressOriginRef = useRef<{ x: number; y: number } | null>(null);
@@ -149,6 +136,7 @@ const ChatMessageBubble = ({
   const urls = extractUrls(message.body);
   const attachments = message.attachments ?? [];
   const reactions = message.reactions ?? [];
+  const hasReactions = reactions.some(({ userIds }) => userIds.length > 0);
   const canReact = !!onToggleReaction;
   // A message made of files only gets no empty text bubble
   const hasTextBubble = !!message.body.trim() || !attachments.length;
@@ -182,7 +170,7 @@ const ChatMessageBubble = ({
     }
 
     pressOriginRef.current = { x: e.clientX, y: e.clientY };
-    longPressTimerRef.current = setTimeout(() => setIsLongPressed(true), LONG_PRESS_MS);
+    longPressTimerRef.current = setTimeout(() => setBarAnchor(bodyRef.current), LONG_PRESS_MS);
   };
 
   const handlePointerMove = (e: PointerEvent) => {
@@ -193,18 +181,28 @@ const ChatMessageBubble = ({
     }
   };
 
-  const openPicker = (anchor: HTMLElement | null) => {
-    setIsLongPressed(false);
-    setPickerAnchor(anchor);
-  };
-
   useEffect(() => () => clearTimeout(longPressTimerRef.current), []);
+
+  useEffect(() => {
+    if (!barAnchor) {
+      return;
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setBarAnchor(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [barAnchor]);
 
   const reactionHandlers = canReact
     ? {
         onContextMenu: (e: MouseEvent) => {
           // The long press opens the reactions, not the system menu
-          if (isLongPressed) {
+          if (barAnchor) {
             e.preventDefault();
           }
         },
@@ -217,29 +215,54 @@ const ChatMessageBubble = ({
 
   const content = (
     <>
-      <Stack spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">
-        {hasTextBubble && (
-          <Bubble isOwn={isOwn}>
-            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-              {renderMessageBody(message.body, isOwn)}
-            </Typography>
-          </Bubble>
+      {/* The bubble, its smiley on the empty side and the reactions hooked under its corner */}
+      <Box
+        ref={bodyRef}
+        sx={{ alignSelf: isOwn ? "flex-end" : "flex-start", maxWidth: "100%", pb: hasReactions ? "18px" : 0, position: "relative" }}
+      >
+        <Stack spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">
+          {hasTextBubble && (
+            <Bubble isOwn={isOwn}>
+              <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                {renderMessageBody(message.body, isOwn)}
+              </Typography>
+            </Bubble>
+          )}
+          {attachments.length > 0 && (
+            <ChatMessageAttachments message={message} attachments={attachments} labels={chatLabels} onLinkAttachment={onLinkAttachment} />
+          )}
+        </Stack>
+        {canReact && (
+          <IconButton
+            data-chat-reaction-trigger
+            aria-label={chatLabels.addReaction}
+            aria-haspopup="dialog"
+            onClick={() => setBarAnchor(bodyRef.current)}
+            sx={{
+              color: "text.secondary",
+              height: 32,
+              mx: 0.5,
+              position: "absolute",
+              top: hasReactions ? "calc(50% - 9px)" : "50%",
+              transform: "translateY(-50%)",
+              width: 32,
+              ...(isOwn ? { right: "100%" } : { left: "100%" }),
+            }}
+          >
+            <AddReactionIcon sx={{ fontSize: 20 }} />
+          </IconButton>
         )}
-        {attachments.length > 0 && (
-          <ChatMessageAttachments message={message} attachments={attachments} labels={chatLabels} onLinkAttachment={onLinkAttachment} />
-        )}
-      </Stack>
+        <ChatReactionSummary
+          reactions={reactions}
+          currentUserId={currentUserId}
+          participants={participants}
+          formatParticipantName={formatParticipantName}
+          labels={chatLabels}
+          isOwn={isOwn}
+          onToggle={canReact ? toggleReaction : undefined}
+        />
+      </Box>
       {renderAfterBubble?.(urls)}
-      <ChatReactionChips
-        reactions={reactions}
-        currentUserId={currentUserId}
-        participants={participants}
-        formatParticipantName={formatParticipantName}
-        labels={chatLabels}
-        isOwn={isOwn}
-        onToggle={canReact ? toggleReaction : undefined}
-        onAdd={canReact ? openPicker : undefined}
-      />
       <Typography variant="caption" color="text.secondary">
         {formattedTime}
       </Typography>
@@ -249,7 +272,7 @@ const ChatMessageBubble = ({
   const author = participants?.find((p) => p.userId === message.authorId);
 
   return (
-    <Box data-test="chatMessage" data-active={isLongPressed || !!pickerAnchor || undefined} sx={rowSx} {...reactionHandlers}>
+    <Box data-test="chatMessage" data-active={!!barAnchor || !!pickerAnchor || undefined} sx={rowSx} {...reactionHandlers}>
       {isOwn ? (
         <Stack alignItems="flex-end" spacing={0.5} sx={{ maxWidth: "70%", ml: "auto" }}>
           {content}
@@ -280,21 +303,38 @@ const ChatMessageBubble = ({
       )}
       {canReact && (
         <>
-          {/* Slack-like: straddles the top of the hovered row, on the empty side of the bubble */}
-          <ClickAwayListener mouseEvent="onPointerDown" touchEvent={false} onClickAway={() => setIsLongPressed(false)}>
-            <Box data-chat-reaction-toolbar sx={{ position: "absolute", top: -20, zIndex: 1, ...(isOwn ? { left: 4 } : { right: 4 }) }}>
-              <ChatReactionBar
-                quickReactions={quickReactions}
-                myEmojis={myEmojis}
-                labels={chatLabels}
-                onToggle={(emoji) => {
-                  setIsLongPressed(false);
-                  toggleReaction(emoji);
-                }}
-                onAdd={(anchor) => openPicker(anchor)}
-              />
-            </Box>
-          </ClickAwayListener>
+          <Popper
+            open={!!barAnchor}
+            anchorEl={barAnchor}
+            placement={isOwn ? "top-end" : "top-start"}
+            transition
+            modifiers={[{ name: "offset", options: { offset: [0, 8] } }]}
+            sx={{ zIndex: ({ zIndex }: Theme) => zIndex.modal }}
+          >
+            {({ TransitionProps }) => (
+              <Grow {...TransitionProps} style={{ transformOrigin: isOwn ? "bottom right" : "bottom left" }} timeout={140}>
+                <div>
+                  <ClickAwayListener mouseEvent="onPointerDown" touchEvent="onTouchStart" onClickAway={() => setBarAnchor(null)}>
+                    <div>
+                      <ChatReactionBar
+                        quickReactions={quickReactions}
+                        myEmojis={myEmojis}
+                        labels={chatLabels}
+                        onToggle={(emoji) => {
+                          setBarAnchor(null);
+                          toggleReaction(emoji);
+                        }}
+                        onAdd={() => {
+                          setBarAnchor(null);
+                          setPickerAnchor(bodyRef.current);
+                        }}
+                      />
+                    </div>
+                  </ClickAwayListener>
+                </div>
+              </Grow>
+            )}
+          </Popper>
           <ChatEmojiPicker
             anchorEl={pickerAnchor}
             onClose={() => setPickerAnchor(null)}

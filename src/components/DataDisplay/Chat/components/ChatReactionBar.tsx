@@ -1,10 +1,9 @@
-import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
+import SvgIcon from "@mui/material/SvgIcon";
 import Tooltip from "@mui/material/Tooltip";
 import { EMOJI_FONT_FAMILY } from "@/components/DataDisplay/Chat/constants";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
-import AddReactionIcon from "@/components/DataDisplay/Icons/AddReactionIcon";
 
 interface ChatReactionBarProps {
   quickReactions: string[];
@@ -15,16 +14,26 @@ interface ChatReactionBarProps {
   onAdd: (anchor: HTMLElement) => void;
 }
 
-// Compact under a mouse, as on Slack; finger-sized on touch screens (long press)
-const buttonSx = {
+// A plain "+", as on Instagram
+const PlusIcon = () => (
+  <SvgIcon viewBox="0 0 24 24" sx={{ fontSize: 20 }}>
+    <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+  </SvgIcon>
+);
+
+const emojiButtonSx = {
   "@media (hover: none)": { height: 44, width: 44 },
-  borderRadius: 1.5,
-  height: 32,
-  width: 32,
+  "&:hover": { backgroundColor: "transparent", transform: "scale(1.25)" },
+  fontFamily: EMOJI_FONT_FAMILY,
+  fontSize: 26,
+  height: 40,
+  lineHeight: 1,
+  transition: "transform 120ms ease-out",
+  width: 40,
 };
 
 /**
- * Toolbar of a message (hover, long press): one-click reactions and the full emoji picker.
+ * Instagram-like pill above a message (smiley, long press): one-tap reactions, then "+" for the full emoji picker.
  */
 const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: ChatReactionBarProps) => (
   <Paper
@@ -32,13 +41,12 @@ const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: 
     data-test="chatReactionBar"
     sx={{
       alignItems: "center",
-      border: "1px solid",
-      borderColor: "divider",
-      borderRadius: 2,
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
+      borderRadius: 999,
+      boxShadow: "0 4px 24px rgba(0, 0, 0, 0.16)",
       display: "flex",
       gap: 0.25,
-      p: 0.25,
+      px: 0.75,
+      py: 0.5,
     }}
   >
     {quickReactions.map((emoji) => {
@@ -50,22 +58,27 @@ const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: 
           aria-label={emoji}
           aria-pressed={isMine}
           onClick={() => onToggle(emoji)}
-          sx={{
-            ...buttonSx,
-            backgroundColor: isMine ? "action.selected" : undefined,
-            fontFamily: EMOJI_FONT_FAMILY,
-            fontSize: 18,
-            lineHeight: 1,
-          }}
+          sx={{ ...emojiButtonSx, ...(isMine && { "&, &:hover": { backgroundColor: "action.selected" } }) }}
         >
           {emoji}
         </IconButton>
       );
     })}
-    <Divider orientation="vertical" flexItem sx={{ mx: 0.25, my: 0.75 }} />
     <Tooltip title={labels.addReaction}>
-      <IconButton aria-label={labels.addReaction} onClick={(e) => onAdd(e.currentTarget)} sx={{ ...buttonSx, color: "text.secondary" }}>
-        <AddReactionIcon sx={{ fontSize: 18 }} />
+      <IconButton
+        aria-label={labels.addReaction}
+        onClick={(e) => onAdd(e.currentTarget)}
+        sx={{
+          "@media (hover: none)": { height: 44, width: 44 },
+          "&:hover": { backgroundColor: "action.selected" },
+          backgroundColor: "action.hover",
+          color: "text.secondary",
+          height: 36,
+          ml: 0.5,
+          width: 36,
+        }}
+      >
+        <PlusIcon />
       </IconButton>
     </Tooltip>
   </Paper>

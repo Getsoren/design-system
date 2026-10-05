@@ -93,6 +93,10 @@ export interface ChatAttachmentLabels {
 
 export interface ChatReactionLabels {
   addReaction?: string;
+  /** Title of the list of who reacted */
+  reactions?: string;
+  /** Under my own reaction in that list */
+  removeReaction?: string;
   searchEmoji?: string;
   /** Header of the recently used emojis in the picker */
   recentEmojis?: string;
@@ -194,7 +198,7 @@ export interface ChatConversationDetailProps {
   onLinkAttachment?: ChatLinkAttachment;
   /** Enables reactions: "mine" is derived from `currentUserId` being in `reaction.userIds` */
   onToggleReaction?: (messageId: ChatMessage["id"], emoji: string) => void;
-  /** One-click reactions of the message toolbar, default ["👍", "✅", "👀"] */
+  /** One-tap reactions of the pill above a message, default ["👍", "✅", "👀", "🙏", "😂", "❤️"] */
   quickReactions?: string[];
 }
 

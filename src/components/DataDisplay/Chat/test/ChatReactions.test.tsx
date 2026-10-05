@@ -18,7 +18,7 @@ const message: ChatMessage = {
 };
 
 describe("Chat reactions", () => {
-  it("toggles a reaction from its pill", () => {
+  it("reacts from the pill opened by the smiley", () => {
     const onToggleReaction = vi.fn();
     render(
       <ChatMessageBubble
@@ -30,24 +30,40 @@ describe("Chat reactions", () => {
       />,
     );
 
-    fireEvent.click(screen.getByLabelText("👀 1 · Alice Martin"));
+    fireEvent.click(screen.getByLabelText("Add a reaction"));
+    fireEvent.click(screen.getByLabelText("👀"));
 
     expect(onToggleReaction).toHaveBeenCalledWith(42, "👀");
   });
 
-  it("marks my pill when the current user is among the userIds", () => {
-    render(<ChatMessageBubble isOwn={false} message={message} participants={participants} currentUserId="me" onToggleReaction={vi.fn()} />);
+  it("sums up the reactions under the bubble and removes mine from the list", () => {
+    const onToggleReaction = vi.fn();
+    render(
+      <ChatMessageBubble
+        isOwn={false}
+        message={message}
+        participants={participants}
+        currentUserId="me"
+        onToggleReaction={onToggleReaction}
+      />,
+    );
 
-    expect(screen.getByLabelText("👍 2 · You, Alice Martin")).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByLabelText("👀 1 · Alice Martin")).toHaveAttribute("aria-pressed", "false");
     // A reaction nobody holds anymore is not shown
-    expect(screen.queryByLabelText(/^🙏/)).toBeNull();
+    const summary = screen.getByLabelText("Reactions · 👍 2, 👀 1");
+    expect(summary).toHaveTextContent("👍👀3");
+
+    fireEvent.click(summary);
+    // One line per person and emoji: Alice reacted twice
+    expect(screen.getAllByText("Alice Martin")).toHaveLength(2);
+    fireEvent.click(screen.getByText("Remove"));
+
+    expect(onToggleReaction).toHaveBeenCalledWith(42, "👍");
   });
 
   it("shows the reactions read-only without onToggleReaction", () => {
     render(<ChatMessageBubble isOwn message={{ ...message, authorId: "me" }} currentUserId="me" />);
 
-    expect(screen.getByLabelText("👍 2 · You")).toBeDisabled();
+    expect(screen.getByLabelText("Reactions · 👍 2, 👀 1")).toBeInTheDocument();
     expect(screen.queryByLabelText("Add a reaction")).toBeNull();
   });
 

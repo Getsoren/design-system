@@ -37,6 +37,9 @@ const defaultFormatDayLabel = (date: string): string => {
   return d.toLocaleDateString(undefined, { day: "numeric", month: "long", weekday: "long" });
 };
 
+// Within this distance of the bottom, the reader counts as following the conversation
+const STICK_TO_BOTTOM_THRESHOLD_PX = 80;
+
 const isSameDay = (a: string, b: string): boolean => {
   const da = new Date(ensureUtc(a));
   const db = new Date(ensureUtc(b));
@@ -78,6 +81,7 @@ const ChatConversationDetail = ({
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousThreadIdRef = useRef<string | undefined>(undefined);
+  const isAtBottomRef = useRef(true);
   const messageInputRef = useRef<ChatMessageInputHandle>(null);
   const chatLabels = useChatLabels(labels);
   // Files dropped anywhere on the conversation join the composer
@@ -101,9 +105,46 @@ const ChatConversationDetail = ({
 
     const isNewThread = previousThreadIdRef.current !== threadId;
     previousThreadIdRef.current = threadId;
+    isAtBottomRef.current = true;
 
     scrollContainerRef.current?.scrollTo({ behavior: isNewThread ? "instant" : "smooth", top: scrollContainerRef.current.scrollHeight });
   }, [lastMessageId, messages?.length, threadId, isLoading]);
+
+  const handleScroll = () => {
+    const container = scrollContainerRef.current;
+
+    if (container) {
+      isAtBottomRef.current = container.scrollHeight - container.scrollTop - container.clientHeight <= STICK_TO_BOTTOM_THRESHOLD_PX;
+    }
+  };
+
+  /**
+   * Stick to the bottom: a reaction, a link pill, an image that loads or the composer tray that grows must not hide
+   * the end of the conversation from a reader who was there. A reader up in the history is left where they are.
+   */
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the observed elements change with the thread and the loading state
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const content = container?.firstElementChild;
+
+    if (!container || typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      if (isAtBottomRef.current) {
+        container.scrollTop = container.scrollHeight;
+      }
+    });
+
+    observer.observe(container);
+
+    if (content) {
+      observer.observe(content);
+    }
+
+    return () => observer.disconnect();
+  }, [threadId, isLoading]);
 
   if (!threadId && isLoading) {
     return (
@@ -157,9 +198,13 @@ const ChatConversationDetail = ({
       />
       <Box
         ref={scrollContainerRef}
+        onScroll={handleScroll}
+        data-test="chatMessages"
         sx={{
           flex: 1,
           overflowY: "auto",
+          // Containing block of the floating reaction bars: they scroll with the messages and are clipped by this area
+          position: "relative",
           px: 3,
           py: 2,
         }}

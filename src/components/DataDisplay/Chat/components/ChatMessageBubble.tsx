@@ -243,7 +243,10 @@ const ChatMessageBubble = ({
       </Typography>
       {canReact && (
         <>
+          {/* Rendered in place, not in a portal: the conversation's scrolling area clips it, so it never floats over
+              the composer when its message slides underneath. */}
           <Popper
+            disablePortal
             open={(isHovered || isLongPressed) && !pickerAnchor}
             anchorEl={bodyRef.current}
             placement={isOwn ? "top-end" : "top-start"}
@@ -252,7 +255,13 @@ const ChatMessageBubble = ({
               { name: "offset", options: { offset: [0, 4] } },
               { name: "preventOverflow", options: { padding: 8 } },
             ]}
-            sx={{ zIndex: ({ zIndex }) => zIndex.drawer + 1 }}
+            sx={{
+              // Popper keeps the bar inside the scrolling area: hide it once its message has left the area
+              "&[data-popper-reference-hidden]": { pointerEvents: "none", visibility: "hidden" },
+              // "&&" outweighs the Stack spacing, which would otherwise push the bar down by a margin
+              "&&": { margin: 0 },
+              zIndex: 2,
+            }}
           >
             <ClickAwayListener mouseEvent="onPointerDown" touchEvent={false} onClickAway={() => setIsLongPressed(false)}>
               <div onPointerEnter={handlePointerEnter} onPointerLeave={handlePointerLeave}>

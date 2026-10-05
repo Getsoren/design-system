@@ -126,6 +126,7 @@ const ChatMessageBubble = ({
   const chatLabels = useChatLabels(labels);
   const bodyRef = useRef<HTMLDivElement>(null);
   const [barAnchor, setBarAnchor] = useState<HTMLElement | null>(null);
+  const isFromTrigger = !!barAnchor && barAnchor !== bodyRef.current;
   const [pickerAnchor, setPickerAnchor] = useState<HTMLElement | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pressOriginRef = useRef<{ x: number; y: number } | null>(null);
@@ -241,7 +242,7 @@ const ChatMessageBubble = ({
             data-chat-reaction-trigger
             aria-label={chatLabels.addReaction}
             aria-haspopup="dialog"
-            onClick={() => setBarAnchor(bodyRef.current)}
+            onClick={(e) => setBarAnchor(e.currentTarget)}
             sx={{
               // A white chip, so the smiley reads on the grey conversation background
               "&:hover": { backgroundColor: "background.paper", color: "text.primary" },
@@ -316,13 +317,19 @@ const ChatMessageBubble = ({
           <Popper
             open={!!barAnchor}
             anchorEl={barAnchor}
-            placement={isOwn ? "top-end" : "top-start"}
+            // WhatsApp-like: right above the smiley that was clicked, spreading over the bubble; above the bubble on a
+            // long press, where there is no smiley
+            placement={isFromTrigger === !!isOwn ? "top-start" : "top-end"}
             transition
             modifiers={[{ name: "offset", options: { offset: [0, 8] } }]}
             sx={{ zIndex: ({ zIndex }: Theme) => zIndex.modal }}
           >
             {({ TransitionProps }) => (
-              <Grow {...TransitionProps} style={{ transformOrigin: isOwn ? "bottom right" : "bottom left" }} timeout={140}>
+              <Grow
+                {...TransitionProps}
+                style={{ transformOrigin: isFromTrigger === !!isOwn ? "bottom left" : "bottom right" }}
+                timeout={140}
+              >
                 <div>
                   <ClickAwayListener mouseEvent="onPointerDown" touchEvent="onTouchStart" onClickAway={() => setBarAnchor(null)}>
                     <div>

@@ -21,9 +21,11 @@ const PlusIcon = () => (
   </SvgIcon>
 );
 
+// Pill 48px high (40px buttons + 4px inset): every round button inside is concentric with its ends
 const emojiButtonSx = {
   "@media (hover: none)": { height: 44, width: 44 },
   "&:hover": { backgroundColor: "transparent", transform: "scale(1.25)" },
+  borderRadius: "50%",
   // An opaque color: the browser draws color emojis with the alpha of the text color (IconButton's grey is 54%)
   color: "text.primary",
   fontFamily: EMOJI_FONT_FAMILY,
@@ -42,12 +44,16 @@ const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: 
     elevation={0}
     data-test="chatReactionBar"
     sx={{
+      // The 36px "+" sits 6px from the top, the bottom and the right end: radius 24 - 6 = 18, a circle. On touch
+      // screens the buttons grow to 44px and the inset drops to 4px: radius 26 - 4 = 22
+      "@media (hover: none)": { pr: 0.5 },
       alignItems: "center",
       borderRadius: 999,
       boxShadow: "0 4px 24px rgba(0, 0, 0, 0.16)",
       display: "flex",
       gap: 0.25,
-      px: 0.75,
+      pl: 0.5,
+      pr: 0.75,
       py: 0.5,
     }}
   >
@@ -74,6 +80,7 @@ const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: 
           "@media (hover: none)": { height: 44, width: 44 },
           "&:hover": { backgroundColor: "action.selected" },
           backgroundColor: "action.hover",
+          borderRadius: "50%",
           color: "text.secondary",
           height: 36,
           ml: 0.5,

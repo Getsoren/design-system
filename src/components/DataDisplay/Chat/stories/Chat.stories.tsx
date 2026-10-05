@@ -7,12 +7,16 @@ import type {
   ChatAttachmentLink,
   ChatLinkAttachment,
   ChatMessage,
+  ChatMessageBooking,
   ChatMessageInputHandle,
   ChatParticipant,
   ChatSearchUser,
   ChatThread,
   ChatUploadAttachment,
 } from "@/components/DataDisplay/Chat/types";
+import FileTextIcon from "@/components/DataDisplay/Icons/FileTextIcon";
+import LinkIcon from "@/components/DataDisplay/Icons/LinkIcon";
+import SportsScoreIcon from "@/components/DataDisplay/Icons/SportsScoreIcon";
 import { ThemeContext } from "@/context/Theme/ThemeProvider";
 
 const now = new Date();
@@ -596,6 +600,99 @@ export const ReadReceipts: StoryFn = () => {
           onDeleteConversation={() => {}}
           onNewConversation={() => {}}
           onSendMessage={handleSendMessage}
+          onAddParticipants={() => {}}
+          labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
+        />
+      </Chat>
+    </ThemeContext.Provider>
+  );
+};
+
+const SUPPLIER: ChatParticipant = { avatar: null, firstName: "Sophie", lastName: "Garnier", userId: "supplier-1" };
+
+const nacelleBooking: ChatMessageBooking = {
+  image: "https://picsum.photos/seed/nacelle/96/96",
+  label: "N° 34126",
+  onClick: () => console.info("Open order 34126"),
+};
+
+/**
+ * Messages the product writes on its own (end of rental, order shared, order detail) as centered notices; a run of
+ * them folds into one line, and the pills above the conversation keep the messages or the updates only.
+ */
+export const AutomaticMessages: StoryFn = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      authorId: SUPPLIER.userId,
+      body: "https://app.getsoren.ai/bookings/34126",
+      createdAt: minutesAgo(26 * 60),
+      event: { booking: nacelleBooking, icon: <LinkIcon fontSize="inherit" />, title: "Commande partagée" },
+      id: "ev-1",
+    },
+    { authorId: CURRENT_USER_ID, body: "Bonjour Sophie, la nacelle peut rester jusqu'au 12 ?", createdAt: minutesAgo(25 * 60), id: "ev-2" },
+    { authorId: SUPPLIER.userId, body: "Oui, je prolonge et je vous confirme.", createdAt: minutesAgo(24 * 60), id: "ev-3" },
+    {
+      authorId: SUPPLIER.userId,
+      body: "5T - thermique 💬 Commentaire : accès par la rue de Gerland",
+      createdAt: minutesAgo(90),
+      event: {
+        booking: nacelleBooking,
+        details: ["Nacelle 16 m thermique", "Accès par la rue de Gerland"],
+        icon: <FileTextIcon fontSize="inherit" />,
+        title: "Détail de commande",
+      },
+      id: "ev-4",
+    },
+    {
+      authorId: SUPPLIER.userId,
+      body: "https://app.getsoren.ai/bookings/34126",
+      createdAt: minutesAgo(80),
+      event: { booking: nacelleBooking, icon: <LinkIcon fontSize="inherit" />, title: "Commande partagée" },
+      id: "ev-5",
+    },
+    {
+      authorId: SUPPLIER.userId,
+      body: "Fin de location confirmée au 12/10/2026 ✅ 📋 Commande n°34126 🚜 Machine : Nacelle 16 m",
+      createdAt: minutesAgo(75),
+      event: {
+        booking: nacelleBooking,
+        details: ["Nacelle 16 m", "12/10/2026"],
+        icon: <SportsScoreIcon fontSize="inherit" />,
+        title: "Fin de location confirmée",
+      },
+      id: "ev-6",
+    },
+    { authorId: CURRENT_USER_ID, body: "Parfait, merci !", createdAt: minutesAgo(60), id: "ev-7" },
+    {
+      authorId: SUPPLIER.userId,
+      body: "Fin de location confirmée au 14/10/2026 ✅",
+      createdAt: minutesAgo(20),
+      event: {
+        booking: { ...nacelleBooking, label: "N° 34188" },
+        details: ["Mini-pelle 2,5 t", "14/10/2026"],
+        icon: <SportsScoreIcon fontSize="inherit" />,
+        title: "Fin de location confirmée",
+      },
+      id: "ev-8",
+    },
+  ]);
+
+  return (
+    <ThemeContext.Provider value={{ language: "fr" }}>
+      <Chat height="100vh">
+        <Chat.ConversationDetail
+          threadId="thread-1"
+          participants={[{ ...SUPPLIER, lastReadAt: minutesAgo(30) }]}
+          messages={messages}
+          currentUserId={CURRENT_USER_ID}
+          onDeleteConversation={() => {}}
+          onNewConversation={() => {}}
+          onSendMessage={(_threadId, body) =>
+            setMessages((previous) => [
+              ...previous,
+              { authorId: CURRENT_USER_ID, body, createdAt: new Date().toISOString(), id: `msg-${Date.now()}` },
+            ])
+          }
           onAddParticipants={() => {}}
           labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
         />

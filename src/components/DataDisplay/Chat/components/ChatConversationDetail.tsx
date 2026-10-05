@@ -3,14 +3,16 @@ import Divider from "@mui/material/Divider";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ChatConversationDetailHeader from "@/components/DataDisplay/Chat/components/ChatConversationDetailHeader";
 import ChatDropOverlay from "@/components/DataDisplay/Chat/components/ChatDropOverlay";
+import ChatEventGroup from "@/components/DataDisplay/Chat/components/ChatEventGroup";
 import ChatMessageBubble from "@/components/DataDisplay/Chat/components/ChatMessageBubble";
 import ChatMessageInput from "@/components/DataDisplay/Chat/components/ChatMessageInput";
+import ChatPill from "@/components/DataDisplay/Chat/components/ChatPill";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import useFileDrop from "@/components/DataDisplay/Chat/hooks/useFileDrop";
-import type { ChatConversationDetailProps, ChatMessageInputHandle } from "@/components/DataDisplay/Chat/types";
+import type { ChatConversationDetailProps, ChatMessage, ChatMessageInputHandle } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import ChatBubbleIcon from "@/components/DataDisplay/Icons/ChatBubbleIcon";
 import Button from "@/components/Inputs/Button/Button";
@@ -45,6 +47,32 @@ const isSameDay = (a: string, b: string): boolean => {
   const db = new Date(ensureUtc(b));
   return da.getFullYear() === db.getFullYear() && da.getMonth() === db.getMonth() && da.getDate() === db.getDate();
 };
+
+type MessagesFilter = "all" | "messages" | "updates";
+
+interface MessageRow {
+  /** A single message, or a run of automatic messages of the same day */
+  messages: ChatMessage[];
+  showDayDivider: boolean;
+}
+
+/**
+ * Day dividers, and consecutive automatic messages of a day folded into one row
+ */
+const toRows = (messages: ChatMessage[], groupEvents: boolean) =>
+  messages.reduce<MessageRow[]>((rows, message, index) => {
+    const previousMessage = messages[index - 1];
+    const showDayDivider = !(previousMessage && isSameDay(message.createdAt, previousMessage.createdAt));
+    const lastRow = rows[rows.length - 1];
+
+    if (groupEvents && message.event && previousMessage?.event && !showDayDivider && lastRow) {
+      lastRow.messages.push(message);
+    } else {
+      rows.push({ messages: [message], showDayDivider });
+    }
+
+    return rows;
+  }, []);
 
 const ChatConversationDetail = ({
   threadId,
@@ -81,8 +109,10 @@ const ChatConversationDetail = ({
   enableVoiceMessages,
   linkAttachmentsOnAdd,
   showReadReceipts,
+  eventsFilter = true,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [filter, setFilter] = useState<{ threadId?: string; value: MessagesFilter }>({ value: "all" });
   const previousThreadIdRef = useRef<string | undefined>(undefined);
   const isAtBottomRef = useRef(true);
   const messageInputRef = useRef<ChatMessageInputHandle>(null);
@@ -93,6 +123,12 @@ const ChatConversationDetail = ({
   );
 
   const getDayLabel = formatDayLabel ?? defaultFormatDayLabel;
+  const showFilter = eventsFilter && !!messages?.some(({ event }) => event);
+  // Back to "All" on another thread
+  const activeFilter = showFilter && filter.threadId === threadId ? filter.value : "all";
+  const visibleMessages =
+    activeFilter === "all" ? (messages ?? []) : (messages ?? []).filter(({ event }) => !!event === (activeFilter === "updates"));
+  const rows = toRows(visibleMessages, activeFilter === "all");
 
   /**
    * Auto-scroll to the bottom of the conversation when a message arrives. Keyed on the last message rather than
@@ -111,7 +147,7 @@ const ChatConversationDetail = ({
     isAtBottomRef.current = true;
 
     scrollContainerRef.current?.scrollTo({ behavior: isNewThread ? "instant" : "smooth", top: scrollContainerRef.current.scrollHeight });
-  }, [lastMessageId, messages?.length, threadId, isLoading]);
+  }, [lastMessageId, messages?.length, threadId, isLoading, activeFilter]);
 
   const handleScroll = () => {
     const container = scrollContainerRef.current;
@@ -148,6 +184,23 @@ const ChatConversationDetail = ({
 
     return () => observer.disconnect();
   }, [threadId, isLoading]);
+
+  const renderMessage = (message: ChatMessage) => (
+    <ChatMessageBubble
+      message={message}
+      isOwn={message.authorId === currentUserId}
+      participants={participants}
+      avatarSrcResolver={avatarSrcResolver}
+      renderAfterBubble={renderAfterBubble ? (urls) => renderAfterBubble(message, urls) : undefined}
+      currentUserId={currentUserId}
+      formatParticipantName={formatParticipantName}
+      onLinkAttachment={onLinkAttachment}
+      onToggleReaction={onToggleReaction}
+      quickReactions={quickReactions}
+      labels={chatLabels}
+      showReadReceipts={showReadReceipts}
+    />
+  );
 
   if (!threadId && isLoading) {
     return (
@@ -199,6 +252,21 @@ const ChatConversationDetail = ({
         onAddParticipantDialogOpenChange={onAddParticipantDialogOpenChange}
         slotProps={slotProps}
       />
+      {showFilter && !isLoading && (
+        <Stack direction="row" spacing={1} sx={{ overflowX: "auto", px: 3, py: 1.5 }} data-test="chatMessagesFilter">
+          {(
+            [
+              ["all", chatLabels.filterAll],
+              ["messages", chatLabels.filterMessages],
+              ["updates", chatLabels.filterUpdates],
+            ] as const
+          ).map(([value, label]) => (
+            <ChatPill key={value} selected={activeFilter === value} onClick={() => setFilter({ threadId, value })}>
+              {label}
+            </ChatPill>
+          ))}
+        </Stack>
+      )}
       <Box
         ref={scrollContainerRef}
         onScroll={handleScroll}
@@ -223,9 +291,8 @@ const ChatConversationDetail = ({
           </Stack>
         ) : (
           <Stack spacing={3}>
-            {messages?.map((message, index) => {
-              const previousMessage = messages[index - 1];
-              const showDayDivider = !(previousMessage && isSameDay(message.createdAt, previousMessage.createdAt));
+            {rows.map(({ messages: rowMessages, showDayDivider }) => {
+              const [message] = rowMessages;
 
               return (
                 <Stack key={message.id} spacing={3}>
@@ -254,20 +321,11 @@ const ChatConversationDetail = ({
                       </Typography>
                     </Divider>
                   )}
-                  <ChatMessageBubble
-                    message={message}
-                    isOwn={message.authorId === currentUserId}
-                    participants={participants}
-                    avatarSrcResolver={avatarSrcResolver}
-                    renderAfterBubble={renderAfterBubble ? (urls) => renderAfterBubble(message, urls) : undefined}
-                    currentUserId={currentUserId}
-                    formatParticipantName={formatParticipantName}
-                    onLinkAttachment={onLinkAttachment}
-                    onToggleReaction={onToggleReaction}
-                    quickReactions={quickReactions}
-                    labels={chatLabels}
-                    showReadReceipts={showReadReceipts}
-                  />
+                  {rowMessages.length > 1 ? (
+                    <ChatEventGroup messages={rowMessages} label={chatLabels.orderUpdates} renderEvent={renderMessage} />
+                  ) : (
+                    renderMessage(message)
+                  )}
                 </Stack>
               );
             })}

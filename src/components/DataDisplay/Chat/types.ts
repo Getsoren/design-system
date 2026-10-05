@@ -29,6 +29,23 @@ export interface ChatReaction {
   userIds: string[];
 }
 
+/** The order a message is about: its "N° 34126" tag, clickable to open it */
+export interface ChatMessageBooking {
+  label: string;
+  image?: string | null;
+  onClick?: () => void;
+}
+
+/** An automatic message (end of rental, order shared…), shown as a centered notice rather than a bubble */
+export interface ChatMessageEvent {
+  /** e.g. "Fin de location confirmée" */
+  title: string;
+  icon?: ReactNode;
+  booking?: ChatMessageBooking;
+  /** e.g. ["Nacelle 16 m", "12/10/2026"], joined on one line */
+  details?: string[];
+}
+
 export interface ChatMessage {
   id: string | number;
   authorId: string;
@@ -36,6 +53,7 @@ export interface ChatMessage {
   createdAt: string;
   attachments?: ChatAttachment[] | null;
   reactions?: ChatReaction[] | null;
+  event?: ChatMessageEvent | null;
 }
 
 /** Resolves with the stored file; report the upload progress (0-100) through `onProgress` */
@@ -125,11 +143,23 @@ export interface ChatReadReceiptLabels {
   seenBy?: string;
 }
 
+export interface ChatEventLabels {
+  /** Filter pills above the conversation */
+  filterAll?: string;
+  filterMessages?: string;
+  filterUpdates?: string;
+  /** After the count of a folded run of automatic messages: "3 order updates" */
+  orderUpdates?: string;
+  /** Before the author of an automatic message: "by Sophie · 17:55" */
+  eventBy?: string;
+}
+
 export interface ChatConversationDetailLabels
   extends ChatAttachmentLabels,
     ChatReactionLabels,
     ChatVoiceMessageLabels,
-    ChatReadReceiptLabels {
+    ChatReadReceiptLabels,
+    ChatEventLabels {
   today?: string;
   yesterday?: string;
   createYourFirstConversation?: string;
@@ -238,9 +268,16 @@ export interface ChatConversationDetailProps {
   linkAttachmentsOnAdd?: boolean;
   /** WhatsApp-like ticks next to the time of my messages: sent, then seen once another participant read it. Default true */
   showReadReceipts?: boolean;
+  /** "All · Messages · Updates" pills above a conversation that holds automatic messages (`message.event`). Default true */
+  eventsFilter?: boolean;
 }
 
-export interface ChatMessageBubbleLabels extends ChatAttachmentLabels, ChatReactionLabels, ChatVoiceMessageLabels, ChatReadReceiptLabels {}
+export interface ChatMessageBubbleLabels
+  extends ChatAttachmentLabels,
+    ChatReactionLabels,
+    ChatVoiceMessageLabels,
+    ChatReadReceiptLabels,
+    ChatEventLabels {}
 
 export interface ChatMessageBubbleProps {
   isOwn: boolean;

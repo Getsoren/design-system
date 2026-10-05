@@ -1,4 +1,4 @@
-import { getInitials } from "@getsoren/react-utils";
+import { capitalize, getInitials } from "@getsoren/react-utils";
 import { Theme } from "@mui/material";
 import Box from "@mui/material/Box";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import { type MouseEvent, type PointerEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import ChatEmojiPicker from "@/components/DataDisplay/Chat/components/ChatEmojiPicker";
+import ChatEventMessage from "@/components/DataDisplay/Chat/components/ChatEventMessage";
 import ChatMessageAttachments from "@/components/DataDisplay/Chat/components/ChatMessageAttachments";
 import ChatReactionBar from "@/components/DataDisplay/Chat/components/ChatReactionBar";
 import ChatReactionSummary from "@/components/DataDisplay/Chat/components/ChatReactionSummary";
@@ -21,6 +22,7 @@ import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatMessage, ChatMessageBubbleProps, ChatParticipant } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import { extractUrls } from "@/components/DataDisplay/Chat/utils/extractUrls";
+import formatMessageTime from "@/components/DataDisplay/Chat/utils/formatMessageTime";
 import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";
 import { addRecentEmoji } from "@/components/DataDisplay/Chat/utils/recentEmojis";
 import AddReactionIcon from "@/components/DataDisplay/Icons/AddReactionIcon";
@@ -28,14 +30,6 @@ import AddReactionIcon from "@/components/DataDisplay/Icons/AddReactionIcon";
 const URL_REGEX = /https?:\/\/\S+/g;
 const LONG_PRESS_MS = 400;
 const LONG_PRESS_TOLERANCE_PX = 8;
-
-const defaultFormatTime = (date: string): string => {
-  try {
-    return new Intl.DateTimeFormat(undefined, { hour: "2-digit", hour12: false, minute: "2-digit" }).format(new Date(ensureUtc(date)));
-  } catch {
-    return "";
-  }
-};
 
 const toTime = (date: string) => new Date(ensureUtc(date)).getTime();
 
@@ -145,7 +139,7 @@ const ChatMessageBubble = ({
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pressOriginRef = useRef<{ x: number; y: number } | null>(null);
 
-  const getTime = formatTime ?? defaultFormatTime;
+  const getTime = formatTime ?? formatMessageTime;
   const formattedTime = getTime(message.createdAt);
   const urls = extractUrls(message.body);
   const attachments = message.attachments ?? [];
@@ -248,6 +242,21 @@ const ChatMessageBubble = ({
       }
     : {};
 
+  const author = participants?.find((p) => p.userId === message.authorId);
+
+  if (message.event) {
+    const authorName = isOwn ? chatLabels.you : author && capitalize(author.firstName);
+
+    return (
+      <Box data-test="chatMessage" display="flex" justifyContent="center">
+        <ChatEventMessage
+          event={message.event}
+          caption={authorName ? `${chatLabels.eventBy} ${authorName} · ${formattedTime}` : formattedTime}
+        />
+      </Box>
+    );
+  }
+
   const content = (
     <>
       {/* The bubble, its smiley on the empty side and the reactions hooked under its corner */}
@@ -324,8 +333,6 @@ const ChatMessageBubble = ({
       )}
     </>
   );
-
-  const author = participants?.find((p) => p.userId === message.authorId);
 
   return (
     <Box data-test="chatMessage" data-active={!!barAnchor || !!pickerAnchor || undefined} sx={rowSx} {...reactionHandlers}>

@@ -1,18 +1,19 @@
 import type {
   ChatAttachmentLabels,
+  ChatEventLabels,
   ChatReactionLabels,
   ChatReadReceiptLabels,
   ChatVoiceMessageLabels,
 } from "@/components/DataDisplay/Chat/types";
 import useTranslation from "@/hooks/useTranslation/useTranslation";
 
-type ChatLabelOverrides = ChatAttachmentLabels & ChatReactionLabels & ChatVoiceMessageLabels & ChatReadReceiptLabels;
+type ChatLabelOverrides = ChatAttachmentLabels & ChatReactionLabels & ChatVoiceMessageLabels & ChatReadReceiptLabels & ChatEventLabels;
 
 export type ChatLabels = Required<ChatLabelOverrides>;
 
 /**
- * Attachment, reaction, voice message and read receipt labels: the caller's strings first, the design system locale
- * otherwise.
+ * Attachment, reaction, voice message, read receipt and automatic message labels: the caller's strings first, the
+ * design system locale otherwise.
  */
 const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
   const { t } = useTranslation();
@@ -24,10 +25,15 @@ const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
     close: labels?.close ?? t("close"),
     download: labels?.download ?? t("download"),
     dropFilesHere: labels?.dropFilesHere ?? t("dropFilesHere"),
+    eventBy: labels?.eventBy ?? t("eventBy"),
     fileTooLarge: labels?.fileTooLarge ?? t("fileTooLarge"),
+    filterAll: labels?.filterAll ?? t("filterAll"),
+    filterMessages: labels?.filterMessages ?? t("filterMessages"),
+    filterUpdates: labels?.filterUpdates ?? t("filterUpdates"),
     linkAttachment: labels?.linkAttachment ?? t("linkAttachment"),
     next: labels?.next ?? t("next"),
     openFile: labels?.openFile ?? t("openFile"),
+    orderUpdates: labels?.orderUpdates ?? t("orderUpdates"),
     pause: labels?.pause ?? t("pause"),
     play: labels?.play ?? t("play"),
     previous: labels?.previous ?? t("previous"),

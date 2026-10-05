@@ -128,19 +128,17 @@ const ChatAttachmentTray = ({
                   </Button>
                 )}
                 {status === "uploaded" && attachment && onLinkAttachment && (
-                  <Box px={1} pb={0.5}>
-                    <ChatAttachmentLinkAction
-                      link={link}
-                      label={labels.linkAttachment}
-                      onLink={async () => {
-                        const nextLink = await onLinkAttachment({ ...attachment, link }, {});
+                  <ChatAttachmentLinkAction
+                    link={link}
+                    label={labels.linkAttachment}
+                    onLink={async () => {
+                      const nextLink = await onLinkAttachment({ ...attachment, link }, {});
 
-                        if (nextLink) {
-                          onLinked(key, nextLink);
-                        }
-                      }}
-                    />
-                  </Box>
+                      if (nextLink) {
+                        onLinked(key, nextLink);
+                      }
+                    }}
+                  />
                 )}
               </ChatFileCard>
             </Box>

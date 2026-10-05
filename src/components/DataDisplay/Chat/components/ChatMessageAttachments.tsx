@@ -149,11 +149,7 @@ const ChatMessageAttachments = ({ message, attachments, labels, onLinkAttachment
               </IconButton>
             }
           >
-            {(file.link || onLinkAttachment) && (
-              <Box px={1} pb={0.5}>
-                {renderLinkAction(file)}
-              </Box>
-            )}
+            {renderLinkAction(file)}
           </ChatFileCard>
         </Box>
       ))}

@@ -229,7 +229,13 @@ const ChatMessageBubble = ({
             </Bubble>
           )}
           {attachments.length > 0 && (
-            <ChatMessageAttachments message={message} attachments={attachments} labels={chatLabels} onLinkAttachment={onLinkAttachment} />
+            <ChatMessageAttachments
+              message={message}
+              attachments={attachments}
+              labels={chatLabels}
+              isOwn={isOwn}
+              onLinkAttachment={onLinkAttachment}
+            />
           )}
         </Stack>
         {canReact && (

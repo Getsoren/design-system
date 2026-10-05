@@ -78,6 +78,7 @@ const ChatConversationDetail = ({
   onLinkAttachment,
   onToggleReaction,
   quickReactions,
+  enableVoiceMessages,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousThreadIdRef = useRef<string | undefined>(undefined);
@@ -285,6 +286,7 @@ const ChatConversationDetail = ({
         maxAttachments={maxAttachments}
         maxAttachmentSize={maxAttachmentSize}
         onLinkAttachment={onLinkAttachment}
+        enableVoiceMessages={enableVoiceMessages}
       />
       {isDraggingFiles && <ChatDropOverlay label={chatLabels.dropFilesHere} />}
     </Stack>

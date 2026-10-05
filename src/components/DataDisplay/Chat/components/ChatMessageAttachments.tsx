@@ -7,9 +7,10 @@ import { useState } from "react";
 import ChatAttachmentLinkAction from "@/components/DataDisplay/Chat/components/ChatAttachmentLinkAction";
 import ChatAttachmentViewer from "@/components/DataDisplay/Chat/components/ChatAttachmentViewer";
 import ChatFileCard from "@/components/DataDisplay/Chat/components/ChatFileCard";
+import ChatVoiceMessage from "@/components/DataDisplay/Chat/components/ChatVoiceMessage";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatAttachment, ChatLinkAttachment, ChatMessage } from "@/components/DataDisplay/Chat/types";
-import { isPreviewableImage } from "@/components/DataDisplay/Chat/utils/getFileKind";
+import { isAudioFile, isPreviewableImage } from "@/components/DataDisplay/Chat/utils/getFileKind";
 import downloadFile from "@/components/DataDisplay/FileViewer/utils/downloadFile";
 import DownloadIcon from "@/components/DataDisplay/Icons/DownloadIcon";
 import LinkIcon from "@/components/DataDisplay/Icons/LinkIcon";
@@ -22,6 +23,7 @@ interface ChatMessageAttachmentsProps {
   message: ChatMessage;
   attachments: ChatAttachment[];
   labels: ChatLabels;
+  isOwn?: boolean;
   onLinkAttachment?: ChatLinkAttachment;
 }
 
@@ -36,12 +38,16 @@ const getSingleImageSize = ({ width, height }: ChatAttachment) => {
 };
 
 /**
- * Attachments of a sent message: images as a grid opening a full screen viewer, other files as cards.
+ * Attachments of a sent message: voice messages as players, images as a grid opening a full screen viewer, other
+ * files as cards.
  */
-const ChatMessageAttachments = ({ message, attachments, labels, onLinkAttachment }: ChatMessageAttachmentsProps) => {
+const ChatMessageAttachments = ({ message, attachments, labels, isOwn, onLinkAttachment }: ChatMessageAttachmentsProps) => {
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
-  const images = attachments.filter(({ fileName, mimeType, thumbnailUrl }) => isPreviewableImage(fileName, mimeType, thumbnailUrl));
-  const files = attachments.filter((attachment) => !images.includes(attachment));
+  const voices = attachments.filter(({ mimeType }) => isAudioFile(mimeType));
+  const images = attachments.filter(
+    (attachment) => !voices.includes(attachment) && isPreviewableImage(attachment.fileName, attachment.mimeType, attachment.thumbnailUrl),
+  );
+  const files = attachments.filter((attachment) => !(voices.includes(attachment) || images.includes(attachment)));
   const visibleImages = images.slice(0, MAX_GRID_TILES);
   const hiddenImagesCount = images.length - visibleImages.length;
 
@@ -57,6 +63,9 @@ const ChatMessageAttachments = ({ message, attachments, labels, onLinkAttachment
 
   return (
     <>
+      {voices.map((voice) => (
+        <ChatVoiceMessage key={voice.id} attachment={voice} isOwn={isOwn} labels={labels} />
+      ))}
       {images.length > 0 && (
         <Box
           data-test="chatMessageImages"

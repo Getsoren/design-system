@@ -43,3 +43,8 @@ export const getFileTypeLabel = (fileName: string, mimeType?: string | null): st
  */
 export const isPreviewableImage = (fileName: string, mimeType?: string | null, thumbnailUrl?: string | null): boolean =>
   getFileKind(fileName, mimeType) === "image" && (!!thumbnailUrl || !/hei[cf]$/i.test(mimeType || fileName));
+
+/**
+ * A voice message (or any audio file), played in the conversation rather than shown as a file card.
+ */
+export const isAudioFile = (mimeType?: string | null): boolean => !!mimeType?.toLowerCase().startsWith("audio/");

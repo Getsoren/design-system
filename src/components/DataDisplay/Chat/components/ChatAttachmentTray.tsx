@@ -25,6 +25,8 @@ interface ChatAttachmentTrayProps {
   onRetry: (key: string) => void;
   onLinkAttachment?: ChatLinkAttachment;
   onLinked: (key: string, link: ChatAttachmentLink) => void;
+  /** A voice message failed to upload: retry it or drop it */
+  voiceFailure?: { onRetry: () => void; onDismiss: () => void } | null;
 }
 
 interface TrayPreviewProps {
@@ -65,10 +67,11 @@ const ChatAttachmentTray = ({
   onRetry,
   onLinkAttachment,
   onLinked,
+  voiceFailure,
 }: ChatAttachmentTrayProps) => {
   const { language } = useContext(ThemeContext);
 
-  if (!(items.length || rejectedFiles.length)) {
+  if (!(items.length || rejectedFiles.length || voiceFailure)) {
     return null;
   }
 
@@ -80,6 +83,22 @@ const ChatAttachmentTray = ({
 
   return (
     <Stack spacing={1} mb={1.5} data-test="chatAttachmentTray">
+      {voiceFailure && (
+        <Stack direction="row" alignItems="center" spacing={1} role="alert" data-test="chatVoiceFailure">
+          <Stack direction="row" alignItems="center" spacing={1} color="error.main" flex={1} minWidth={0}>
+            <InfoIcon sx={{ fontSize: 18 }} />
+            <Typography variant="caption" noWrap>
+              {labels.voiceMessageFailed}
+            </Typography>
+          </Stack>
+          <Button color="inherit" startIcon={<RefreshIcon sx={{ fontSize: 16 }} />} onClick={voiceFailure.onRetry} sx={{ minHeight: 44 }}>
+            {labels.retryUpload}
+          </Button>
+          <IconButton aria-label={labels.removeAttachment} onClick={voiceFailure.onDismiss} sx={{ height: 44, width: 44 }}>
+            <CloseIcon sx={{ fontSize: 20 }} />
+          </IconButton>
+        </Stack>
+      )}
       {rejectedFiles.length > 0 && (
         <Stack spacing={0.5} role="alert">
           {rejectedFiles.map(({ fileName, reason }, index) => (

@@ -42,6 +42,7 @@ export const ChatVoiceRecorder = ({
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const startedAtRef = useRef(0);
   // Read by the recorder's onstop: cancel discards the take instead of emitting it
   const discardRef = useRef(false);
   // Web Audio graph used only for silence detection (Siri-style auto-send)
@@ -135,13 +136,14 @@ export const ChatVoiceRecorder = ({
         chunksRef.current = [];
 
         if (!discardRef.current && chunks.length) {
-          onRecorded(new Blob(chunks, { type: recorder.mimeType || "audio/webm" }));
+          onRecorded(new Blob(chunks, { type: recorder.mimeType || "audio/webm" }), Date.now() - startedAtRef.current);
         }
         releaseStream();
       };
 
       streamRef.current = stream;
       recorderRef.current = recorder;
+      startedAtRef.current = Date.now();
       recorder.start();
       monitorSilence(stream);
       setElapsedSeconds(0);
@@ -185,7 +187,13 @@ export const ChatVoiceRecorder = ({
     return (
       <Tooltip title={labels?.record ?? "Record a voice message"}>
         <span>
-          <IconButton onClick={start} disabled={disabled || isProcessing} data-test="chatVoiceStart">
+          <IconButton
+            aria-label={labels?.record ?? "Record a voice message"}
+            onClick={start}
+            disabled={disabled || isProcessing}
+            data-test="chatVoiceStart"
+            sx={{ height: 44, width: 44 }}
+          >
             {isProcessing ? <CircularProgress size={20} /> : <MicIcon />}
           </IconButton>
         </span>
@@ -216,12 +224,12 @@ export const ChatVoiceRecorder = ({
         {formatElapsed(elapsedSeconds)}
       </Typography>
       <Tooltip title={labels?.cancel ?? "Cancel"}>
-        <IconButton size="small" onClick={() => stop(true)} data-test="chatVoiceCancel">
+        <IconButton onClick={() => stop(true)} data-test="chatVoiceCancel" sx={{ height: 44, width: 44 }}>
           <CloseIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title={labels?.send ?? "Use this recording"}>
-        <IconButton size="small" color="primary" onClick={() => stop(false)} data-test="chatVoiceSend">
+        <IconButton color="primary" onClick={() => stop(false)} data-test="chatVoiceSend" sx={{ height: 44, width: 44 }}>
           <CheckIcon />
         </IconButton>
       </Tooltip>

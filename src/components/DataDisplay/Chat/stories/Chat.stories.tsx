@@ -372,6 +372,74 @@ const attachmentMessages: ChatMessage[] = [
   },
 ];
 
+/**
+ * A few seconds of syllable-like tone bursts as a WAV file, standing for a recorded voice message.
+ */
+const createVoiceSampleUrl = (seconds: number, pitch: number): string => {
+  const sampleRate = 8000;
+  const length = Math.round(seconds * sampleRate);
+  const view = new DataView(new ArrayBuffer(44 + length * 2));
+  const writeText = (offset: number, text: string) => {
+    for (let i = 0; i < text.length; i += 1) {
+      view.setUint8(offset + i, text.charCodeAt(i));
+    }
+  };
+
+  writeText(0, "RIFF");
+  view.setUint32(4, 36 + length * 2, true);
+  writeText(8, "WAVEfmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeText(36, "data");
+  view.setUint32(40, length * 2, true);
+
+  for (let i = 0; i < length; i += 1) {
+    const time = i / sampleRate;
+    const envelope = Math.max(0, Math.sin(time * Math.PI * 3.1)) ** 2;
+    const sample = envelope * 0.3 * (Math.sin(2 * Math.PI * pitch * time) + 0.5 * Math.sin(4 * Math.PI * pitch * time));
+    view.setInt16(44 + i * 2, sample * 32767, true);
+  }
+
+  return URL.createObjectURL(new Blob([view], { type: "audio/wav" }));
+};
+
+/**
+ * A voice message received (its length read from the file) and one sent (its length known from the recording).
+ */
+const createVoiceMessages = (): ChatMessage[] => [
+  {
+    attachments: [
+      { fileName: "vocal-20261005-091204.wav", id: "voice-1", mimeType: "audio/wav", size: 112_044, url: createVoiceSampleUrl(7, 180) },
+    ],
+    authorId: "user-1",
+    body: "",
+    createdAt: now.toISOString(),
+    id: "att-6",
+  },
+  {
+    attachments: [
+      {
+        durationMs: 4_000,
+        fileName: "vocal-20261005-091530.wav",
+        id: "voice-2",
+        mimeType: "audio/wav",
+        size: 64_044,
+        url: createVoiceSampleUrl(4, 140),
+      },
+    ],
+    authorId: CURRENT_USER_ID,
+    body: "",
+    createdAt: now.toISOString(),
+    id: "att-7",
+    reactions: [{ emoji: "👍", userIds: ["user-1"] }],
+  },
+];
+
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const failedOnce = new Set<string>();
@@ -415,10 +483,11 @@ const toggleUser = (userIds: string[], userId: string) =>
 
 /**
  * Paperclip, drag & drop or paste: the upload is simulated (progress, a file named "echec…" fails once).
+ * Mic next to the paperclip: the take is uploaded the same way, then sent at once as a voice message.
  * Reactions on hover or long press, emoji picker in French with search.
  */
 export const Attachments: StoryFn = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>(attachmentMessages);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [...attachmentMessages, ...createVoiceMessages()]);
 
   const handleSendMessage = (_threadId: string, body: string, attachments?: ChatAttachment[]) => {
     setMessages((previous) => [

@@ -15,15 +15,23 @@ import {
   useState,
 } from "react";
 import ChatAttachmentTray from "@/components/DataDisplay/Chat/components/ChatAttachmentTray";
+import ChatVoiceRecorder from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
 import { DEFAULT_ATTACHMENT_ACCEPT, DEFAULT_MAX_ATTACHMENT_SIZE, DEFAULT_MAX_ATTACHMENTS } from "@/components/DataDisplay/Chat/constants";
 import useChatAttachmentUploads from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatMessageInputHandle, ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
+import createVoiceFile from "@/components/DataDisplay/Chat/utils/createVoiceFile";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
 import AttachFileIcon from "@/components/DataDisplay/Icons/AttachFileIcon";
 
 const RADIUS = 15;
 const COUNTER_VISIBLE_FROM = 40;
+
+interface VoiceUpload {
+  file: File;
+  durationMs: number;
+  status: "uploading" | "error";
+}
 
 const ChatMessageInput = (
   {
@@ -40,10 +48,14 @@ const ChatMessageInput = (
     maxAttachments = DEFAULT_MAX_ATTACHMENTS,
     maxAttachmentSize = DEFAULT_MAX_ATTACHMENT_SIZE,
     onLinkAttachment,
+    enableVoiceMessages = true,
   }: ChatMessageInputProps,
   ref: ForwardedRef<ChatMessageInputHandle>,
 ) => {
   const [message, setMessage] = useState("");
+  const [voiceUpload, setVoiceUpload] = useState<VoiceUpload | null>(null);
+  // Bumped by every take and thread switch: a late upload result of a former one is dropped
+  const voiceRequestRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatLabels = useChatLabels(labels);
@@ -52,6 +64,32 @@ const ChatMessageInput = (
   const canSend = (!!message.trim() || uploads.hasUploaded) && !isSending && !uploads.isUploading;
 
   useImperativeHandle(ref, () => ({ addFiles: uploads.addFiles }));
+
+  /**
+   * A voice message leaves on its own, right after its upload: empty body, the audio as its only attachment
+   */
+  const sendVoiceMessage = (file: File, durationMs: number) => {
+    if (!onUploadAttachment) {
+      return;
+    }
+
+    voiceRequestRef.current += 1;
+    const request = voiceRequestRef.current;
+    setVoiceUpload({ durationMs, file, status: "uploading" });
+
+    onUploadAttachment(file, () => {})
+      .then((attachment) => {
+        if (request === voiceRequestRef.current) {
+          setVoiceUpload(null);
+          onSend("", [{ ...attachment, durationMs: attachment.durationMs ?? durationMs }]);
+        }
+      })
+      .catch(() => {
+        if (request === voiceRequestRef.current) {
+          setVoiceUpload({ durationMs, file, status: "error" });
+        }
+      });
+  };
 
   const handleSend = () => {
     if (!canSend) {
@@ -100,6 +138,8 @@ const ChatMessageInput = (
   // biome-ignore lint/correctness/useExhaustiveDependencies: only the thread change matters
   useEffect(() => {
     uploads.clear();
+    voiceRequestRef.current += 1;
+    setVoiceUpload(null);
   }, [autoFocusKey]);
 
   return (
@@ -121,6 +161,11 @@ const ChatMessageInput = (
         onRetry={uploads.retry}
         onLinkAttachment={onLinkAttachment}
         onLinked={uploads.setLink}
+        voiceFailure={
+          voiceUpload?.status === "error"
+            ? { onDismiss: () => setVoiceUpload(null), onRetry: () => sendVoiceMessage(voiceUpload.file, voiceUpload.durationMs) }
+            : null
+        }
       />
       <TextField
         fullWidth
@@ -200,6 +245,14 @@ const ChatMessageInput = (
                 }}
               />
             </>
+          )}
+          {enableVoiceMessages && onUploadAttachment && (
+            <ChatVoiceRecorder
+              onRecorded={(audio, durationMs) => sendVoiceMessage(createVoiceFile(audio), durationMs)}
+              isProcessing={voiceUpload?.status === "uploading"}
+              disabled={isSending}
+              labels={{ cancel: chatLabels.cancelRecording, record: chatLabels.recordVoiceMessage, send: chatLabels.sendVoiceMessage }}
+            />
           )}
           {startActions}
         </Stack>

@@ -19,6 +19,8 @@ export interface ChatAttachment {
   height?: number | null;
   /** Business object the file is filed under (an order on Soren) */
   link?: ChatAttachmentLink | null;
+  /** Length of a voice message, set when recorded; read from the audio file otherwise */
+  durationMs?: number | null;
 }
 
 export interface ChatReaction {
@@ -103,7 +105,17 @@ export interface ChatReactionLabels {
   you?: string;
 }
 
-export interface ChatConversationDetailLabels extends ChatAttachmentLabels, ChatReactionLabels {
+export interface ChatVoiceMessageLabels {
+  voiceMessage?: string;
+  play?: string;
+  pause?: string;
+  voiceMessageFailed?: string;
+  recordVoiceMessage?: string;
+  cancelRecording?: string;
+  sendVoiceMessage?: string;
+}
+
+export interface ChatConversationDetailLabels extends ChatAttachmentLabels, ChatReactionLabels, ChatVoiceMessageLabels {
   today?: string;
   yesterday?: string;
   createYourFirstConversation?: string;
@@ -119,7 +131,7 @@ export interface ChatConversationDetailLabels extends ChatAttachmentLabels, Chat
   back?: string;
 }
 
-export interface ChatMessageInputLabels extends ChatAttachmentLabels {
+export interface ChatMessageInputLabels extends ChatAttachmentLabels, ChatVoiceMessageLabels {
   writeAMessage?: string;
   send?: string;
   enterToSend?: string;
@@ -200,9 +212,14 @@ export interface ChatConversationDetailProps {
   onToggleReaction?: (messageId: ChatMessage["id"], emoji: string) => void;
   /** One-tap reactions of the pill above a message, default ["👍", "✅", "👀", "🙏", "😂", "❤️"] */
   quickReactions?: string[];
+  /**
+   * Mic next to the paperclip, with `onUploadAttachment`: a validated take is uploaded and sent at once as its own
+   * message (empty body, the audio as its only attachment). Default true
+   */
+  enableVoiceMessages?: boolean;
 }
 
-export interface ChatMessageBubbleLabels extends ChatAttachmentLabels, ChatReactionLabels {}
+export interface ChatMessageBubbleLabels extends ChatAttachmentLabels, ChatReactionLabels, ChatVoiceMessageLabels {}
 
 export interface ChatMessageBubbleProps {
   isOwn: boolean;
@@ -246,6 +263,8 @@ export interface ChatMessageInputProps {
   maxAttachments?: number;
   maxAttachmentSize?: number;
   onLinkAttachment?: ChatLinkAttachment;
+  /** Mic next to the paperclip, with `onUploadAttachment`. Default true */
+  enableVoiceMessages?: boolean;
 }
 
 export interface ChatVoiceRecorderLabels {
@@ -256,9 +275,9 @@ export interface ChatVoiceRecorderLabels {
 
 export interface ChatVoiceRecorderProps {
   /**
-   * Receives the recorded audio once the user validates the take
+   * Receives the recorded audio and its length once the user validates the take
    */
-  onRecorded: (audio: Blob) => void;
+  onRecorded: (audio: Blob, durationMs: number) => void;
   /**
    * Typically a denied microphone permission
    */

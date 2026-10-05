@@ -1,9 +1,9 @@
 import { getInitials } from "@getsoren/react-utils";
 import { Theme } from "@mui/material";
+import Box from "@mui/material/Box";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
-import Popper from "@mui/material/Popper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { type MouseEvent, type PointerEvent, type ReactNode, useEffect, useRef, useState } from "react";
@@ -22,7 +22,6 @@ import { addRecentEmoji } from "@/components/DataDisplay/Chat/utils/recentEmojis
 const URL_REGEX = /https?:\/\/\S+/g;
 const LONG_PRESS_MS = 400;
 const LONG_PRESS_TOLERANCE_PX = 8;
-const HOVER_LEAVE_DELAY_MS = 150;
 
 const defaultFormatTime = (date: string): string => {
   try {
@@ -96,6 +95,35 @@ const Bubble = ({ children, isOwn }: BubbleProps) => (
   </Paper>
 );
 
+const TOOLBAR = "[data-chat-reaction-toolbar]";
+const ADD_CHIP = "[data-chat-reaction-add]";
+const visible = { opacity: 1, pointerEvents: "auto", visibility: "visible" } as const;
+
+// Hover is pure CSS (no timers, no repositioning): the row lights up and its toolbar fades in, like Slack
+const rowSx = {
+  "&::before": {
+    borderRadius: 2,
+    content: '""',
+    inset: "-6px -12px",
+    position: "absolute",
+    transition: "background-color 80ms",
+    zIndex: -1,
+  },
+  "&[data-active]::before": { backgroundColor: "action.hover" },
+  [`&[data-active] ${TOOLBAR}`]: visible,
+  [`& ${TOOLBAR}`]: { opacity: 0, pointerEvents: "none", transition: "opacity 80ms, visibility 80ms", visibility: "hidden" },
+  "@media (hover: hover)": {
+    "&:hover::before": { backgroundColor: "action.hover" },
+    [`&:hover ${TOOLBAR}, &:has(:focus-visible) ${TOOLBAR}`]: visible,
+    // The "+" pill only shows on the hovered row, as on Slack
+    [`& ${ADD_CHIP}`]: { opacity: 0, transition: "opacity 80ms" },
+    [`&:hover ${ADD_CHIP}, & ${ADD_CHIP}:focus-visible`]: { opacity: 1 },
+  },
+  isolation: "isolate",
+  position: "relative",
+  WebkitTouchCallout: "none",
+};
+
 const ChatMessageBubble = ({
   isOwn,
   message,
@@ -112,11 +140,8 @@ const ChatMessageBubble = ({
   labels,
 }: ChatMessageBubbleProps) => {
   const chatLabels = useChatLabels(labels);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
   const [isLongPressed, setIsLongPressed] = useState(false);
   const [pickerAnchor, setPickerAnchor] = useState<HTMLElement | null>(null);
-  const hoverTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pressOriginRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -146,20 +171,6 @@ const ChatMessageBubble = ({
   // React bubbles events out of portals (viewer, picker): only the message itself counts
   const isFromMessage = (e: PointerEvent) => e.currentTarget.contains(e.target as Node);
 
-  const handlePointerEnter = (e: PointerEvent) => {
-    if (e.pointerType === "mouse" && isFromMessage(e)) {
-      clearTimeout(hoverTimerRef.current);
-      setIsHovered(true);
-    }
-  };
-
-  const handlePointerLeave = (e: PointerEvent) => {
-    if (e.pointerType === "mouse") {
-      // Leaves time to reach the bar, which floats above the message
-      hoverTimerRef.current = setTimeout(() => setIsHovered(false), HOVER_LEAVE_DELAY_MS);
-    }
-  };
-
   const cancelLongPress = () => {
     clearTimeout(longPressTimerRef.current);
     pressOriginRef.current = null;
@@ -184,17 +195,10 @@ const ChatMessageBubble = ({
 
   const openPicker = (anchor: HTMLElement | null) => {
     setIsLongPressed(false);
-    setIsHovered(false);
     setPickerAnchor(anchor);
   };
 
-  useEffect(
-    () => () => {
-      clearTimeout(hoverTimerRef.current);
-      clearTimeout(longPressTimerRef.current);
-    },
-    [],
-  );
+  useEffect(() => () => clearTimeout(longPressTimerRef.current), []);
 
   const reactionHandlers = canReact
     ? {
@@ -206,8 +210,6 @@ const ChatMessageBubble = ({
         },
         onPointerCancel: cancelLongPress,
         onPointerDown: handlePointerDown,
-        onPointerEnter: handlePointerEnter,
-        onPointerLeave: handlePointerLeave,
         onPointerMove: handlePointerMove,
         onPointerUp: cancelLongPress,
       }
@@ -215,7 +217,7 @@ const ChatMessageBubble = ({
 
   const content = (
     <>
-      <Stack ref={bodyRef} spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">
+      <Stack spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">
         {hasTextBubble && (
           <Bubble isOwn={isOwn}>
             <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
@@ -241,43 +243,58 @@ const ChatMessageBubble = ({
       <Typography variant="caption" color="text.secondary">
         {formattedTime}
       </Typography>
+    </>
+  );
+
+  const author = participants?.find((p) => p.userId === message.authorId);
+
+  return (
+    <Box data-test="chatMessage" data-active={isLongPressed || !!pickerAnchor || undefined} sx={rowSx} {...reactionHandlers}>
+      {isOwn ? (
+        <Stack alignItems="flex-end" spacing={0.5} sx={{ maxWidth: "70%", ml: "auto" }}>
+          {content}
+        </Stack>
+      ) : (
+        <Stack direction="row" spacing={1.5} alignItems="flex-start">
+          {!hideAvatar && (
+            <Avatar
+              src={avatarSrcResolver?.(author?.avatar)}
+              sx={{
+                backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
+                fontSize: 12,
+                height: 28,
+                mt: 0.5,
+                width: 28,
+              }}
+            >
+              {getInitials(
+                author ? { firstName: author.firstName, lastName: author.lastName } : { fullName: String(message.authorId).slice(0, 2) },
+                true,
+              )}
+            </Avatar>
+          )}
+          <Stack spacing={0.5} sx={{ maxWidth: "70%" }}>
+            {content}
+          </Stack>
+        </Stack>
+      )}
       {canReact && (
         <>
-          {/* Rendered in place, not in a portal: the conversation's scrolling area clips it, so it never floats over
-              the composer when its message slides underneath. */}
-          <Popper
-            disablePortal
-            open={(isHovered || isLongPressed) && !pickerAnchor}
-            anchorEl={bodyRef.current}
-            placement={isOwn ? "top-end" : "top-start"}
-            modifiers={[
-              // Just above the message: the hover leave delay covers the small gap on the way to the bar
-              { name: "offset", options: { offset: [0, 4] } },
-              { name: "preventOverflow", options: { padding: 8 } },
-            ]}
-            sx={{
-              // Popper keeps the bar inside the scrolling area: hide it once its message has left the area
-              "&[data-popper-reference-hidden]": { pointerEvents: "none", visibility: "hidden" },
-              // "&&" outweighs the Stack spacing, which would otherwise push the bar down by a margin
-              "&&": { margin: 0 },
-              zIndex: 2,
-            }}
-          >
-            <ClickAwayListener mouseEvent="onPointerDown" touchEvent={false} onClickAway={() => setIsLongPressed(false)}>
-              <div onPointerEnter={handlePointerEnter} onPointerLeave={handlePointerLeave}>
-                <ChatReactionBar
-                  quickReactions={quickReactions}
-                  myEmojis={myEmojis}
-                  labels={chatLabels}
-                  onToggle={(emoji) => {
-                    setIsLongPressed(false);
-                    toggleReaction(emoji);
-                  }}
-                  onAdd={() => openPicker(bodyRef.current)}
-                />
-              </div>
-            </ClickAwayListener>
-          </Popper>
+          {/* Slack-like: straddles the top of the hovered row, on the empty side of the bubble */}
+          <ClickAwayListener mouseEvent="onPointerDown" touchEvent={false} onClickAway={() => setIsLongPressed(false)}>
+            <Box data-chat-reaction-toolbar sx={{ position: "absolute", top: -20, zIndex: 1, ...(isOwn ? { left: 4 } : { right: 4 }) }}>
+              <ChatReactionBar
+                quickReactions={quickReactions}
+                myEmojis={myEmojis}
+                labels={chatLabels}
+                onToggle={(emoji) => {
+                  setIsLongPressed(false);
+                  toggleReaction(emoji);
+                }}
+                onAdd={(anchor) => openPicker(anchor)}
+              />
+            </Box>
+          </ClickAwayListener>
           <ChatEmojiPicker
             anchorEl={pickerAnchor}
             onClose={() => setPickerAnchor(null)}
@@ -289,49 +306,7 @@ const ChatMessageBubble = ({
           />
         </>
       )}
-    </>
-  );
-
-  if (isOwn) {
-    return (
-      <Stack
-        alignItems="flex-end"
-        spacing={0.5}
-        sx={{ maxWidth: "70%", WebkitTouchCallout: "none" }}
-        alignSelf="flex-end"
-        data-test="chatMessage"
-        {...reactionHandlers}
-      >
-        {content}
-      </Stack>
-    );
-  }
-
-  const author = participants?.find((p) => p.userId === message.authorId);
-
-  return (
-    <Stack direction="row" spacing={1.5} alignItems="flex-start" data-test="chatMessage">
-      {!hideAvatar && (
-        <Avatar
-          src={avatarSrcResolver?.(author?.avatar)}
-          sx={{
-            backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
-            fontSize: 12,
-            height: 28,
-            mt: 0.5,
-            width: 28,
-          }}
-        >
-          {getInitials(
-            author ? { firstName: author.firstName, lastName: author.lastName } : { fullName: String(message.authorId).slice(0, 2) },
-            true,
-          )}
-        </Avatar>
-      )}
-      <Stack spacing={0.5} sx={{ maxWidth: "70%", WebkitTouchCallout: "none" }} {...reactionHandlers}>
-        {content}
-      </Stack>
-    </Stack>
+    </Box>
   );
 };
 

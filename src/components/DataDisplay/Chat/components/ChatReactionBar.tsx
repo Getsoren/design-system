@@ -12,13 +12,19 @@ interface ChatReactionBarProps {
   myEmojis: string[];
   labels: ChatLabels;
   onToggle: (emoji: string) => void;
-  onAdd: () => void;
+  onAdd: (anchor: HTMLElement) => void;
 }
 
-const buttonSx = { borderRadius: 999, height: 44, width: 44 };
+// Compact under a mouse, as on Slack; finger-sized on touch screens (long press)
+const buttonSx = {
+  "@media (hover: none)": { height: 44, width: 44 },
+  borderRadius: 1.5,
+  height: 32,
+  width: 32,
+};
 
 /**
- * Floating bar of a message (hover, long press): the quick reactions and the full emoji picker.
+ * Toolbar of a message (hover, long press): one-click reactions and the full emoji picker.
  */
 const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: ChatReactionBarProps) => (
   <Paper
@@ -28,9 +34,10 @@ const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: 
       alignItems: "center",
       border: "1px solid",
       borderColor: "divider",
-      borderRadius: 999,
-      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+      borderRadius: 2,
+      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
       display: "flex",
+      gap: 0.25,
       p: 0.25,
     }}
   >
@@ -47,7 +54,7 @@ const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: 
             ...buttonSx,
             backgroundColor: isMine ? "action.selected" : undefined,
             fontFamily: EMOJI_FONT_FAMILY,
-            fontSize: 22,
+            fontSize: 18,
             lineHeight: 1,
           }}
         >
@@ -55,10 +62,10 @@ const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: 
         </IconButton>
       );
     })}
-    <Divider orientation="vertical" flexItem sx={{ mx: 0.25, my: 1 }} />
+    <Divider orientation="vertical" flexItem sx={{ mx: 0.25, my: 0.75 }} />
     <Tooltip title={labels.addReaction}>
-      <IconButton aria-label={labels.addReaction} onClick={onAdd} sx={{ ...buttonSx, color: "text.secondary" }}>
-        <AddReactionIcon sx={{ fontSize: 22 }} />
+      <IconButton aria-label={labels.addReaction} onClick={(e) => onAdd(e.currentTarget)} sx={{ ...buttonSx, color: "text.secondary" }}>
+        <AddReactionIcon sx={{ fontSize: 18 }} />
       </IconButton>
     </Tooltip>
   </Paper>

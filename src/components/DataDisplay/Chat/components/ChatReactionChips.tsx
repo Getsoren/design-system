@@ -106,6 +106,7 @@ const ChatReactionChips = ({
       {onAdd && (
         <Tooltip title={labels.addReaction} arrow>
           <ButtonBase
+            data-chat-reaction-add
             aria-label={labels.addReaction}
             onClick={(e) => onAdd(e.currentTarget)}
             sx={{ ...chipSx, color: "text.secondary", minWidth: 44 }}

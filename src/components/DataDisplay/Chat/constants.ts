@@ -18,7 +18,7 @@ export const DEFAULT_MAX_ATTACHMENTS = 10;
 
 export const DEFAULT_MAX_ATTACHMENT_SIZE = 25 * 1024 * 1024;
 
-export const DEFAULT_QUICK_REACTIONS = ["👍", "✅", "👀", "🙏", "😂", "❤️"];
+export const DEFAULT_QUICK_REACTIONS = ["👍", "✅", "👀"];
 
 export const EMOJI_FONT_FAMILY =
   "'Apple Color Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', 'Android Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif";

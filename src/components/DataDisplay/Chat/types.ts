@@ -194,7 +194,7 @@ export interface ChatConversationDetailProps {
   onLinkAttachment?: ChatLinkAttachment;
   /** Enables reactions: "mine" is derived from `currentUserId` being in `reaction.userIds` */
   onToggleReaction?: (messageId: ChatMessage["id"], emoji: string) => void;
-  /** Default ["👍", "✅", "👀", "🙏", "😂", "❤️"] */
+  /** One-click reactions of the message toolbar, default ["👍", "✅", "👀"] */
   quickReactions?: string[];
 }
 

@@ -2,6 +2,7 @@ import type {
   ChatAttachmentLabels,
   ChatEventLabels,
   ChatQuickActionLabels,
+  ChatQuickReplyLabels,
   ChatReactionLabels,
   ChatReadReceiptLabels,
   ChatTeamLabels,
@@ -15,12 +16,14 @@ type ChatLabelOverrides = ChatAttachmentLabels &
   ChatReadReceiptLabels &
   ChatEventLabels &
   ChatQuickActionLabels &
-  ChatTeamLabels;
+  ChatTeamLabels &
+  ChatQuickReplyLabels;
 
 export type ChatLabels = Required<ChatLabelOverrides>;
 
 /**
- * Chat labels (attachments, reactions, voice messages, read receipts, automatic messages, quick actions, team view):
+ * Chat labels (attachments, reactions, voice messages, read receipts, automatic messages, quick actions, team view,
+ * quick replies):
  * the caller's strings first, the design system locale otherwise.
  */
 const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
@@ -48,6 +51,7 @@ const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
     pause: labels?.pause ?? t("pause"),
     play: labels?.play ?? t("play"),
     previous: labels?.previous ?? t("previous"),
+    quickReplies: labels?.quickReplies ?? t("quickReplies"),
     reactions: labels?.reactions ?? t("reactions"),
     recentEmojis: labels?.recentEmojis ?? t("recentEmojis"),
     recordVoiceMessage: labels?.recordVoiceMessage ?? t("recordVoiceMessage"),

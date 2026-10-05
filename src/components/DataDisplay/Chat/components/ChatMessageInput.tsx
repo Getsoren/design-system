@@ -15,6 +15,7 @@ import {
   useState,
 } from "react";
 import ChatAttachmentTray from "@/components/DataDisplay/Chat/components/ChatAttachmentTray";
+import ChatPill from "@/components/DataDisplay/Chat/components/ChatPill";
 import ChatQuickActionMenu from "@/components/DataDisplay/Chat/components/ChatQuickActionMenu";
 import ChatVoiceRecorder from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
 import { DEFAULT_ATTACHMENT_ACCEPT, DEFAULT_MAX_ATTACHMENT_SIZE, DEFAULT_MAX_ATTACHMENTS } from "@/components/DataDisplay/Chat/constants";
@@ -54,6 +55,7 @@ const ChatMessageInput = (
     linkAttachmentsOnAdd = true,
     quickActions,
     onQuickAction,
+    quickReplies,
   }: ChatMessageInputProps,
   ref: ForwardedRef<ChatMessageInputHandle>,
 ) => {
@@ -69,6 +71,8 @@ const ChatMessageInput = (
   const uploads = useChatAttachmentUploads({ accept: attachmentAccept, maxAttachmentSize, maxAttachments, onUploadAttachment });
   // Files alone make a message; an upload still running blocks the send so nothing leaves half-way
   const canSend = (!!message.trim() || uploads.hasUploaded) && !isSending && !uploads.isUploading;
+  // Fi and Noom-like: only offered on an empty composer
+  const showQuickReplies = !!quickReplies?.length && !message && !uploads.items.length && !voiceUpload;
 
   // Files waiting for the link dialog, opened one at a time
   const linkQueueRef = useRef<ChatPendingAttachment[]>([]);
@@ -218,6 +222,22 @@ const ChatMessageInput = (
             : null
         }
       />
+      {showQuickReplies && (
+        <Stack
+          direction="row"
+          spacing={1}
+          role="group"
+          aria-label={chatLabels.quickReplies}
+          data-test="chatQuickReplies"
+          sx={{ mb: 1, mt: -0.5, overflowX: "auto", py: 0.5 }}
+        >
+          {quickReplies.map((reply) => (
+            <ChatPill key={reply} onClick={() => onSend(reply)} disabled={isSending}>
+              {reply}
+            </ChatPill>
+          ))}
+        </Stack>
+      )}
       <TextField
         fullWidth
         multiline

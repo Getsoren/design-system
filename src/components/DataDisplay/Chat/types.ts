@@ -217,6 +217,11 @@ export interface ChatQuickActionLabels {
   fileOrPhoto?: string;
 }
 
+export interface ChatQuickReplyLabels {
+  /** Name of the group of one-tap replies above the field */
+  quickReplies?: string;
+}
+
 export interface ChatTeamLabels {
   /** Default action of the read-only bar */
   joinConversation?: string;
@@ -229,7 +234,8 @@ export interface ChatConversationDetailLabels
     ChatReadReceiptLabels,
     ChatEventLabels,
     ChatQuickActionLabels,
-    ChatTeamLabels {
+    ChatTeamLabels,
+    ChatQuickReplyLabels {
   today?: string;
   yesterday?: string;
   createYourFirstConversation?: string;
@@ -245,7 +251,7 @@ export interface ChatConversationDetailLabels
   back?: string;
 }
 
-export interface ChatMessageInputLabels extends ChatAttachmentLabels, ChatVoiceMessageLabels, ChatQuickActionLabels {
+export interface ChatMessageInputLabels extends ChatAttachmentLabels, ChatVoiceMessageLabels, ChatQuickActionLabels, ChatQuickReplyLabels {
   writeAMessage?: string;
   send?: string;
   enterToSend?: string;
@@ -352,6 +358,8 @@ export interface ChatConversationDetailProps {
   onActionResponse?: ChatActionResponseHandler;
   /** A colleague's thread read from the team view: a bar to join it replaces the composer */
   readOnly?: ChatConversationReadOnly | null;
+  /** One-tap replies above the field, shown while it is empty and the last message comes from someone else */
+  quickReplies?: string[];
 }
 
 export interface ChatMessageBubbleLabels
@@ -414,6 +422,8 @@ export interface ChatMessageInputProps {
   /** Turns the paperclip into a "+" opening a menu: "File or photo" first, then these actions */
   quickActions?: ChatQuickAction[];
   onQuickAction?: (actionId: string) => void;
+  /** One-tap replies above the field while it is empty: a tap sends the reply */
+  quickReplies?: string[];
 }
 
 export interface ChatVoiceRecorderLabels {

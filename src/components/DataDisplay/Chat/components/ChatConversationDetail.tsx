@@ -115,6 +115,7 @@ const ChatConversationDetail = ({
   onQuickAction,
   onActionResponse,
   readOnly,
+  quickReplies,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<{ threadId?: string; value: MessagesFilter }>({ value: "all" });
@@ -139,7 +140,8 @@ const ChatConversationDetail = ({
    * Auto-scroll to the bottom of the conversation when a message arrives. Keyed on the last message rather than
    * the array: a reaction or a link on an older message must not pull the reader down.
    */
-  const lastMessageId = messages?.[messages.length - 1]?.id;
+  const lastMessage = messages?.[messages.length - 1];
+  const lastMessageId = lastMessage?.id;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: the last message stands for the list
   useEffect(() => {
@@ -360,6 +362,8 @@ const ChatConversationDetail = ({
           linkAttachmentsOnAdd={linkAttachmentsOnAdd}
           quickActions={quickActions}
           onQuickAction={onQuickAction}
+          // Something to answer: the last message comes from someone else
+          quickReplies={lastMessage && lastMessage.authorId !== currentUserId ? quickReplies : undefined}
         />
       )}
       {isDraggingFiles && <ChatDropOverlay label={chatLabels.dropFilesHere} />}

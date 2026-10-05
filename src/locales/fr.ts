@@ -37,6 +37,7 @@ export default {
   pause: "Pause",
   play: "Lire",
   previous: "Précédent",
+  quickReplies: "Réponses rapides",
   reactions: "Réactions",
   recentEmojis: "Récents",
   recordVoiceMessage: "Enregistrer un message vocal",

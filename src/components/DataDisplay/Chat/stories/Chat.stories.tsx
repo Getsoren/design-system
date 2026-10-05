@@ -958,6 +958,51 @@ export const TeamConversations: StoryFn = () => {
   );
 };
 
+/**
+ * Supplier side: one-tap replies above the empty field while the last message comes from the client; a tap sends it.
+ */
+export const QuickReplies: StoryFn = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { authorId: CURRENT_USER_ID, body: "Bonjour, la nacelle est prête au dépôt.", createdAt: minutesAgo(90), id: "qr-1" },
+    { authorId: "user-1", body: "Super, vous pouvez la livrer demain avant 8 h ?", createdAt: minutesAgo(10), id: "qr-2" },
+  ]);
+
+  const handleSendMessage = (_threadId: string, body: string) => {
+    setMessages((previous) => [
+      ...previous,
+      { authorId: CURRENT_USER_ID, body, createdAt: new Date().toISOString(), id: `msg-${Date.now()}` },
+    ]);
+    // The client answers a moment later: the replies come back
+    setTimeout(
+      () =>
+        setMessages((previous) => [
+          ...previous,
+          { authorId: "user-1", body: "Merci, à demain !", createdAt: new Date().toISOString(), id: `msg-${Date.now()}` },
+        ]),
+      2500,
+    );
+  };
+
+  return (
+    <ThemeContext.Provider value={{ language: "fr" }}>
+      <Chat height="100vh">
+        <Chat.ConversationDetail
+          threadId="thread-1"
+          participants={[{ ...participants[0], lastReadAt: minutesAgo(5) }]}
+          messages={messages}
+          currentUserId={CURRENT_USER_ID}
+          onDeleteConversation={() => {}}
+          onNewConversation={() => {}}
+          onSendMessage={handleSendMessage}
+          onAddParticipants={() => {}}
+          quickReplies={["C'est noté", "Bien pris en compte", "Je regarde et je reviens vers vous", "Merci"]}
+          labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
+        />
+      </Chat>
+    </ThemeContext.Provider>
+  );
+};
+
 const createSampleImage = (): Promise<File> =>
   new Promise((resolve) => {
     const canvas = document.createElement("canvas");

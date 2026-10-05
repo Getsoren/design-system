@@ -859,6 +859,105 @@ export const QuickActions: StoryFn = () => {
   );
 };
 
+const JULIE: ChatParticipant = { avatar: null, firstName: "Julie", lastName: "Martin", userId: "colleague-1" };
+const MARC: ChatParticipant = { avatar: null, firstName: "Marc", lastName: "Dupont", userId: "supplier-2" };
+
+const teamMessages: Record<string, ChatMessage[]> = {
+  "team-1": [
+    {
+      authorId: JULIE.userId,
+      body: "Bonjour Marc, la benne de 15 m³ peut-elle être vidée jeudi ?",
+      createdAt: minutesAgo(200),
+      id: "tm-1",
+    },
+    { authorId: MARC.userId, body: "Oui, passage prévu jeudi entre 8 h et 10 h.", createdAt: minutesAgo(150), id: "tm-2" },
+  ],
+  "team-2": [{ authorId: SUPPLIER.userId, body: "Le groupe électrogène est prêt au dépôt.", createdAt: minutesAgo(400), id: "tm-3" }],
+};
+
+/**
+ * "My conversations / Team" pills above the list; a colleague's thread opens read-only, with a bar to join it.
+ */
+export const TeamConversations: StoryFn = () => {
+  const [tab, setTab] = useState("mine");
+  const [joinedIds, setJoinedIds] = useState<string[]>([]);
+  const [selectedThreadId, setSelectedThreadId] = useState("thread-1");
+  const myThreads: ChatThread[] = [
+    {
+      createdAt: minutesAgo(600),
+      id: "thread-1",
+      lastMessagePreview: "Parfait, merci !",
+      participants: [SUPPLIER],
+      unreadCount: 1,
+      updatedAt: minutesAgo(60),
+    },
+    ...threads.slice(1, 2),
+  ];
+  const teamThreads: ChatThread[] = [
+    {
+      createdAt: minutesAgo(600),
+      id: "team-1",
+      lastMessagePreview: "Oui, passage prévu jeudi entre 8 h et 10 h.",
+      participants: [JULIE, MARC],
+      updatedAt: minutesAgo(150),
+    },
+    {
+      createdAt: minutesAgo(900),
+      id: "team-2",
+      lastMessagePreview: "Le groupe électrogène est prêt au dépôt.",
+      participants: [JULIE, SUPPLIER],
+      updatedAt: minutesAgo(400),
+    },
+  ];
+  const joined = teamThreads.filter(({ id }) => joinedIds.includes(id));
+  const visibleThreads = tab === "mine" ? [...joined, ...myThreads] : teamThreads.filter(({ id }) => !joinedIds.includes(id));
+  const selectedThread = [...myThreads, ...teamThreads].find(({ id }) => id === selectedThreadId);
+  const isTeamThread = teamThreads.some(({ id }) => id === selectedThreadId) && !joinedIds.includes(selectedThreadId);
+  const participantsOf = (thread?: ChatThread) => thread?.participants?.map(({ firstName }) => firstName).join(" et ");
+
+  const handleJoin = async () => {
+    await wait(800);
+    setJoinedIds((previous) => [...previous, selectedThreadId]);
+    setTab("mine");
+  };
+
+  return (
+    <ThemeContext.Provider value={{ language: "fr" }}>
+      <Chat height="100vh">
+        <Chat.Body>
+          <Chat.ConversationList
+            threads={visibleThreads}
+            selectedThreadId={selectedThreadId}
+            onSelectThread={setSelectedThreadId}
+            onNewConversation={() => {}}
+            labels={{ messages: "Messages", search: "Rechercher" }}
+            tabs={[
+              { count: myThreads.length + joined.length, id: "mine", label: "Mes conversations" },
+              { count: teamThreads.length - joined.length, id: "team", label: "Équipe" },
+            ]}
+            selectedTab={tab}
+            onTabChange={setTab}
+          />
+          <Chat.ConversationDetail
+            threadId={selectedThreadId}
+            participants={selectedThread?.participants}
+            messages={teamMessages[selectedThreadId] ?? messagesThread1}
+            currentUserId={CURRENT_USER_ID}
+            onDeleteConversation={() => {}}
+            onNewConversation={() => {}}
+            onSendMessage={() => {}}
+            onAddParticipants={() => {}}
+            readOnly={
+              isTeamThread ? { label: `Vous consultez la conversation de ${participantsOf(selectedThread)}`, onAction: handleJoin } : null
+            }
+            labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
+          />
+        </Chat.Body>
+      </Chat>
+    </ThemeContext.Provider>
+  );
+};
+
 const createSampleImage = (): Promise<File> =>
   new Promise((resolve) => {
     const canvas = document.createElement("canvas");

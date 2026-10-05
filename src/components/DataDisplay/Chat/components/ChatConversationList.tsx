@@ -14,6 +14,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
 import Avatar from "@/components/DataDisplay/Avatar/Avatar";
+import ChatPill from "@/components/DataDisplay/Chat/components/ChatPill";
 import type { ChatConversationListProps } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";
@@ -48,12 +49,16 @@ const ChatConversationList = ({
   onLoadMore,
   hasMore,
   slotProps,
+  tabs,
+  selectedTab,
+  onTabChange,
 }: ChatConversationListProps) => {
   const [search, setSearch] = useState("");
   const getDate = formatDate ?? defaultFormatDate;
   const sentinelRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const canLoadMore = hasMore ?? !!onLoadMore;
+  const activeTab = selectedTab ?? tabs?.[0]?.id;
 
   /**
    * Infinite scroll: observes a sentinel element at the bottom of the list.
@@ -126,6 +131,15 @@ const ChatConversationList = ({
           }}
         />
       </Box>
+      {!!tabs?.length && (
+        <Stack direction="row" spacing={1} sx={{ overflowX: "auto", pb: 1.5, pt: 0.5, px: 2 }} data-test="chatConversationTabs">
+          {tabs.map(({ id, label, count }) => (
+            <ChatPill key={id} selected={id === activeTab} count={count} onClick={() => onTabChange?.(id)}>
+              {label}
+            </ChatPill>
+          ))}
+        </Stack>
+      )}
       <Divider />
       <List ref={listRef} disablePadding sx={{ flex: 1, overflowY: "auto" }}>
         {isLoading &&

@@ -21,6 +21,7 @@ export default {
   filterAll: "All",
   filterMessages: "Messages",
   filterUpdates: "Updates",
+  joinConversation: "Join the conversation",
   linkAttachment: "Link to an order",
   month: "Month",
   moreActions: "More actions",

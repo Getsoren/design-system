@@ -10,6 +10,7 @@ import ChatEventGroup from "@/components/DataDisplay/Chat/components/ChatEventGr
 import ChatMessageBubble from "@/components/DataDisplay/Chat/components/ChatMessageBubble";
 import ChatMessageInput from "@/components/DataDisplay/Chat/components/ChatMessageInput";
 import ChatPill from "@/components/DataDisplay/Chat/components/ChatPill";
+import ChatReadOnlyBar from "@/components/DataDisplay/Chat/components/ChatReadOnlyBar";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import useFileDrop from "@/components/DataDisplay/Chat/hooks/useFileDrop";
 import type { ChatConversationDetailProps, ChatMessage, ChatMessageInputHandle } from "@/components/DataDisplay/Chat/types";
@@ -113,6 +114,7 @@ const ChatConversationDetail = ({
   quickActions,
   onQuickAction,
   onActionResponse,
+  readOnly,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<{ threadId?: string; value: MessagesFilter }>({ value: "all" });
@@ -122,7 +124,7 @@ const ChatConversationDetail = ({
   const chatLabels = useChatLabels(labels);
   // Files dropped anywhere on the conversation join the composer
   const { isDraggingFiles, dropZoneProps } = useFileDrop(
-    onUploadAttachment ? (files) => messageInputRef.current?.addFiles(files) : undefined,
+    onUploadAttachment && !readOnly ? (files) => messageInputRef.current?.addFiles(files) : undefined,
   );
 
   const getDayLabel = formatDayLabel ?? defaultFormatDayLabel;
@@ -336,26 +338,30 @@ const ChatConversationDetail = ({
           </Stack>
         )}
       </Box>
-      <ChatMessageInput
-        ref={messageInputRef}
-        // Without files, the exact same call as before: (threadId, body)
-        onSend={(body, attachments) => (attachments ? onSendMessage(threadId, body, attachments) : onSendMessage(threadId, body))}
-        labels={{ ...chatLabels, enterToSend: labels?.enterToSend, send: labels?.send, writeAMessage: labels?.writeAMessage }}
-        autoFocusKey={threadId}
-        isSending={isSending}
-        defaultMessage={defaultMessage}
-        maxLength={messageMaxLength}
-        slotProps={slotProps}
-        onUploadAttachment={onUploadAttachment}
-        attachmentAccept={attachmentAccept}
-        maxAttachments={maxAttachments}
-        maxAttachmentSize={maxAttachmentSize}
-        onLinkAttachment={onLinkAttachment}
-        enableVoiceMessages={enableVoiceMessages}
-        linkAttachmentsOnAdd={linkAttachmentsOnAdd}
-        quickActions={quickActions}
-        onQuickAction={onQuickAction}
-      />
+      {readOnly ? (
+        <ChatReadOnlyBar readOnly={readOnly} actionLabel={readOnly.actionLabel ?? chatLabels.joinConversation} />
+      ) : (
+        <ChatMessageInput
+          ref={messageInputRef}
+          // Without files, the exact same call as before: (threadId, body)
+          onSend={(body, attachments) => (attachments ? onSendMessage(threadId, body, attachments) : onSendMessage(threadId, body))}
+          labels={{ ...chatLabels, enterToSend: labels?.enterToSend, send: labels?.send, writeAMessage: labels?.writeAMessage }}
+          autoFocusKey={threadId}
+          isSending={isSending}
+          defaultMessage={defaultMessage}
+          maxLength={messageMaxLength}
+          slotProps={slotProps}
+          onUploadAttachment={onUploadAttachment}
+          attachmentAccept={attachmentAccept}
+          maxAttachments={maxAttachments}
+          maxAttachmentSize={maxAttachmentSize}
+          onLinkAttachment={onLinkAttachment}
+          enableVoiceMessages={enableVoiceMessages}
+          linkAttachmentsOnAdd={linkAttachmentsOnAdd}
+          quickActions={quickActions}
+          onQuickAction={onQuickAction}
+        />
+      )}
       {isDraggingFiles && <ChatDropOverlay label={chatLabels.dropFilesHere} />}
     </Stack>
   );

@@ -130,6 +130,23 @@ export interface ChatSearchUser {
   avatar?: string | null;
 }
 
+/** A pill above the conversation list, e.g. "My conversations" / "Team" */
+export interface ChatConversationListTab {
+  id: string;
+  label: string;
+  count?: number;
+}
+
+/** A thread read without being one of its participants: a bar to join it replaces the composer */
+export interface ChatConversationReadOnly {
+  /** e.g. "Vous consultez la conversation de Sophie et Julie" */
+  label: ReactNode;
+  /** Default "Join the conversation" */
+  actionLabel?: string;
+  /** May return a promise: the button then spins until it settles */
+  onAction: () => void | Promise<unknown>;
+}
+
 export interface ChatConversationListLabels {
   messages?: string;
   search?: string;
@@ -200,13 +217,19 @@ export interface ChatQuickActionLabels {
   fileOrPhoto?: string;
 }
 
+export interface ChatTeamLabels {
+  /** Default action of the read-only bar */
+  joinConversation?: string;
+}
+
 export interface ChatConversationDetailLabels
   extends ChatAttachmentLabels,
     ChatReactionLabels,
     ChatVoiceMessageLabels,
     ChatReadReceiptLabels,
     ChatEventLabels,
-    ChatQuickActionLabels {
+    ChatQuickActionLabels,
+    ChatTeamLabels {
   today?: string;
   yesterday?: string;
   createYourFirstConversation?: string;
@@ -254,6 +277,11 @@ export interface ChatConversationListProps {
   onLoadMore?: () => void;
   hasMore?: boolean;
   slotProps?: ChatConversationListSlotProps;
+  /** Front-like pills above the list, e.g. "My conversations" / "Team" */
+  tabs?: ChatConversationListTab[];
+  /** Default: the first tab */
+  selectedTab?: string;
+  onTabChange?: (tabId: string) => void;
 }
 
 /** `data-*` attributes forwarded to the conversation detail's inner controls */
@@ -322,6 +350,8 @@ export interface ChatConversationDetailProps {
   onQuickAction?: (actionId: string) => void;
   /** Answer to an action card (`message.action`), from its recipient */
   onActionResponse?: ChatActionResponseHandler;
+  /** A colleague's thread read from the team view: a bar to join it replaces the composer */
+  readOnly?: ChatConversationReadOnly | null;
 }
 
 export interface ChatMessageBubbleLabels

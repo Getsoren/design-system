@@ -4,6 +4,7 @@ import type {
   ChatQuickActionLabels,
   ChatReactionLabels,
   ChatReadReceiptLabels,
+  ChatTeamLabels,
   ChatVoiceMessageLabels,
 } from "@/components/DataDisplay/Chat/types";
 import useTranslation from "@/hooks/useTranslation/useTranslation";
@@ -13,13 +14,14 @@ type ChatLabelOverrides = ChatAttachmentLabels &
   ChatVoiceMessageLabels &
   ChatReadReceiptLabels &
   ChatEventLabels &
-  ChatQuickActionLabels;
+  ChatQuickActionLabels &
+  ChatTeamLabels;
 
 export type ChatLabels = Required<ChatLabelOverrides>;
 
 /**
- * Chat labels (attachments, reactions, voice messages, read receipts, automatic messages, quick actions): the caller's
- * strings first, the design system locale otherwise.
+ * Chat labels (attachments, reactions, voice messages, read receipts, automatic messages, quick actions, team view):
+ * the caller's strings first, the design system locale otherwise.
  */
 const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
   const { t } = useTranslation();
@@ -37,6 +39,7 @@ const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
     filterAll: labels?.filterAll ?? t("filterAll"),
     filterMessages: labels?.filterMessages ?? t("filterMessages"),
     filterUpdates: labels?.filterUpdates ?? t("filterUpdates"),
+    joinConversation: labels?.joinConversation ?? t("joinConversation"),
     linkAttachment: labels?.linkAttachment ?? t("linkAttachment"),
     moreActions: labels?.moreActions ?? t("moreActions"),
     next: labels?.next ?? t("next"),

@@ -243,9 +243,15 @@ const ChatMessageBubble = ({
             aria-haspopup="dialog"
             onClick={() => setBarAnchor(bodyRef.current)}
             sx={{
+              // A white chip, so the smiley reads on the grey conversation background
+              "&:hover": { backgroundColor: "background.paper", color: "text.primary" },
+              backgroundColor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
               color: "text.secondary",
               height: 32,
-              mx: 0.5,
+              mx: 0.75,
               position: "absolute",
               top: hasReactions ? "calc(50% - 9px)" : "50%",
               transform: "translateY(-50%)",

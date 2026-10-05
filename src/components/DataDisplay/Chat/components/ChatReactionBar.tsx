@@ -24,6 +24,8 @@ const PlusIcon = () => (
 const emojiButtonSx = {
   "@media (hover: none)": { height: 44, width: 44 },
   "&:hover": { backgroundColor: "transparent", transform: "scale(1.25)" },
+  // An opaque color: the browser draws color emojis with the alpha of the text color (IconButton's grey is 54%)
+  color: "text.primary",
   fontFamily: EMOJI_FONT_FAMILY,
   fontSize: 26,
   height: 40,

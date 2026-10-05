@@ -80,6 +80,7 @@ const ChatConversationDetail = ({
   quickReactions,
   enableVoiceMessages,
   linkAttachmentsOnAdd,
+  showReadReceipts,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousThreadIdRef = useRef<string | undefined>(undefined);
@@ -265,6 +266,7 @@ const ChatConversationDetail = ({
                     onToggleReaction={onToggleReaction}
                     quickReactions={quickReactions}
                     labels={chatLabels}
+                    showReadReceipts={showReadReceipts}
                   />
                 </Stack>
               );

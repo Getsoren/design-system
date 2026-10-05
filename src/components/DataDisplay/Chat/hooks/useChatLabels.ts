@@ -1,12 +1,20 @@
-import type { ChatAttachmentLabels, ChatReactionLabels, ChatVoiceMessageLabels } from "@/components/DataDisplay/Chat/types";
+import type {
+  ChatAttachmentLabels,
+  ChatReactionLabels,
+  ChatReadReceiptLabels,
+  ChatVoiceMessageLabels,
+} from "@/components/DataDisplay/Chat/types";
 import useTranslation from "@/hooks/useTranslation/useTranslation";
 
-export type ChatLabels = Required<ChatAttachmentLabels & ChatReactionLabels & ChatVoiceMessageLabels>;
+type ChatLabelOverrides = ChatAttachmentLabels & ChatReactionLabels & ChatVoiceMessageLabels & ChatReadReceiptLabels;
+
+export type ChatLabels = Required<ChatLabelOverrides>;
 
 /**
- * Attachment, reaction and voice message labels: the caller's strings first, the design system locale otherwise.
+ * Attachment, reaction, voice message and read receipt labels: the caller's strings first, the design system locale
+ * otherwise.
  */
-const useChatLabels = (labels?: ChatAttachmentLabels & ChatReactionLabels & ChatVoiceMessageLabels): ChatLabels => {
+const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
   const { t } = useTranslation();
 
   return {
@@ -30,7 +38,10 @@ const useChatLabels = (labels?: ChatAttachmentLabels & ChatReactionLabels & Chat
     removeReaction: labels?.removeReaction ?? t("removeReaction"),
     retryUpload: labels?.retryUpload ?? t("retryUpload"),
     searchEmoji: labels?.searchEmoji ?? t("searchEmoji"),
+    seenBy: labels?.seenBy ?? t("seenBy"),
+    sending: labels?.sending ?? t("sending"),
     sendVoiceMessage: labels?.sendVoiceMessage ?? t("sendVoiceMessage"),
+    sent: labels?.sent ?? t("sent"),
     tooManyFiles: labels?.tooManyFiles ?? t("tooManyFiles"),
     unsupportedFileType: labels?.unsupportedFileType ?? t("unsupportedFileType"),
     uploadFailed: labels?.uploadFailed ?? t("uploadFailed"),

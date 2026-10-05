@@ -557,6 +557,53 @@ export const Attachments: StoryFn = () => {
   );
 };
 
+const minutesAgo = (minutes: number) => new Date(now.getTime() - minutes * 60000).toISOString();
+
+/**
+ * Ticks next to the time of my messages: the first ones were read by Alice, the last one not yet. A new message shows
+ * the clock until it is acknowledged, then Alice reads it a moment later.
+ */
+export const ReadReceipts: StoryFn = () => {
+  const [aliceLastReadAt, setAliceLastReadAt] = useState(minutesAgo(30));
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { authorId: "user-1", body: "Bonjour, la nacelle est bien prévue pour demain ?", createdAt: minutesAgo(50), id: "rr-1" },
+    { authorId: CURRENT_USER_ID, body: "Oui, livraison entre 7 h et 9 h.", createdAt: minutesAgo(45), id: "rr-2" },
+    { authorId: CURRENT_USER_ID, body: "Le chauffeur vous appellera en arrivant.", createdAt: minutesAgo(44), id: "rr-3" },
+    { authorId: CURRENT_USER_ID, body: "Pensez à libérer l'accès côté portail.", createdAt: minutesAgo(5), id: "rr-4" },
+  ]);
+  const readers: ChatParticipant[] = [{ ...participants[0], lastReadAt: aliceLastReadAt }];
+
+  const handleSendMessage = (_threadId: string, body: string) => {
+    const id = `temp-${Date.now()}`;
+
+    setMessages((previous) => [...previous, { authorId: CURRENT_USER_ID, body, createdAt: new Date().toISOString(), id }]);
+    // The server acknowledges the message, then Alice reads it
+    setTimeout(
+      () => setMessages((previous) => previous.map((message) => (message.id === id ? { ...message, id: `rr-${id}` } : message))),
+      1200,
+    );
+    setTimeout(() => setAliceLastReadAt(new Date().toISOString()), 3500);
+  };
+
+  return (
+    <ThemeContext.Provider value={{ language: "fr" }}>
+      <Chat height="100vh">
+        <Chat.ConversationDetail
+          threadId="thread-1"
+          participants={readers}
+          messages={messages}
+          currentUserId={CURRENT_USER_ID}
+          onDeleteConversation={() => {}}
+          onNewConversation={() => {}}
+          onSendMessage={handleSendMessage}
+          onAddParticipants={() => {}}
+          labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
+        />
+      </Chat>
+    </ThemeContext.Provider>
+  );
+};
+
 const createSampleImage = (): Promise<File> =>
   new Promise((resolve) => {
     const canvas = document.createElement("canvas");

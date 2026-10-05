@@ -15,11 +15,13 @@ import ChatEmojiPicker from "@/components/DataDisplay/Chat/components/ChatEmojiP
 import ChatMessageAttachments from "@/components/DataDisplay/Chat/components/ChatMessageAttachments";
 import ChatReactionBar from "@/components/DataDisplay/Chat/components/ChatReactionBar";
 import ChatReactionSummary from "@/components/DataDisplay/Chat/components/ChatReactionSummary";
+import ChatReadReceipt, { type ChatReadReceiptStatus } from "@/components/DataDisplay/Chat/components/ChatReadReceipt";
 import { DEFAULT_QUICK_REACTIONS, getOwnBubbleBackground } from "@/components/DataDisplay/Chat/constants";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
-import type { ChatMessageBubbleProps } from "@/components/DataDisplay/Chat/types";
+import type { ChatMessage, ChatMessageBubbleProps, ChatParticipant } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import { extractUrls } from "@/components/DataDisplay/Chat/utils/extractUrls";
+import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";
 import { addRecentEmoji } from "@/components/DataDisplay/Chat/utils/recentEmojis";
 import AddReactionIcon from "@/components/DataDisplay/Icons/AddReactionIcon";
 
@@ -34,6 +36,17 @@ const defaultFormatTime = (date: string): string => {
     return "";
   }
 };
+
+const toTime = (date: string) => new Date(ensureUtc(date)).getTime();
+
+/**
+ * The other participants who read the thread after this message was sent
+ */
+const getReaders = (message: ChatMessage, participants?: ChatParticipant[] | null, currentUserId?: string) =>
+  (participants ?? []).filter(
+    ({ userId, lastReadAt }) =>
+      userId !== message.authorId && userId !== currentUserId && !!lastReadAt && toTime(lastReadAt) >= toTime(message.createdAt),
+  );
 
 // "👍️" and "👍" are the same reaction
 const stripVariationSelectors = (emoji: string) => emoji.replace(/️/g, "");
@@ -122,6 +135,7 @@ const ChatMessageBubble = ({
   onToggleReaction,
   quickReactions = DEFAULT_QUICK_REACTIONS,
   labels,
+  showReadReceipts = true,
 }: ChatMessageBubbleProps) => {
   const chatLabels = useChatLabels(labels);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -131,7 +145,8 @@ const ChatMessageBubble = ({
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pressOriginRef = useRef<{ x: number; y: number } | null>(null);
 
-  const formattedTime = (formatTime ?? defaultFormatTime)(message.createdAt);
+  const getTime = formatTime ?? defaultFormatTime;
+  const formattedTime = getTime(message.createdAt);
   const urls = extractUrls(message.body);
   const attachments = message.attachments ?? [];
   const reactions = message.reactions ?? [];
@@ -140,6 +155,27 @@ const ChatMessageBubble = ({
   // A message made of files only gets no empty text bubble
   const hasTextBubble = !!message.body.trim() || !attachments.length;
   const myEmojis = currentUserId ? reactions.filter(({ userIds }) => userIds.includes(currentUserId)).map(({ emoji }) => emoji) : [];
+
+  const getReadReceipt = (): { status: ChatReadReceiptStatus; label: string } => {
+    // Optimistic messages carry a temporary id until the server acknowledges them
+    if (String(message.id).startsWith("temp-")) {
+      return { label: chatLabels.sending, status: "sending" };
+    }
+
+    const readers = getReaders(message, participants, currentUserId);
+
+    if (!readers.length) {
+      return { label: chatLabels.sent, status: "sent" };
+    }
+
+    const seenBy = readers.map(
+      (reader) => `${formatParticipantNames([reader], formatParticipantName)} · ${getTime(reader.lastReadAt ?? message.createdAt)}`,
+    );
+
+    return { label: `${chatLabels.seenBy} ${seenBy.join(", ")}`, status: "read" };
+  };
+
+  const readReceipt = isOwn && showReadReceipts ? getReadReceipt() : null;
 
   const toggleReaction = (emoji: string, fromPicker?: boolean) => {
     // Reuse the string already used on this message (or in the quick reactions): one pill per emoji
@@ -274,9 +310,18 @@ const ChatMessageBubble = ({
         />
       </Box>
       {renderAfterBubble?.(urls)}
-      <Typography variant="caption" color="text.secondary">
-        {formattedTime}
-      </Typography>
+      {readReceipt ? (
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Typography variant="caption" color="text.secondary">
+            {formattedTime}
+          </Typography>
+          <ChatReadReceipt status={readReceipt.status} label={readReceipt.label} />
+        </Stack>
+      ) : (
+        <Typography variant="caption" color="text.secondary">
+          {formattedTime}
+        </Typography>
+      )}
     </>
   );
 

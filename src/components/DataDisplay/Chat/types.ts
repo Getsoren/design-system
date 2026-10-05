@@ -52,6 +52,8 @@ export interface ChatParticipant {
   firstName: string;
   lastName: string;
   avatar?: string | null;
+  /** When this participant last read the thread: my messages sent before it show as seen */
+  lastReadAt?: string | null;
 }
 
 export interface ChatThread {
@@ -115,7 +117,19 @@ export interface ChatVoiceMessageLabels {
   sendVoiceMessage?: string;
 }
 
-export interface ChatConversationDetailLabels extends ChatAttachmentLabels, ChatReactionLabels, ChatVoiceMessageLabels {
+export interface ChatReadReceiptLabels {
+  /** Optimistic message, not acknowledged yet */
+  sending?: string;
+  sent?: string;
+  /** Followed by the readers' names and times */
+  seenBy?: string;
+}
+
+export interface ChatConversationDetailLabels
+  extends ChatAttachmentLabels,
+    ChatReactionLabels,
+    ChatVoiceMessageLabels,
+    ChatReadReceiptLabels {
   today?: string;
   yesterday?: string;
   createYourFirstConversation?: string;
@@ -222,9 +236,11 @@ export interface ChatConversationDetailProps {
    * (cancelling one skips the rest of the batch). Default true
    */
   linkAttachmentsOnAdd?: boolean;
+  /** WhatsApp-like ticks next to the time of my messages: sent, then seen once another participant read it. Default true */
+  showReadReceipts?: boolean;
 }
 
-export interface ChatMessageBubbleLabels extends ChatAttachmentLabels, ChatReactionLabels, ChatVoiceMessageLabels {}
+export interface ChatMessageBubbleLabels extends ChatAttachmentLabels, ChatReactionLabels, ChatVoiceMessageLabels, ChatReadReceiptLabels {}
 
 export interface ChatMessageBubbleProps {
   isOwn: boolean;
@@ -241,6 +257,8 @@ export interface ChatMessageBubbleProps {
   onToggleReaction?: (messageId: ChatMessage["id"], emoji: string) => void;
   quickReactions?: string[];
   labels?: ChatMessageBubbleLabels;
+  /** Ticks next to the time of my messages, read from the participants' `lastReadAt`. Default true */
+  showReadReceipts?: boolean;
 }
 
 /** `data-*` attributes forwarded to the message input's inner controls */

@@ -22,26 +22,24 @@ const ChatEventGroup = ({ messages, label, renderEvent }: ChatEventGroupProps) =
 
   return (
     <Stack alignItems="center" data-test="chatEventGroup">
+      {/* A quiet text line like the events it folds, a 44px hit area all the same */}
       <ButtonBase
         aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
         sx={{
-          "&:hover": { backgroundColor: "action.selected" },
-          backgroundColor: "action.hover",
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: 1.5,
+          "&:hover": { color: "text.primary" },
+          borderRadius: 999,
           color: "text.secondary",
-          gap: 1,
+          gap: 0.5,
           maxWidth: `min(${EVENT_MAX_WIDTH}px, 100%)`,
           minHeight: 44,
           px: 2,
         }}
       >
-        <Typography variant="body2" fontWeight={500} color="text.primary">
+        <Typography variant="caption" fontWeight={500} color="inherit">
           {messages.length} {label}
         </Typography>
-        <ChevronIcon sx={{ fontSize: 18, transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 150ms" }} />
+        <ChevronIcon sx={{ fontSize: 16, transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 150ms" }} />
       </ButtonBase>
       <Collapse in={isOpen} unmountOnExit sx={{ alignSelf: "stretch" }}>
         <Stack spacing={1} pt={1} alignItems="center">

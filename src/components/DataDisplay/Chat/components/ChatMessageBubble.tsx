@@ -168,7 +168,11 @@ const ChatMessageBubble = ({
   const hasReactions = reactions.some(({ userIds }) => userIds.length > 0);
   const canReact = !!onToggleReaction;
   // A message made of files only gets no empty text bubble; an action's body only stands for it in previews
-  const hasTextBubble = !message.action && (!!message.body.trim() || !attachments.length);
+  const afterBubble = renderAfterBubble?.(urls);
+  // A bare shared link shows as its preview card only, when the app renders one (an order link)
+  // ("Commande : https://…" included, the label the order drawer used to prefix)
+  const isPreviewOnly = !!afterBubble && /^\s*(?:[^\s:]{1,20}\s?:\s*)?https?:\/\/\S+\s*$/.test(message.body);
+  const hasTextBubble = !(message.action || isPreviewOnly) && (!!message.body.trim() || !attachments.length);
   const myEmojis = currentUserId ? reactions.filter(({ userIds }) => userIds.includes(currentUserId)).map(({ emoji }) => emoji) : [];
 
   const getReadReceipt = (): { status: ChatReadReceiptStatus; label: string } => {
@@ -270,10 +274,7 @@ const ChatMessageBubble = ({
 
     return (
       <Box data-test="chatMessage" display="flex" justifyContent="center">
-        <ChatEventMessage
-          event={message.event}
-          caption={authorName ? `${chatLabels.eventBy} ${authorName} · ${formattedTime}` : formattedTime}
-        />
+        <ChatEventMessage event={message.event} caption={authorName ? `${authorName} · ${formattedTime}` : formattedTime} />
       </Box>
     );
   }
@@ -345,7 +346,7 @@ const ChatMessageBubble = ({
           onToggle={canReact ? toggleReaction : undefined}
         />
       </Box>
-      {renderAfterBubble?.(urls)}
+      {afterBubble}
       {readReceipt ? (
         <Stack direction="row" alignItems="center" spacing={0.5}>
           <Typography variant="caption" color="text.secondary">

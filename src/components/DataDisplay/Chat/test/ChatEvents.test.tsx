@@ -49,8 +49,10 @@ describe("Chat automatic messages", () => {
     );
 
     expect(screen.getByText("Fin de location e1")).toBeInTheDocument();
-    expect(screen.getByText("Nacelle 16 m · 12/10/2026")).toBeInTheDocument();
-    expect(screen.getByText("by Sophie · 17:55")).toBeInTheDocument();
+    // One quiet line: title, details, order, author and time
+    expect(container.querySelector('[data-test="chatEvent"]')).toHaveTextContent(
+      "Fin de location e1 · Nacelle 16 m · 12/10/2026 · N° 34126 · Sophie · 17:55",
+    );
     expect(screen.queryByText(/✅/)).toBeNull();
     expect(container.querySelector(".MuiPaper-root")).toBeNull();
 

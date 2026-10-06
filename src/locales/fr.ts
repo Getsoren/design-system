@@ -25,7 +25,7 @@ export default {
   joinConversation: "Rejoindre la conversation",
   linkAttachment: "Rattacher à une commande",
   month: "Mois",
-  moreActions: "Actions rapides",
+  moreActions: "Actions",
   next: "Suivant",
   noResult: "Aucun résultat",
   oops: "Oups !",

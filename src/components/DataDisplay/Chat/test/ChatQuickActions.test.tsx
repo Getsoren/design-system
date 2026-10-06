@@ -27,24 +27,25 @@ const request: ChatMessage = {
 };
 
 describe("Chat quick actions", () => {
-  it("shows the quick actions as pills next to the paperclip, no click needed", () => {
+  it("opens the order actions from a named button next to the +", () => {
     const onQuickAction = vi.fn();
     render(<ChatMessageInput onSend={vi.fn()} onUploadAttachment={vi.fn()} quickActions={quickActions} onQuickAction={onQuickAction} />);
 
     expect(screen.getByLabelText("Attach a file")).toBeInTheDocument();
-    const toolbar = screen.getByRole("toolbar", { name: "Quick actions" });
-    expect(toolbar).toHaveTextContent("Prolonger la location");
-    expect(toolbar).toHaveTextContent("Demander un document");
+    fireEvent.click(screen.getByRole("button", { name: /Actions/ }));
 
-    fireEvent.click(screen.getByRole("button", { name: "Prolonger la location" }));
+    const entries = screen.getAllByRole("menuitem").map((item) => item.textContent);
+    expect(entries).toEqual(["Prolonger la location", "Demander un document"]);
+
+    fireEvent.click(screen.getByText("Prolonger la location"));
     expect(onQuickAction).toHaveBeenCalledWith("extend");
   });
 
-  it("keeps a plain paperclip without quick actions", () => {
+  it("keeps the + alone without quick actions", () => {
     render(<ChatMessageInput onSend={vi.fn()} onUploadAttachment={vi.fn()} />);
 
     expect(screen.getByLabelText("Attach a file")).toBeInTheDocument();
-    expect(screen.queryByRole("toolbar")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Actions/ })).toBeNull();
   });
 
   it("shows an action card with one-tap answers to its recipient", async () => {

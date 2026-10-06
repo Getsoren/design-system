@@ -16,7 +16,6 @@ import {
 } from "react";
 import ChatAttachmentTray from "@/components/DataDisplay/Chat/components/ChatAttachmentTray";
 import ChatPill from "@/components/DataDisplay/Chat/components/ChatPill";
-import ChatQuickActionMenu from "@/components/DataDisplay/Chat/components/ChatQuickActionMenu";
 import ChatVoiceRecorder from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
 import { DEFAULT_ATTACHMENT_ACCEPT, DEFAULT_MAX_ATTACHMENT_SIZE, DEFAULT_MAX_ATTACHMENTS } from "@/components/DataDisplay/Chat/constants";
 import useChatAttachmentUploads, { type ChatPendingAttachment } from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
@@ -25,7 +24,6 @@ import type { ChatMessageInputHandle, ChatMessageInputProps } from "@/components
 import createVoiceFile from "@/components/DataDisplay/Chat/utils/createVoiceFile";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
 import AttachFileIcon from "@/components/DataDisplay/Icons/AttachFileIcon";
-import PlusIcon from "@/components/DataDisplay/Icons/PlusIcon";
 
 const RADIUS = 15;
 const COUNTER_VISIBLE_FROM = 40;
@@ -65,7 +63,6 @@ const ChatMessageInput = (
   const voiceRequestRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [quickActionsAnchor, setQuickActionsAnchor] = useState<HTMLElement | null>(null);
   const hasQuickActions = !!quickActions?.length;
   const chatLabels = useChatLabels(labels);
   const uploads = useChatAttachmentUploads({ accept: attachmentAccept, maxAttachmentSize, maxAttachments, onUploadAttachment });
@@ -290,45 +287,18 @@ const ChatMessageInput = (
         }}
       >
         <Stack direction="row" alignItems="center" spacing={1}>
-          {/* With quick actions the paperclip becomes a "+" whose menu starts with "File or photo" */}
-          {hasQuickActions && (
-            <>
-              <Tooltip title={chatLabels.moreActions}>
-                <IconButton
-                  aria-label={chatLabels.moreActions}
-                  aria-haspopup="menu"
-                  aria-expanded={!!quickActionsAnchor}
-                  onClick={(e) => setQuickActionsAnchor(e.currentTarget)}
-                  data-test="chatQuickActions"
-                  sx={{ height: 44, width: 44 }}
-                >
-                  <PlusIcon />
-                </IconButton>
-              </Tooltip>
-              <ChatQuickActionMenu
-                anchorEl={quickActionsAnchor}
-                onClose={() => setQuickActionsAnchor(null)}
-                actions={quickActions}
-                onAction={(actionId) => onQuickAction?.(actionId)}
-                onPickFile={onUploadAttachment ? () => fileInputRef.current?.click() : undefined}
-                labels={chatLabels}
-              />
-            </>
-          )}
           {onUploadAttachment && (
             <>
-              {!hasQuickActions && (
-                <Tooltip title={chatLabels.attachFile}>
-                  <IconButton
-                    aria-label={chatLabels.attachFile}
-                    onClick={() => fileInputRef.current?.click()}
-                    data-test="chatAttachFile"
-                    sx={{ height: 44, width: 44 }}
-                  >
-                    <AttachFileIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
+              <Tooltip title={chatLabels.attachFile}>
+                <IconButton
+                  aria-label={chatLabels.attachFile}
+                  onClick={() => fileInputRef.current?.click()}
+                  data-test="chatAttachFile"
+                  sx={{ height: 44, width: 44 }}
+                >
+                  <AttachFileIcon />
+                </IconButton>
+              </Tooltip>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -354,6 +324,39 @@ const ChatMessageInput = (
           )}
           {startActions}
         </Stack>
+        {/* Always in sight, as ChatGPT's composer shortcuts: hidden behind a "+" nobody found them. They scroll
+            sideways when the composer is narrow (drawer, tablet); the fading edge hints at the rest. */}
+        {hasQuickActions && (
+          <Stack
+            role="toolbar"
+            aria-label={chatLabels.moreActions}
+            direction="row"
+            alignItems="center"
+            gap={1}
+            data-test="chatQuickActions"
+            sx={{
+              "&::-webkit-scrollbar": { display: "none" },
+              flex: 1,
+              maskImage: "linear-gradient(to right, black calc(100% - 24px), transparent)",
+              minWidth: 0,
+              mx: 1,
+              overflowX: "auto",
+              py: 0.5,
+              scrollbarWidth: "none",
+            }}
+          >
+            {quickActions.map(({ id, label, icon }) => (
+              <ChatPill key={id} onClick={() => onQuickAction?.(id)} disabled={isSending}>
+                {icon && (
+                  <Box component="span" sx={{ color: "text.secondary", display: "inline-flex", fontSize: 18, ml: -0.5 }}>
+                    {icon}
+                  </Box>
+                )}
+                {label}
+              </ChatPill>
+            ))}
+          </Stack>
+        )}
         <Stack direction="row" alignItems="center" spacing={1}>
           {/* The counter only comes out near the limit: shown permanently it taught nothing, hidden
               entirely the input truncated silently. */}

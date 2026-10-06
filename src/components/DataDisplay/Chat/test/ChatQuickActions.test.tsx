@@ -27,25 +27,24 @@ const request: ChatMessage = {
 };
 
 describe("Chat quick actions", () => {
-  it("turns the paperclip into a + menu, the file entry first", () => {
+  it("shows the quick actions as pills next to the paperclip, no click needed", () => {
     const onQuickAction = vi.fn();
     render(<ChatMessageInput onSend={vi.fn()} onUploadAttachment={vi.fn()} quickActions={quickActions} onQuickAction={onQuickAction} />);
 
-    expect(screen.queryByLabelText("Attach a file")).toBeNull();
-    fireEvent.click(screen.getByLabelText("More actions"));
+    expect(screen.getByLabelText("Attach a file")).toBeInTheDocument();
+    const toolbar = screen.getByRole("toolbar", { name: "Quick actions" });
+    expect(toolbar).toHaveTextContent("Prolonger la location");
+    expect(toolbar).toHaveTextContent("Demander un document");
 
-    const entries = screen.getAllByRole("menuitem").map((item) => item.textContent);
-    expect(entries).toEqual(["File or photo", "Prolonger la location", "Demander un document"]);
-
-    fireEvent.click(screen.getByText("Prolonger la location"));
+    fireEvent.click(screen.getByRole("button", { name: "Prolonger la location" }));
     expect(onQuickAction).toHaveBeenCalledWith("extend");
   });
 
-  it("keeps the paperclip without quick actions", () => {
+  it("keeps a plain paperclip without quick actions", () => {
     render(<ChatMessageInput onSend={vi.fn()} onUploadAttachment={vi.fn()} />);
 
     expect(screen.getByLabelText("Attach a file")).toBeInTheDocument();
-    expect(screen.queryByLabelText("More actions")).toBeNull();
+    expect(screen.queryByRole("toolbar")).toBeNull();
   });
 
   it("shows an action card with one-tap answers to its recipient", async () => {

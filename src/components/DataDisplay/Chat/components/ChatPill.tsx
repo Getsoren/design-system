@@ -30,6 +30,8 @@ const ChatPill = ({ children, onClick, selected, count, disabled }: ChatPillProp
       borderRadius: 999,
       color: selected ? "background.paper" : "text.primary",
       flexShrink: 0,
+      // A ButtonBase is a raw <button>: without this it takes the browser's system font, not the theme's
+      fontFamily: ({ typography }) => typography.fontFamily,
       fontSize: ({ typography }) => typography.body2.fontSize,
       fontWeight: 500,
       gap: 0.75,

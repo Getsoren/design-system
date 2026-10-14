@@ -1,3 +1,4 @@
+import type { SxProps, Theme } from "@mui/material/styles";
 import type { ReactNode } from "react";
 import type { DataAttributes } from "@/types/dataAttributes";
 
@@ -474,6 +475,10 @@ export interface ChatVoiceRecorderProps {
    * Translated strings for the tooltips (record / cancel / send) — falls back to English defaults
    */
   labels?: ChatVoiceRecorderLabels;
+  /**
+   * Shape of its buttons, e.g. to match the composer they sit in. Default: the theme's 44px buttons
+   */
+  buttonSx?: SxProps<Theme>;
 }
 
 /** `data-*` attributes forwarded to the participant dialog's inner controls */

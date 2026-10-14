@@ -31,6 +31,7 @@ export const ChatVoiceRecorder = ({
   onRecorded,
   onError,
   labels,
+  buttonSx,
   isProcessing = false,
   disabled = false,
   autoSubmitOnSilence = false,
@@ -38,6 +39,7 @@ export const ChatVoiceRecorder = ({
   silenceTimeoutMs = 2_500,
 }: ChatVoiceRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
+  const iconButtonSx = [{ height: 44, width: 44 }, ...(Array.isArray(buttonSx) ? buttonSx : [buttonSx])];
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -192,7 +194,7 @@ export const ChatVoiceRecorder = ({
             onClick={start}
             disabled={disabled || isProcessing}
             data-test="chatVoiceStart"
-            sx={{ height: 44, width: 44 }}
+            sx={iconButtonSx}
           >
             {isProcessing ? <CircularProgress size={20} /> : <MicIcon />}
           </IconButton>
@@ -224,12 +226,12 @@ export const ChatVoiceRecorder = ({
         {formatElapsed(elapsedSeconds)}
       </Typography>
       <Tooltip title={labels?.cancel ?? "Cancel"}>
-        <IconButton onClick={() => stop(true)} data-test="chatVoiceCancel" sx={{ height: 44, width: 44 }}>
+        <IconButton onClick={() => stop(true)} data-test="chatVoiceCancel" sx={iconButtonSx}>
           <CloseIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title={labels?.send ?? "Use this recording"}>
-        <IconButton color="primary" onClick={() => stop(false)} data-test="chatVoiceSend" sx={{ height: 44, width: 44 }}>
+        <IconButton color="primary" onClick={() => stop(false)} data-test="chatVoiceSend" sx={iconButtonSx}>
           <CheckIcon />
         </IconButton>
       </Tooltip>

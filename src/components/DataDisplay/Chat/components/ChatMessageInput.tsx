@@ -36,9 +36,11 @@ const BoltIcon = (props: SvgIconProps) => (
   </SvgIcon>
 );
 
-// Rounded like ChatGPT's composer; its 40px round buttons sit 8px from the edge
-const RADIUS = 24;
-const composerIconSx = { "@media (hover: none)": { height: 44, width: 44 }, borderRadius: "50%", height: 40, width: 40 };
+// Concentric corners: the composer is rounded at 20px and its 40px buttons sit 8px from its edges, so they take
+// 20 - 8 = 12px, the slightly square shape of the app's buttons, hugging the composer's corners
+const RADIUS = 20;
+const INNER_RADIUS = "12px";
+const composerIconSx = { "@media (hover: none)": { height: 44, width: 44 }, borderRadius: INNER_RADIUS, height: 40, width: 40 };
 const COUNTER_VISIBLE_FROM = 40;
 
 interface VoiceUpload {
@@ -322,7 +324,7 @@ const ChatMessageInput = (
                   data-test="chatQuickActions"
                   sx={{
                     "&:hover": { backgroundColor: "action.hover", color: "text.primary" },
-                    borderRadius: 999,
+                    borderRadius: INNER_RADIUS,
                     color: quickActionsAnchor ? "text.primary" : "text.secondary",
                     fontFamily: ({ typography }) => typography.fontFamily,
                     fontSize: ({ typography }) => typography.body2.fontSize,
@@ -366,9 +368,10 @@ const ChatMessageInput = (
                 isProcessing={voiceUpload?.status === "uploading"}
                 disabled={isSending}
                 labels={{ cancel: chatLabels.cancelRecording, record: chatLabels.recordVoiceMessage, send: chatLabels.sendVoiceMessage }}
+                buttonSx={composerIconSx}
               />
             )}
-            {/* Send: a black round button with an upward arrow, as ChatGPT */}
+            {/* Send: a black button with an upward arrow, in the corner shape of the others */}
             <IconButton
               {...slotProps?.sendButton}
               aria-label={labels?.send ?? "Send"}

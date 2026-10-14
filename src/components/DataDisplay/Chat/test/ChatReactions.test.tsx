@@ -60,6 +60,53 @@ describe("Chat reactions", () => {
     expect(onToggleReaction).toHaveBeenCalledWith(42, "👍");
   });
 
+  it("puts a thumb up on a double click, never takes it back", () => {
+    const onToggleReaction = vi.fn();
+    const { rerender } = render(
+      <ChatMessageBubble
+        isOwn={false}
+        message={{ ...message, reactions: [] }}
+        participants={participants}
+        currentUserId="me"
+        onToggleReaction={onToggleReaction}
+      />,
+    );
+
+    fireEvent.doubleClick(screen.getByText("Livraison confirmée"));
+    expect(onToggleReaction).toHaveBeenCalledWith(42, "👍");
+
+    // Already mine: a double click leaves it (a fresh bubble, out of the double tap debounce)
+    onToggleReaction.mockClear();
+    rerender(
+      <ChatMessageBubble
+        key="mine"
+        isOwn={false}
+        message={{ ...message, id: 43 }}
+        participants={participants}
+        currentUserId="me"
+        onToggleReaction={onToggleReaction}
+      />,
+    );
+    fireEvent.doubleClick(screen.getByText("Livraison confirmée"));
+    expect(onToggleReaction).not.toHaveBeenCalled();
+  });
+
+  it("leaves the message's controls to their own double click", () => {
+    const onToggleReaction = vi.fn();
+    render(
+      <ChatMessageBubble
+        isOwn={false}
+        message={{ ...message, reactions: [] }}
+        participants={participants}
+        currentUserId="me"
+        onToggleReaction={onToggleReaction}
+      />,
+    );
+
+    fireEvent.doubleClick(screen.getByLabelText("Add a reaction"));
+    expect(onToggleReaction).not.toHaveBeenCalled();
+  });
+
   it("shows the reactions read-only without onToggleReaction", () => {
     render(<ChatMessageBubble isOwn message={{ ...message, authorId: "me" }} currentUserId="me" />);
 

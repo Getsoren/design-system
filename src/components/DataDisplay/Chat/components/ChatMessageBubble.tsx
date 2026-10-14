@@ -32,6 +32,14 @@ import AddReactionIcon from "@/components/DataDisplay/Icons/AddReactionIcon";
 const URL_REGEX = /https?:\/\/\S+/g;
 const LONG_PRESS_MS = 400;
 const LONG_PRESS_TOLERANCE_PX = 8;
+// Instagram's double tap, with a thumb: the usual "noted" on a worksite
+const DOUBLE_TAP_REACTION = "👍";
+const DOUBLE_TAP_MS = 300;
+const DOUBLE_TAP_TOLERANCE_PX = 24;
+// Touch screens may follow a double tap with their own dblclick: both count as one
+const DOUBLE_TAP_DEBOUNCE_MS = 600;
+// A double click there keeps its own meaning (open, play, answer)
+const INTERACTIVE_SELECTOR = "a, button, input, textarea, audio, video, [role='button']";
 
 const toTime = (date: string) => new Date(ensureUtc(date)).getTime();
 
@@ -158,7 +166,9 @@ const ChatMessageBubble = ({
   const isFromTrigger = !!barAnchor && barAnchor !== bodyRef.current;
   const [pickerAnchor, setPickerAnchor] = useState<HTMLElement | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const pressOriginRef = useRef<{ x: number; y: number } | null>(null);
+  const pressOriginRef = useRef<{ time: number; x: number; y: number } | null>(null);
+  const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null);
+  const lastDoubleTapAtRef = useRef(0);
 
   const getTime = formatTime ?? formatMessageTime;
   const formattedTime = getTime(message.createdAt);
@@ -223,7 +233,7 @@ const ChatMessageBubble = ({
       return;
     }
 
-    pressOriginRef.current = { x: e.clientX, y: e.clientY };
+    pressOriginRef.current = { time: Date.now(), x: e.clientX, y: e.clientY };
     longPressTimerRef.current = setTimeout(() => setBarAnchor(bodyRef.current), LONG_PRESS_MS);
   };
 
@@ -232,6 +242,54 @@ const ChatMessageBubble = ({
 
     if (origin && Math.hypot(e.clientX - origin.x, e.clientY - origin.y) > LONG_PRESS_TOLERANCE_PX) {
       cancelLongPress();
+    }
+  };
+
+  // On the message itself (text, card, files), not on one of its controls
+  const isOnMessageBody = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+
+    return !!bodyRef.current?.contains(target) && !target.closest(INTERACTIVE_SELECTOR);
+  };
+
+  /**
+   * Double click or double tap: a thumb up, never a removal (Instagram's double tap only likes)
+   */
+  const reactWithThumb = () => {
+    const now = Date.now();
+
+    if (now - lastDoubleTapAtRef.current < DOUBLE_TAP_DEBOUNCE_MS) {
+      return;
+    }
+
+    lastDoubleTapAtRef.current = now;
+
+    if (!myEmojis.some((emoji) => stripVariationSelectors(emoji) === stripVariationSelectors(DOUBLE_TAP_REACTION))) {
+      toggleReaction(DOUBLE_TAP_REACTION);
+    }
+  };
+
+  const handlePointerUp = (e: PointerEvent) => {
+    const origin = pressOriginRef.current;
+    cancelLongPress();
+
+    // Touch only, and a quick tap: a long press opens the reactions instead
+    if (!origin || Date.now() - origin.time >= LONG_PRESS_MS || !isOnMessageBody(e)) {
+      return;
+    }
+
+    const now = Date.now();
+    const lastTap = lastTapRef.current;
+
+    if (
+      lastTap &&
+      now - lastTap.time < DOUBLE_TAP_MS &&
+      Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < DOUBLE_TAP_TOLERANCE_PX
+    ) {
+      lastTapRef.current = null;
+      reactWithThumb();
+    } else {
+      lastTapRef.current = { time: now, x: e.clientX, y: e.clientY };
     }
   };
 
@@ -260,10 +318,21 @@ const ChatMessageBubble = ({
             e.preventDefault();
           }
         },
+        onDoubleClick: (e: MouseEvent) => {
+          if (isOnMessageBody(e)) {
+            reactWithThumb();
+          }
+        },
+        onMouseDown: (e: MouseEvent) => {
+          // The second click of a double click selects a word: here it reacts instead (a drag still selects)
+          if (e.detail === 2 && isOnMessageBody(e)) {
+            e.preventDefault();
+          }
+        },
         onPointerCancel: cancelLongPress,
         onPointerDown: handlePointerDown,
         onPointerMove: handlePointerMove,
-        onPointerUp: cancelLongPress,
+        onPointerUp: handlePointerUp,
       }
     : {};
 
@@ -284,7 +353,14 @@ const ChatMessageBubble = ({
       {/* The bubble, its smiley on the empty side and the reactions hooked under its corner */}
       <Box
         ref={bodyRef}
-        sx={{ alignSelf: isOwn ? "flex-end" : "flex-start", maxWidth: "100%", pb: hasReactions ? "18px" : 0, position: "relative" }}
+        sx={{
+          alignSelf: isOwn ? "flex-end" : "flex-start",
+          maxWidth: "100%",
+          pb: hasReactions ? "18px" : 0,
+          position: "relative",
+          // A double tap reacts rather than zooming the page
+          ...(canReact && { touchAction: "manipulation" }),
+        }}
       >
         <Stack spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">
           {hasTextBubble && (

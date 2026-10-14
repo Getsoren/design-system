@@ -78,6 +78,8 @@ const ChatMessageInput = (
     quickActions,
     onQuickAction,
     quickReplies,
+    replyTo,
+    onCancelReply,
   }: ChatMessageInputProps,
   ref: ForwardedRef<ChatMessageInputHandle>,
 ) => {
@@ -147,7 +149,7 @@ const ChatMessageInput = (
     }
   };
 
-  useImperativeHandle(ref, () => ({ addFiles }));
+  useImperativeHandle(ref, () => ({ addFiles, focus: () => inputRef.current?.focus() }));
 
   /**
    * The validated take is uploaded on send, then leaves with the text and the files of the composer
@@ -247,6 +249,10 @@ const ChatMessageInput = (
       e.preventDefault();
       handleSend();
     }
+
+    if (e.key === "Escape" && replyTo) {
+      onCancelReply?.();
+    }
   };
 
   /**
@@ -331,6 +337,38 @@ const ChatMessageInput = (
           transition: "border-color 120ms",
         }}
       >
+        {/* The message being answered, 9px inside the composer's corner (1px border + 8px): 20 - 9 = 11 */}
+        {replyTo && (
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            data-test="chatComposerReply"
+            sx={{
+              backgroundColor: "action.hover",
+              borderLeft: "3px solid",
+              borderLeftColor: "text.secondary",
+              borderRadius: INNER_RADIUS,
+              m: 1,
+              mb: 0,
+              pl: 1.5,
+              pr: 0.5,
+              py: 0.75,
+            }}
+          >
+            <Stack flex={1} minWidth={0}>
+              <Typography variant="caption" fontWeight={600} noWrap>
+                {replyTo.authorName}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {replyTo.body}
+              </Typography>
+            </Stack>
+            <IconButton aria-label={chatLabels.cancelReply} onClick={onCancelReply} sx={{ borderRadius: "8px", color: "text.secondary" }}>
+              <ChatLineIcon d={LINE_ICON_PATHS.close} size={16} />
+            </IconButton>
+          </Stack>
+        )}
         <TextField
           fullWidth
           multiline

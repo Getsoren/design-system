@@ -33,11 +33,13 @@ export const LINE_ICON_PATHS = {
   bolt: "M13 2 4 14h7l-1 8 9-12h-7l1-8Z",
   check: "M20 6 9 17l-5-5",
   chevronDown: "m7 10 5 5 5-5",
+  clock: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20ZM12 6v6l4 2",
   close: "M18 6 6 18M6 6l12 12",
   // The order page's own signs, drawn in line: the event flag, "Terminer", "Prolonger", the delivery truck
   flag: "M5 21V4h8.5l.5 2H19v9h-6.5l-.5-2H5",
   mic: "M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0ZM19 10v2a7 7 0 0 1-14 0v-2M12 19v3",
   panelRight: "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM15 3v18",
+  reply: "M9 17 4 12l5-5M20 18v-2a4 4 0 0 0-4-4H4",
   skipForward: "M5 4l10 8-10 8V4ZM19 5v14",
   stopCircle: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20ZM10 9h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z",
   trash: "M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6",

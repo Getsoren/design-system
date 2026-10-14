@@ -1038,6 +1038,52 @@ export const SidePanel: StoryFn = () => (
 );
 
 /**
+ * WhatsApp's answer to a precise message (hover a bubble, then the arrow; a long press on a tablet), the "New messages"
+ * divider where the reader left off, and Airbnb's usual response time above the field.
+ */
+export const RepliesAndUnread: StoryFn = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { authorId: CURRENT_USER_ID, body: "Bonjour, la pelle arrive à quelle heure ?", createdAt: minutesAgo(180), id: "ru-1" },
+    { authorId: "user-1", body: "Livraison prévue à 8 h, le chauffeur appelle 30 min avant.", createdAt: minutesAgo(150), id: "ru-2" },
+    {
+      authorId: CURRENT_USER_ID,
+      body: "Parfait, le portail sera ouvert.",
+      createdAt: minutesAgo(140),
+      id: "ru-3",
+      replyTo: { authorName: "Alice Martin", body: "Livraison prévue à 8 h, le chauffeur appelle 30 min avant.", messageId: "ru-2" },
+    },
+    { authorId: "user-1", body: "La pelle est livrée.", createdAt: minutesAgo(20), id: "ru-4" },
+    { authorId: "user-1", body: "Le bon de livraison est signé, je vous l'envoie.", createdAt: minutesAgo(19), id: "ru-5" },
+  ]);
+
+  return (
+    <ThemeContext.Provider value={{ language: "fr" }}>
+      <Chat height="100vh">
+        <Chat.ConversationDetail
+          threadId="thread-1"
+          participants={[participants[0]]}
+          messages={messages}
+          currentUserId={CURRENT_USER_ID}
+          unreadCount={2}
+          composerNotice="Alice répond en général en 20 min"
+          onDeleteConversation={() => {}}
+          onNewConversation={() => {}}
+          onSendMessage={(_threadId, body, _attachments, replyTo) =>
+            setMessages((previous) => [
+              ...previous,
+              { authorId: CURRENT_USER_ID, body, createdAt: new Date().toISOString(), id: `ru-${Date.now()}`, replyTo },
+            ])
+          }
+          onAddParticipants={() => {}}
+          onToggleReaction={() => {}}
+          labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
+        />
+      </Chat>
+    </ThemeContext.Provider>
+  );
+};
+
+/**
  * French phone numbers in a message become `tel:` links, underlined like the URLs: a tap calls from a tablet.
  */
 export const PhoneNumbers: StoryFn = () => (

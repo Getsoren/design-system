@@ -1,6 +1,7 @@
 import { capitalize, getInitials } from "@getsoren/react-utils";
 import { Theme } from "@mui/material";
 import Box from "@mui/material/Box";
+import ButtonBase from "@mui/material/ButtonBase";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Grow from "@mui/material/Grow";
 import IconButton from "@mui/material/IconButton";
@@ -14,13 +15,14 @@ import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import ChatActionCard from "@/components/DataDisplay/Chat/components/ChatActionCard";
 import ChatEmojiPicker from "@/components/DataDisplay/Chat/components/ChatEmojiPicker";
 import ChatEventMessage from "@/components/DataDisplay/Chat/components/ChatEventMessage";
+import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
 import ChatMessageAttachments from "@/components/DataDisplay/Chat/components/ChatMessageAttachments";
 import ChatReactionBar from "@/components/DataDisplay/Chat/components/ChatReactionBar";
 import ChatReactionSummary from "@/components/DataDisplay/Chat/components/ChatReactionSummary";
 import ChatReadReceipt, { type ChatReadReceiptStatus } from "@/components/DataDisplay/Chat/components/ChatReadReceipt";
-import { DEFAULT_QUICK_REACTIONS, getOwnBubbleBackground } from "@/components/DataDisplay/Chat/constants";
+import { DEFAULT_QUICK_REACTIONS, getOwnBubbleBackground, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
-import type { ChatMessage, ChatMessageBubbleProps, ChatParticipant } from "@/components/DataDisplay/Chat/types";
+import type { ChatMessage, ChatMessageBubbleProps, ChatMessageReply, ChatParticipant } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import { extractUrls } from "@/components/DataDisplay/Chat/utils/extractUrls";
 import formatMessageTime from "@/components/DataDisplay/Chat/utils/formatMessageTime";
@@ -141,6 +143,52 @@ const Bubble = ({ children, isOwn, hasTail }: BubbleProps) => (
   </Paper>
 );
 
+interface ReplyQuoteProps {
+  reply: ChatMessageReply;
+  onJump?: () => void;
+}
+
+/**
+ * WhatsApp-like quote on top of an answer: concentric with the bubble (4px inside its corners, 18 - 4 = 14), a tap
+ * scrolls back to the quoted message
+ */
+const ReplyQuote = ({ reply, onJump }: ReplyQuoteProps) => (
+  <ButtonBase
+    onClick={onJump}
+    disabled={!onJump}
+    data-test="chatReplyQuote"
+    sx={{
+      "&.Mui-disabled": { color: "inherit" },
+      alignItems: "stretch",
+      backgroundColor: "rgba(0, 0, 0, 0.05)",
+      borderLeft: "3px solid",
+      borderLeftColor: "text.secondary",
+      borderRadius: `${BUBBLE_RADIUS - 4}px`,
+      display: "flex",
+      flexDirection: "column",
+      // The bubble's padding (16px, 10px) minus the 4px inset
+      mb: 0.75,
+      mt: "-6px",
+      mx: "-12px",
+      px: 1.5,
+      py: 0.75,
+      textAlign: "left",
+      width: "calc(100% + 24px)",
+    }}
+  >
+    <Typography variant="caption" fontWeight={600} noWrap>
+      {reply.authorName}
+    </Typography>
+    <Typography
+      variant="caption"
+      color="text.secondary"
+      sx={{ display: "-webkit-box", overflow: "hidden", WebkitBoxOrient: "vertical", WebkitLineClamp: 2 }}
+    >
+      {reply.body}
+    </Typography>
+  </ButtonBase>
+);
+
 const TRIGGER = "[data-chat-reaction-trigger]";
 const visible = { opacity: 1, pointerEvents: "auto" } as const;
 
@@ -148,8 +196,23 @@ const visible = { opacity: 1, pointerEvents: "auto" } as const;
 const rowSx = {
   [`& ${TRIGGER}`]: { opacity: 0, pointerEvents: "none", transition: "opacity 100ms" },
   [`&[data-active] ${TRIGGER}, & ${TRIGGER}:focus-visible`]: visible,
+  "@keyframes chatMessageHighlight": { from: { backgroundColor: "rgba(0, 0, 0, 0.08)" }, to: { backgroundColor: "transparent" } },
   "@media (hover: hover)": { [`&:hover ${TRIGGER}`]: visible },
+  // Reached from the quote of an answer: a short flash, as in WhatsApp
+  "&[data-highlight]": { animation: "chatMessageHighlight 1.6s ease-out" },
   WebkitTouchCallout: "none",
+};
+
+// A white chip, so the smiley and the reply read on the grey conversation background
+const toolSx = {
+  "&:hover": { backgroundColor: "background.paper", color: "text.primary" },
+  backgroundColor: "background.paper",
+  border: "1px solid",
+  borderColor: "divider",
+  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
+  color: "text.secondary",
+  height: 32,
+  width: 32,
 };
 
 const ChatMessageBubble = ({
@@ -170,6 +233,8 @@ const ChatMessageBubble = ({
   onActionResponse,
   isFirstInGroup = true,
   isLastInGroup = true,
+  onReply,
+  onJumpToMessage,
 }: ChatMessageBubbleProps) => {
   const chatLabels = useChatLabels(labels);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -193,7 +258,8 @@ const ChatMessageBubble = ({
   // A bare shared link shows as its preview card only, when the app renders one (an order link)
   // ("Commande : https://…" included, the label the order drawer used to prefix)
   const isPreviewOnly = !!afterBubble && /^\s*(?:[^\s:]{1,20}\s?:\s*)?https?:\/\/\S+\s*$/.test(message.body);
-  const hasTextBubble = !(message.action || isPreviewOnly) && (!!message.body.trim() || !attachments.length);
+  const replyTo = message.replyTo;
+  const hasTextBubble = !(message.action || isPreviewOnly) && (!!message.body.trim() || !attachments.length || !!replyTo);
   const myEmojis = currentUserId ? reactions.filter(({ userIds }) => userIds.includes(currentUserId)).map(({ emoji }) => emoji) : [];
 
   const getReadReceipt = (): { status: ChatReadReceiptStatus; label: string } => {
@@ -377,9 +443,21 @@ const ChatMessageBubble = ({
         <Stack spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">
           {hasTextBubble && (
             <Bubble isOwn={isOwn} hasTail={isLastInGroup}>
-              <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-                {renderMessageBody(message.body, chatLabels.callNumber)}
-              </Typography>
+              {replyTo && (
+                <ReplyQuote
+                  reply={replyTo}
+                  onJump={
+                    replyTo.messageId !== undefined && onJumpToMessage
+                      ? () => onJumpToMessage(replyTo.messageId as ChatMessage["id"])
+                      : undefined
+                  }
+                />
+              )}
+              {!!message.body.trim() && (
+                <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                  {renderMessageBody(message.body, chatLabels.callNumber)}
+                </Typography>
+              )}
             </Bubble>
           )}
           {message.action && (
@@ -398,31 +476,36 @@ const ChatMessageBubble = ({
             />
           )}
         </Stack>
-        {canReact && (
-          <IconButton
-            data-chat-reaction-trigger
-            aria-label={chatLabels.addReaction}
-            aria-haspopup="dialog"
-            onClick={(e) => setBarAnchor(e.currentTarget)}
+        {(canReact || onReply) && (
+          // Discreet tools on the empty side of the bubble, revealed on hover: the smiley, then "Reply"
+          <Stack
+            direction={isOwn ? "row-reverse" : "row"}
+            spacing={0.5}
             sx={{
-              // A white chip, so the smiley reads on the grey conversation background
-              "&:hover": { backgroundColor: "background.paper", color: "text.primary" },
-              backgroundColor: "background.paper",
-              border: "1px solid",
-              borderColor: "divider",
-              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
-              color: "text.secondary",
-              height: 32,
               mx: 0.75,
               position: "absolute",
               top: hasReactions ? "calc(50% - 9px)" : "50%",
               transform: "translateY(-50%)",
-              width: 32,
               ...(isOwn ? { right: "100%" } : { left: "100%" }),
             }}
           >
-            <AddReactionIcon sx={{ fontSize: 20 }} />
-          </IconButton>
+            {canReact && (
+              <IconButton
+                data-chat-reaction-trigger
+                aria-label={chatLabels.addReaction}
+                aria-haspopup="dialog"
+                onClick={(e) => setBarAnchor(e.currentTarget)}
+                sx={toolSx}
+              >
+                <AddReactionIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            )}
+            {onReply && (
+              <IconButton data-chat-reaction-trigger aria-label={chatLabels.reply} onClick={() => onReply(message)} sx={toolSx}>
+                <ChatLineIcon d={LINE_ICON_PATHS.reply} />
+              </IconButton>
+            )}
+          </Stack>
         )}
         <ChatReactionSummary
           reactions={reactions}
@@ -439,7 +522,13 @@ const ChatMessageBubble = ({
   );
 
   return (
-    <Box data-test="chatMessage" data-active={!!barAnchor || !!pickerAnchor || undefined} sx={rowSx} {...reactionHandlers}>
+    <Box
+      data-test="chatMessage"
+      data-message-id={message.id}
+      data-active={!!barAnchor || !!pickerAnchor || undefined}
+      sx={rowSx}
+      {...reactionHandlers}
+    >
       {/* Airbnb-like runs: the time once under my last message, with its ticks; the author's name and the time once
           above theirs, their avatar next to the last one */}
       {isOwn ? (
@@ -531,6 +620,13 @@ const ChatMessageBubble = ({
                           setBarAnchor(null);
                           setPickerAnchor(bodyRef.current);
                         }}
+                        onReply={
+                          onReply &&
+                          (() => {
+                            setBarAnchor(null);
+                            onReply(message);
+                          })
+                        }
                       />
                     </div>
                   </ClickAwayListener>

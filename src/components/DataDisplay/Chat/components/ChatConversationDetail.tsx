@@ -19,8 +19,14 @@ import ChatReadOnlyBar from "@/components/DataDisplay/Chat/components/ChatReadOn
 import { CHAT_HEADER_HEIGHT, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import useFileDrop from "@/components/DataDisplay/Chat/hooks/useFileDrop";
-import type { ChatConversationDetailProps, ChatMessage, ChatMessageInputHandle } from "@/components/DataDisplay/Chat/types";
+import type {
+  ChatConversationDetailProps,
+  ChatMessage,
+  ChatMessageInputHandle,
+  ChatMessageReply,
+} from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
+import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";
 import ChatBubbleIcon from "@/components/DataDisplay/Icons/ChatBubbleIcon";
 import Button from "@/components/Inputs/Button/Button";
 
@@ -53,6 +59,19 @@ const SCROLL_BUTTON_THRESHOLD_PX = 240;
 // Messages of one author within this delay form one run: one name, one time, one avatar
 const GROUP_WINDOW_MS = 5 * 60 * 1000;
 const ASIDE_WIDTH = 360;
+// The unread divider sits a little below the top when the thread opens on it
+const UNREAD_DIVIDER_OFFSET_PX = 24;
+const HIGHLIGHT_MS = 1600;
+
+/**
+ * The first of the last `unreadCount` messages from the others: where the reader left off
+ */
+const getFirstUnreadId = (messages: ChatMessage[], currentUserId: string, unreadCount = 0) => {
+  const fromOthers = messages.filter(({ authorId, event }) => authorId !== currentUserId && !event);
+  const count = Math.min(unreadCount, fromOthers.length);
+
+  return count ? fromOthers[fromOthers.length - count].id : null;
+};
 
 const isSameDay = (a: string, b: string): boolean => {
   const da = new Date(ensureUtc(a));
@@ -166,6 +185,8 @@ const ChatConversationDetail = ({
   quickReplies,
   aside,
   asideTitle,
+  unreadCount,
+  composerNotice,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<{ threadId?: string; value: MessagesFilter }>({ value: "all" });
@@ -181,6 +202,17 @@ const ChatConversationDetail = ({
   const isWide = useMediaQuery(breakpoints.up("lg"));
   const [asideChoice, setAsideChoice] = useState<boolean | null>(null);
   const isAsideOpen = !!aside && (asideChoice ?? isWide);
+  // The message being answered, for this thread only
+  const [reply, setReply] = useState<{ threadId?: string; value: ChatMessageReply } | null>(null);
+  const activeReply = reply && reply.threadId === threadId ? reply.value : null;
+  // Where the reader left off, fixed when the thread opens: reading it must not move the divider
+  const [unreadMarker, setUnreadMarker] = useState<{ threadId?: string; messageId: ChatMessage["id"] | null } | null>(null);
+
+  if (threadId && messages && !isLoading && unreadMarker?.threadId !== threadId) {
+    setUnreadMarker({ messageId: getFirstUnreadId(messages, currentUserId, unreadCount), threadId });
+  }
+
+  const unreadMessageId = unreadMarker && unreadMarker.threadId === threadId ? unreadMarker.messageId : null;
   const messageInputRef = useRef<ChatMessageInputHandle>(null);
   const chatLabels = useChatLabels(labels);
   // Files dropped anywhere on the conversation join the composer
@@ -226,7 +258,13 @@ const ChatConversationDetail = ({
     previousThreadIdRef.current = threadId;
     previousLastMessageIdRef.current = lastMessageId;
 
-    if (isNewView) {
+    const unreadDivider = scrollContainerRef.current?.querySelector<HTMLElement>("[data-unread-divider]");
+
+    if (isNewView && unreadDivider && scrollContainerRef.current) {
+      // WhatsApp-like: the thread opens on the first unread message
+      scrollContainerRef.current.scrollTop = unreadDivider.offsetTop - UNREAD_DIVIDER_OFFSET_PX;
+      handleScroll();
+    } else if (isNewView) {
       scrollToBottom("instant");
     } else if (isNewMessage && (isAtBottomRef.current || lastMessage?.authorId === currentUserId)) {
       scrollToBottom("smooth");
@@ -277,8 +315,53 @@ const ChatConversationDetail = ({
     return () => observer.disconnect();
   }, [threadId, isLoading]);
 
+  /**
+   * The quote of an answer: the author's name ("You" for mine) and the text, or a word for a file, a voice message or
+   * a request card
+   */
+  const toReply = (message: ChatMessage): ChatMessageReply => {
+    const author = participants?.find(({ userId }) => userId === message.authorId);
+    const voice = message.attachments?.find(({ mimeType }) => mimeType.startsWith("audio/"));
+    const body =
+      message.body.trim() ||
+      message.action?.title ||
+      (voice ? chatLabels.voiceMessage : message.attachments?.map(({ fileName }) => fileName).join(", ")) ||
+      "";
+
+    return {
+      authorName:
+        message.authorId === currentUserId ? chatLabels.you : author ? formatParticipantNames([author], formatParticipantName) : "",
+      body: body.replace(/\s+/g, " "),
+      messageId: message.id,
+    };
+  };
+
+  const handleReply = (message: ChatMessage) => {
+    setReply({ threadId, value: toReply(message) });
+    messageInputRef.current?.focus();
+  };
+
+  /**
+   * Back to a quoted message: brought to the middle of the list and flashed
+   */
+  const jumpToMessage = (messageId: ChatMessage["id"]) => {
+    const row = Array.from(scrollContainerRef.current?.querySelectorAll<HTMLElement>("[data-message-id]") ?? []).find(
+      (element) => element.dataset.messageId === String(messageId),
+    );
+
+    if (!row) {
+      return;
+    }
+
+    row.scrollIntoView({ behavior: "smooth", block: "center" });
+    row.setAttribute("data-highlight", "");
+    setTimeout(() => row.removeAttribute("data-highlight"), HIGHLIGHT_MS);
+  };
+
   const renderMessage = (message: ChatMessage, position?: Pick<MessageRow, "isFirstInGroup" | "isLastInGroup">) => (
     <ChatMessageBubble
+      onReply={readOnly || message.event ? undefined : handleReply}
+      onJumpToMessage={jumpToMessage}
       isFirstInGroup={position?.isFirstInGroup}
       isLastInGroup={position?.isLastInGroup}
       message={message}
@@ -391,6 +474,17 @@ const ChatConversationDetail = ({
 
                   return (
                     <Stack key={message.id} spacing={2} sx={{ mt: getRowGap(row, index) }}>
+                      {message.id === unreadMessageId && (
+                        <Divider
+                          data-unread-divider
+                          data-test="chatUnreadDivider"
+                          sx={{ "& .MuiDivider-wrapper": { px: 1.5 }, "&::after, &::before": { borderTopColor: "text.disabled" } }}
+                        >
+                          <Typography variant="caption" fontWeight={600} color="text.primary" lineHeight={1}>
+                            {chatLabels.newMessages}
+                          </Typography>
+                        </Divider>
+                      )}
                       {showDayDivider && (
                         // Centered text rather than a full-width line: the ::before/::after keep their
                         // flex (centering) but lose their line.
@@ -469,13 +563,41 @@ const ChatConversationDetail = ({
             </ButtonBase>
           )}
         </Box>
+        {composerNotice && !readOnly && (
+          // Airbnb-like: what to expect from the other side, right above the field
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            spacing={0.75}
+            data-test="chatComposerNotice"
+            sx={{ pt: 1, px: 3 }}
+          >
+            <ChatLineIcon d={LINE_ICON_PATHS.clock} size={14} sx={{ color: "text.secondary" }} />
+            <Typography variant="caption" color="text.secondary">
+              {composerNotice}
+            </Typography>
+          </Stack>
+        )}
         {readOnly ? (
           <ChatReadOnlyBar readOnly={readOnly} actionLabel={readOnly.actionLabel ?? chatLabels.joinConversation} />
         ) : (
           <ChatMessageInput
             ref={messageInputRef}
             // Without files, the exact same call as before: (threadId, body)
-            onSend={(body, attachments) => (attachments ? onSendMessage(threadId, body, attachments) : onSendMessage(threadId, body))}
+            onSend={(body, attachments) => {
+              // Without a quote, the exact same call as before: (threadId, body) or (threadId, body, attachments)
+              if (activeReply) {
+                onSendMessage(threadId, body, attachments, activeReply);
+                setReply(null);
+              } else if (attachments) {
+                onSendMessage(threadId, body, attachments);
+              } else {
+                onSendMessage(threadId, body);
+              }
+            }}
+            replyTo={activeReply}
+            onCancelReply={() => setReply(null)}
             labels={{ ...chatLabels, enterToSend: labels?.enterToSend, send: labels?.send, writeAMessage: labels?.writeAMessage }}
             autoFocusKey={threadId}
             isSending={isSending}

@@ -82,6 +82,15 @@ export interface ChatQuickAction {
   icon?: ReactNode;
 }
 
+/** The message an answer quotes, WhatsApp-like */
+export interface ChatMessageReply {
+  /** To scroll back to it; unknown when it cannot be found any more */
+  messageId?: string | number;
+  authorName: string;
+  /** Its text, or a word standing for a file, a voice message or a request card */
+  body: string;
+}
+
 export interface ChatMessage {
   id: string | number;
   authorId: string;
@@ -91,6 +100,8 @@ export interface ChatMessage {
   reactions?: ChatReaction[] | null;
   event?: ChatMessageEvent | null;
   action?: ChatMessageAction | null;
+  /** The message this one answers, quoted on top of its bubble */
+  replyTo?: ChatMessageReply | null;
 }
 
 /** May return a promise: the button then spins until it settles */
@@ -205,6 +216,11 @@ export interface ChatReadReceiptLabels {
 export interface ChatThreadLabels {
   /** Floating button back to the end of the conversation, with the count of messages received meanwhile */
   scrollToLatest?: string;
+  /** Answer a precise message, quoting it */
+  reply?: string;
+  cancelReply?: string;
+  /** Divider above the first message received since the last visit */
+  newMessages?: string;
 }
 
 export interface ChatEventLabels {
@@ -321,7 +337,8 @@ export interface ChatConversationDetailProps {
   currentUserId: string;
   onDeleteConversation: (threadId: string) => void;
   onNewConversation: () => void;
-  onSendMessage: (threadId: string, body: string, attachments?: ChatAttachment[]) => void;
+  /** `replyTo`: the quoted message, only when the user answers a precise one */
+  onSendMessage: (threadId: string, body: string, attachments?: ChatAttachment[], replyTo?: ChatMessageReply) => void;
   onAddParticipants: (participants: ChatSearchUser[]) => void | Promise<unknown>;
   onSearchParticipants?: (query: string) => void;
   searchResults?: ChatSearchUser[];
@@ -382,6 +399,13 @@ export interface ChatConversationDetailProps {
   aside?: ReactNode;
   /** The side panel's title, also its header button's name */
   asideTitle?: string;
+  /**
+   * Unread messages when the thread was opened: a "New messages" divider above the first of them, where the thread
+   * opens. Pass the count taken before it is marked read
+   */
+  unreadCount?: number;
+  /** A line above the composer, e.g. the other side's usual response time (Airbnb) */
+  composerNotice?: ReactNode;
 }
 
 export interface ChatMessageBubbleLabels
@@ -415,6 +439,10 @@ export interface ChatMessageBubbleProps {
   isFirstInGroup?: boolean;
   /** Closes a run: the avatar, the bubble's pointed corner and, under my messages, the time and the ticks. Default true */
   isLastInGroup?: boolean;
+  /** Shows "Reply" next to the smiley and in the long-press bar */
+  onReply?: (message: ChatMessage) => void;
+  /** A tap on the quote of an answer */
+  onJumpToMessage?: (messageId: ChatMessage["id"]) => void;
 }
 
 /** `data-*` attributes forwarded to the message input's inner controls */
@@ -425,9 +453,13 @@ export interface ChatMessageInputSlotProps {
 /** Imperative handle of the message input, e.g. to feed it files dropped elsewhere */
 export interface ChatMessageInputHandle {
   addFiles: (files: File[]) => void;
+  focus: () => void;
 }
 
 export interface ChatMessageInputProps {
+  /** The message being answered: quoted in the composer, until sent or cancelled */
+  replyTo?: ChatMessageReply | null;
+  onCancelReply?: () => void;
   onSend: (message: string, attachments?: ChatAttachment[]) => void;
   labels?: ChatMessageInputLabels;
   autoFocusKey?: string;

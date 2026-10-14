@@ -1,7 +1,8 @@
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
-import { EMOJI_FONT_FAMILY } from "@/components/DataDisplay/Chat/constants";
+import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
+import { EMOJI_FONT_FAMILY, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import PlusIcon from "@/components/DataDisplay/Icons/PlusIcon";
 
@@ -12,6 +13,8 @@ interface ChatReactionBarProps {
   labels: ChatLabels;
   onToggle: (emoji: string) => void;
   onAdd: (anchor: HTMLElement) => void;
+  /** After "+": answer this message, the long press's way to "Reply" on a touch screen */
+  onReply?: () => void;
 }
 
 // Pill 48px high (40px buttons + 4px inset): every round button inside is concentric with its ends
@@ -32,7 +35,7 @@ const emojiButtonSx = {
 /**
  * Instagram-like pill above a message (smiley, long press): one-tap reactions, then "+" for the full emoji picker.
  */
-const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: ChatReactionBarProps) => (
+const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd, onReply }: ChatReactionBarProps) => (
   <Paper
     elevation={0}
     data-test="chatReactionBar"
@@ -84,6 +87,26 @@ const ChatReactionBar = ({ quickReactions, myEmojis, labels, onToggle, onAdd }: 
         <PlusIcon sx={{ fontSize: 20 }} />
       </IconButton>
     </Tooltip>
+    {onReply && (
+      <Tooltip title={labels.reply}>
+        <IconButton
+          aria-label={labels.reply}
+          onClick={onReply}
+          sx={{
+            "@media (hover: none)": { height: 44, width: 44 },
+            "&:hover": { backgroundColor: "action.selected" },
+            backgroundColor: "action.hover",
+            borderRadius: "50%",
+            color: "text.secondary",
+            height: 36,
+            ml: 0.5,
+            width: 36,
+          }}
+        >
+          <ChatLineIcon d={LINE_ICON_PATHS.reply} />
+        </IconButton>
+      </Tooltip>
+    )}
   </Paper>
 );
 

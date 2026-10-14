@@ -161,8 +161,6 @@ const ReplyQuote = ({ reply, onJump }: ReplyQuoteProps) => (
       "&.Mui-disabled": { color: "inherit" },
       alignItems: "stretch",
       backgroundColor: "rgba(0, 0, 0, 0.05)",
-      borderLeft: "3px solid",
-      borderLeftColor: "text.secondary",
       borderRadius: `${BUBBLE_RADIUS - 4}px`,
       display: "flex",
       flexDirection: "column",

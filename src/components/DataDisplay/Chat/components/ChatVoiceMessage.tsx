@@ -3,7 +3,8 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
-import { getOwnBubbleBackground } from "@/components/DataDisplay/Chat/constants";
+import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
+import { getOwnBubbleBackground, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatAttachment } from "@/components/DataDisplay/Chat/types";
 import PauseRoundedIcon from "@/components/DataDisplay/Icons/PauseRoundedIcon";
@@ -30,6 +31,9 @@ interface ChatVoiceMessageProps {
   isOwn?: boolean;
   /** "composer": a take waiting to be sent, inside the composer's white card rather than as a sent bubble */
   variant?: "bubble" | "composer";
+  /** In the composer: a trash button at the end of the pill, as tall as the play button */
+  onRemove?: () => void;
+  removeLabel?: string;
   labels: ChatLabels;
 }
 
@@ -64,7 +68,7 @@ const getWaveform = (id: string): number[] => {
  * A voice message as a bubble: play / pause button, waveform filling up with the playback (a click moves the
  * playhead), the duration then the elapsed time.
  */
-const ChatVoiceMessage = ({ attachment, isOwn, labels, variant = "bubble" }: ChatVoiceMessageProps) => {
+const ChatVoiceMessage = ({ attachment, isOwn, labels, variant = "bubble", onRemove, removeLabel }: ChatVoiceMessageProps) => {
   const isInComposer = variant === "composer";
   const audioRef = useRef<HTMLAudioElement>(null);
   // MediaRecorder webm files have no duration in their header: seeking far away makes the browser compute it
@@ -196,8 +200,8 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels, variant = "bubble" }: Cha
         gap: 1.25,
         maxWidth: "100%",
         p: `${isInComposer ? COMPOSER_INSET : BUTTON_INSET}px`,
-        pr: 1.5,
-        width: 260,
+        pr: onRemove ? `${COMPOSER_INSET}px` : 1.5,
+        width: onRemove ? 300 : 260,
       }}
     >
       <IconButton
@@ -262,6 +266,23 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels, variant = "bubble" }: Cha
       >
         {duration || hasStarted ? formatDuration(hasStarted ? currentTime : Math.max(1, Math.round(duration))) : ""}
       </Typography>
+      {onRemove && (
+        <IconButton
+          aria-label={removeLabel}
+          title={removeLabel}
+          onClick={onRemove}
+          sx={{
+            "&:hover": { backgroundColor: "action.hover", color: "text.primary" },
+            borderRadius: `${COMPOSER_RADIUS - COMPOSER_INSET}px`,
+            color: "text.secondary",
+            flexShrink: 0,
+            height: COMPOSER_BUTTON_SIZE,
+            width: COMPOSER_BUTTON_SIZE,
+          }}
+        >
+          <ChatLineIcon d={LINE_ICON_PATHS.trash} />
+        </IconButton>
+      )}
       {/* biome-ignore lint/a11y/useMediaCaption: a voice message has no caption track */}
       <audio
         ref={audioRef}

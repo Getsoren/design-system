@@ -4,7 +4,6 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import type { Theme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import {
   type ClipboardEvent,
@@ -62,8 +61,31 @@ const composerToolSx = (isActive: boolean) => ({
   whiteSpace: "nowrap",
 });
 
-// The bolt's outline length in its 24px grid (six strokes), for its draw-in
-const BOLT_PATH_LENGTH = 61;
+/**
+ * The bolt as a mask over the landing's ember: the composer's line (1.25px at 20px), its colour the button's, and a
+ * warm 48° band parked off it until a hover sends it across, as on the Soren logo of getsoren.ai
+ */
+const BOLT_MASK = `url("data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='${LINE_ICON_PATHS.bolt}' fill='none' stroke='black' stroke-width='${(1.25 * 24) / 20}' stroke-linecap='round' stroke-linejoin='round'/></svg>`,
+)}")`;
+const boltEmberSx = {
+  backgroundColor: "currentColor",
+  backgroundImage:
+    "linear-gradient(48deg, rgba(247, 78, 0, 0) 36%, rgba(247, 78, 0, 0.85) 44%, #ff9a4d 50%, rgba(247, 78, 0, 0.85) 56%, rgba(247, 78, 0, 0) 64%)",
+  backgroundPosition: "140% -40%",
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "300% 300%",
+  display: "block",
+  flexShrink: 0,
+  height: 20,
+  maskImage: BOLT_MASK,
+  maskRepeat: "no-repeat",
+  maskSize: "contain",
+  WebkitMaskImage: BOLT_MASK,
+  WebkitMaskRepeat: "no-repeat",
+  WebkitMaskSize: "contain",
+  width: 20,
+};
 const BUTTON_INSET = 9;
 const INNER_RADIUS = `${RADIUS - BUTTON_INSET}px`;
 const composerIconSx = { "@media (hover: none)": { height: 44, width: 44 }, borderRadius: INNER_RADIUS, height: 40, width: 40 };
@@ -357,18 +379,16 @@ const ChatMessageInput = (
       >
         {/* A validated take waits inside the white card, not above it: it is not sent yet */}
         {pendingVoice && (
-          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ m: 1, mb: 0 }} data-test="chatPendingVoice">
-            <ChatVoiceMessage attachment={pendingVoice.preview} variant="composer" labels={chatLabels} />
-            <Tooltip title={chatLabels.removeAttachment}>
-              <IconButton
-                aria-label={chatLabels.removeAttachment}
-                onClick={discardVoice}
-                sx={{ ...composerIconSx, color: "text.secondary" }}
-              >
-                <ChatLineIcon d={LINE_ICON_PATHS.trash} />
-              </IconButton>
-            </Tooltip>
-          </Stack>
+          // The trash at the end of the take's own pill: one block, one height
+          <Box sx={{ m: 1, mb: 0 }} data-test="chatPendingVoice">
+            <ChatVoiceMessage
+              attachment={pendingVoice.preview}
+              variant="composer"
+              labels={chatLabels}
+              onRemove={discardVoice}
+              removeLabel={chatLabels.removeAttachment}
+            />
+          </Box>
         )}
         {/* The message being answered, 9px inside the composer's corner (1px border + 8px): 20 - 9 = 11 */}
         {replyTo && (
@@ -379,8 +399,6 @@ const ChatMessageInput = (
             data-test="chatComposerReply"
             sx={{
               backgroundColor: "action.hover",
-              borderLeft: "3px solid",
-              borderLeftColor: "text.secondary",
               borderRadius: INNER_RADIUS,
               m: 1,
               mb: 0,
@@ -465,26 +483,16 @@ const ChatMessageInput = (
                   data-test="chatQuickActions"
                   sx={{
                     ...composerToolSx(!!quickActionsAnchor),
-                    // A little life on the bolt: drawn once when the composer appears, a zap on hover
-                    "@keyframes chatBoltDraw": { to: { strokeDashoffset: 0 } },
-                    "@keyframes chatBoltZap": {
-                      "0%, 100%": { transform: "rotate(0) scale(1)" },
-                      "30%": { transform: "rotate(-12deg) scale(1.15)" },
-                      "60%": { transform: "rotate(8deg) scale(1.1)" },
-                    },
+                    // The landing's logo ember: one warm pass across the bolt on hover, then it settles back
+                    "@keyframes chatBoltEmber": { from: { backgroundPosition: "140% -40%" }, to: { backgroundPosition: "-40% 140%" } },
                     "@media (prefers-reduced-motion: reduce)": {
-                      "& [data-bolt], & [data-bolt] path": { animation: "none", strokeDashoffset: 0 },
+                      "& [data-bolt]": { animation: "none !important", backgroundImage: "none" },
                     },
-                    "& [data-bolt] path": {
-                      animation: "chatBoltDraw 700ms ease-out 300ms forwards",
-                      strokeDasharray: BOLT_PATH_LENGTH,
-                      strokeDashoffset: BOLT_PATH_LENGTH,
-                    },
-                    "&:hover [data-bolt]": { animation: "chatBoltZap 420ms ease-in-out" },
+                    "&:hover [data-bolt]": { animation: "chatBoltEmber 900ms cubic-bezier(0.4, 0, 0.3, 1) 1" },
                   }}
                 >
                   {/* Order actions: a lightning bolt, not the AI assistant's spark */}
-                  <ChatLineIcon d={LINE_ICON_PATHS.bolt} size={ICON_SIZE} data-bolt />
+                  <Box component="span" data-bolt sx={boltEmberSx} />
                   <span data-label>{chatLabels.moreActions}</span>
                   <ChatLineIcon
                     d={LINE_ICON_PATHS.chevronDown}

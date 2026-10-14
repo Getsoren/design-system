@@ -13,8 +13,9 @@ import PlayArrowRoundedIcon from "@/components/DataDisplay/Icons/PlayArrowRounde
 const BAR_COUNT = 32;
 const KEYBOARD_STEP = 0.05;
 // Same shape as the text bubble: 16px corners, the 5px tail on the author's side
-const BUBBLE_RADIUS = 16;
-const TAIL_RADIUS = 5;
+// As the text bubbles: the design system's borderRadiusL, the pointed corner at its borderRadiusS
+const BUBBLE_RADIUS = 12;
+const TAIL_RADIUS = 4;
 // Even inset around the button, so its corners are concentric with the bubble's (inner = outer - inset)
 const BUTTON_INSET = 6;
 const BUTTON_SIZE = 44;

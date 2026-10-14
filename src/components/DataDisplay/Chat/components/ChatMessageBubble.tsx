@@ -119,8 +119,10 @@ interface BubbleProps {
   hasTail?: boolean;
 }
 
-const BUBBLE_RADIUS = 18;
-const TAIL_RADIUS = 6;
+// The design system's scale: a bubble is rounded as its cards (borderRadiusL), its pointed corner as its small radius
+// (borderRadiusS)
+const BUBBLE_RADIUS = 12;
+const TAIL_RADIUS = 4;
 const AVATAR_SIZE = 28;
 // A reading column rather than the whole width: long messages wrap as in Airbnb's or WhatsApp's threads
 const MESSAGE_MAX_WIDTH = { sm: "min(75%, 560px)", xs: "85%" };
@@ -149,7 +151,8 @@ interface ReplyQuoteProps {
 }
 
 /**
- * WhatsApp-like quote on top of an answer: concentric with the bubble (4px inside its corners, 18 - 4 = 14), a tap
+ * WhatsApp-like quote on top of an answer: concentric with the bubble (4px inside its corners, 12 - 4 = 8, the design
+ * system's base radius), a tap
  * scrolls back to the quoted message
  */
 const ReplyQuote = ({ reply, onJump }: ReplyQuoteProps) => (

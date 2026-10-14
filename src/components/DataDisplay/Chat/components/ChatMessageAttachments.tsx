@@ -90,7 +90,8 @@ const ChatMessageAttachments = ({ message, attachments, labels, isOwn, onLinkAtt
                 sx={{
                   aspectRatio: images.length === 1 ? getSingleImageSize(image).aspectRatio : isWide ? "2 / 1" : "1",
                   backgroundColor: ({ palette }) => (palette.mode === "dark" ? "grey.800" : "grey.100"),
-                  borderRadius: 2,
+                  // As the bubbles: the design system's borderRadiusL
+                  borderRadius: "12px",
                   gridColumn: isWide ? "span 2" : undefined,
                   overflow: "hidden",
                   position: "relative",

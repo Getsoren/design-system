@@ -1,14 +1,10 @@
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { useContext, useState } from "react";
-import ChatAttachmentLinkAction from "@/components/DataDisplay/Chat/components/ChatAttachmentLinkAction";
-import ChatFileCard, { FILE_CARD_VISUAL_SIZE } from "@/components/DataDisplay/Chat/components/ChatFileCard";
-import type { ChatPendingAttachment, ChatRejectedFile } from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
+import { useContext } from "react";
+import type { ChatRejectedFile } from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
-import type { ChatAttachmentLink, ChatLinkAttachment } from "@/components/DataDisplay/Chat/types";
 import formatFileSize from "@/components/DataDisplay/Chat/utils/formatFileSize";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import InfoIcon from "@/components/DataDisplay/Icons/InfoIcon";
@@ -16,62 +12,22 @@ import RefreshIcon from "@/components/DataDisplay/Icons/RefreshIcon";
 import { ThemeContext } from "@/context/Theme/ThemeProvider";
 
 interface ChatAttachmentTrayProps {
-  items: ChatPendingAttachment[];
   rejectedFiles: ChatRejectedFile[];
   labels: ChatLabels;
   maxAttachments: number;
   maxAttachmentSize: number;
-  onRemove: (key: string) => void;
-  onRetry: (key: string) => void;
-  onLinkAttachment?: ChatLinkAttachment;
-  onLinked: (key: string, link: ChatAttachmentLink) => void;
   /** A voice message failed to upload: retry it or drop it */
   voiceFailure?: { onRetry: () => void; onDismiss: () => void } | null;
 }
 
-interface TrayPreviewProps {
-  src: string;
-}
-
 /**
- * Square local preview of an image, falling back on the type icon when the browser cannot draw the file
+ * Above the composer, what went wrong with its files: the refused ones, a voice message that failed to upload.
  */
-const TrayPreview = ({ src }: TrayPreviewProps) => {
-  const [isBroken, setIsBroken] = useState(false);
-
-  if (isBroken) {
-    return null;
-  }
-
-  return (
-    <Box
-      component="img"
-      src={src}
-      alt=""
-      onError={() => setIsBroken(true)}
-      sx={{ borderRadius: 1.5, flexShrink: 0, height: FILE_CARD_VISUAL_SIZE, objectFit: "cover", width: FILE_CARD_VISUAL_SIZE }}
-    />
-  );
-};
-
-/**
- * Files waiting in the composer: preview, upload progress, retry, link to an order, and the refused files.
- */
-const ChatAttachmentTray = ({
-  items,
-  rejectedFiles,
-  labels,
-  maxAttachments,
-  maxAttachmentSize,
-  onRemove,
-  onRetry,
-  onLinkAttachment,
-  onLinked,
-  voiceFailure,
-}: ChatAttachmentTrayProps) => {
+const ChatAttachmentTray = ({ rejectedFiles, labels, maxAttachments, maxAttachmentSize, voiceFailure }: ChatAttachmentTrayProps) => {
   const { language } = useContext(ThemeContext);
 
-  if (!(items.length || rejectedFiles.length || voiceFailure)) {
+  // The files themselves sit inside the composer's card (ChatComposerAttachments): only what went wrong shows here
+  if (!(rejectedFiles.length || voiceFailure)) {
     return null;
   }
 
@@ -108,59 +64,6 @@ const ChatAttachmentTray = ({
                 {rejectionReason[reason]} · {fileName}
               </Typography>
             </Stack>
-          ))}
-        </Stack>
-      )}
-      {items.length > 0 && (
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ "& > *": { scrollSnapAlign: "start" }, overflowX: "auto", pb: 0.5, scrollSnapType: "x proximity" }}
-        >
-          {items.map(({ key, file, previewUrl, status, progress, attachment, link }) => (
-            <Box key={key} flexShrink={0} width={272}>
-              <ChatFileCard
-                fileName={file.name}
-                mimeType={file.type}
-                size={file.size}
-                visual={previewUrl ? <TrayPreview src={previewUrl} /> : undefined}
-                progress={status === "uploading" ? progress : undefined}
-                error={status === "error" ? labels.uploadFailed : undefined}
-                actions={
-                  <IconButton
-                    aria-label={`${labels.removeAttachment} ${file.name}`}
-                    onClick={() => onRemove(key)}
-                    sx={{ height: 44, width: 44 }}
-                  >
-                    <CloseIcon sx={{ fontSize: 20 }} />
-                  </IconButton>
-                }
-              >
-                {status === "error" && (
-                  <Button
-                    color="inherit"
-                    startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
-                    onClick={() => onRetry(key)}
-                    sx={{ mb: 0.5, minHeight: 44, ml: 1 }}
-                  >
-                    {labels.retryUpload}
-                  </Button>
-                )}
-                {status === "uploaded" && attachment && onLinkAttachment && (
-                  <ChatAttachmentLinkAction
-                    link={link}
-                    label={labels.linkAttachment}
-                    onLink={async () => {
-                      const nextLink = await onLinkAttachment({ ...attachment, link }, {});
-
-                      if (nextLink) {
-                        onLinked(key, nextLink);
-                      }
-                    }}
-                  />
-                )}
-              </ChatFileCard>
-            </Box>
           ))}
         </Stack>
       )}

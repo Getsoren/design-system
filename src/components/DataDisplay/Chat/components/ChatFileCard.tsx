@@ -29,7 +29,7 @@ export const ChatFileIcon = ({ fileName, mimeType }: ChatFileIconProps) => {
       flexShrink={0}
       sx={{
         backgroundColor: ({ palette }) => (palette.mode === "dark" ? "grey.800" : "grey.100"),
-        borderRadius: 1.5,
+        borderRadius: "8px",
         color: "text.secondary",
         height: FILE_CARD_VISUAL_SIZE,
         width: FILE_CARD_VISUAL_SIZE,
@@ -94,7 +94,8 @@ const ChatFileCard = ({
         backgroundColor: "background.paper",
         border: "1px solid",
         borderColor: error ? "error.main" : "divider",
-        borderRadius: 2,
+        // As the bubbles: the design system's borderRadiusL; inside, its base (8) and small (4) radii
+        borderRadius: "12px",
         color: "text.primary",
         overflow: "hidden",
         position: "relative",
@@ -105,7 +106,7 @@ const ChatFileCard = ({
           <ButtonBase
             onClick={onClick}
             aria-label={onClickLabel ? `${onClickLabel} ${fileName}` : undefined}
-            sx={{ borderRadius: 1.5, flex: 1, gap: 1.5, justifyContent: "flex-start", minHeight: 48, minWidth: 0 }}
+            sx={{ borderRadius: "4px", flex: 1, gap: 1.5, justifyContent: "flex-start", minHeight: 48, minWidth: 0 }}
           >
             {details}
           </ButtonBase>

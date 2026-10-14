@@ -16,6 +16,7 @@ import {
   useState,
 } from "react";
 import ChatAttachmentTray from "@/components/DataDisplay/Chat/components/ChatAttachmentTray";
+import ChatComposerAttachments from "@/components/DataDisplay/Chat/components/ChatComposerAttachments";
 import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
 import ChatPill from "@/components/DataDisplay/Chat/components/ChatPill";
 import ChatQuickActionMenu from "@/components/DataDisplay/Chat/components/ChatQuickActionMenu";
@@ -329,15 +330,10 @@ const ChatMessageInput = (
     // out above it (see the message list's mask)
     <Box sx={{ p: 2 }}>
       <ChatAttachmentTray
-        items={uploads.items}
         rejectedFiles={uploads.rejectedFiles}
         labels={chatLabels}
         maxAttachments={maxAttachments}
         maxAttachmentSize={maxAttachmentSize}
-        onRemove={uploads.remove}
-        onRetry={uploads.retry}
-        onLinkAttachment={onLinkAttachment}
-        onLinked={uploads.setLink}
         voiceFailure={
           voiceUpload?.status === "error"
             ? {
@@ -377,6 +373,15 @@ const ChatMessageInput = (
           transition: "border-color 120ms",
         }}
       >
+        {/* The files about to be sent, inside the white card as ChatGPT's and Claude's */}
+        <ChatComposerAttachments
+          items={uploads.items}
+          labels={chatLabels}
+          onRemove={uploads.remove}
+          onRetry={uploads.retry}
+          onLinkAttachment={onLinkAttachment}
+          onLinked={uploads.setLink}
+        />
         {/* A validated take waits inside the white card, not above it: it is not sent yet */}
         {pendingVoice && (
           // The trash at the end of the take's own pill: one block, one height

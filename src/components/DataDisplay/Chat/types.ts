@@ -190,6 +190,8 @@ export interface ChatVoiceMessageLabels {
   recordVoiceMessage?: string;
   cancelRecording?: string;
   sendVoiceMessage?: string;
+  /** Stops the take and keeps it in the composer, to listen to it before sending */
+  validateRecording?: string;
 }
 
 export interface ChatReadReceiptLabels {
@@ -478,6 +480,10 @@ export interface ChatVoiceRecorderProps {
    * Hard stop: past this duration the take is validated automatically (default 2 min)
    */
   maxDurationMs?: number;
+  /**
+   * Told when a take starts and ends, e.g. to let the validate button stand in the composer's send slot
+   */
+  onRecordingChange?: (isRecording: boolean) => void;
   /**
    * Enables Siri-style auto-send: once the user has started speaking, the take is validated automatically
    * after a trailing silence. Opt-in (default false) so a shared consumer never auto-sends by surprise.

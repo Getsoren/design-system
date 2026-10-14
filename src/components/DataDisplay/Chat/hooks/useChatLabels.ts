@@ -72,6 +72,7 @@ const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
     tooManyFiles: labels?.tooManyFiles ?? t("tooManyFiles"),
     unsupportedFileType: labels?.unsupportedFileType ?? t("unsupportedFileType"),
     uploadFailed: labels?.uploadFailed ?? t("uploadFailed"),
+    validateRecording: labels?.validateRecording ?? t("validateRecording"),
     voiceMessage: labels?.voiceMessage ?? t("voiceMessage"),
     voiceMessageFailed: labels?.voiceMessageFailed ?? t("voiceMessageFailed"),
     you: labels?.you ?? t("you"),

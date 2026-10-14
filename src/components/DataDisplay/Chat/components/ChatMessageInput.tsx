@@ -19,6 +19,7 @@ import ChatAttachmentTray from "@/components/DataDisplay/Chat/components/ChatAtt
 import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
 import ChatPill from "@/components/DataDisplay/Chat/components/ChatPill";
 import ChatQuickActionMenu from "@/components/DataDisplay/Chat/components/ChatQuickActionMenu";
+import ChatVoiceMessage from "@/components/DataDisplay/Chat/components/ChatVoiceMessage";
 import ChatVoiceRecorder from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
 import {
   DEFAULT_ATTACHMENT_ACCEPT,
@@ -28,7 +29,7 @@ import {
 } from "@/components/DataDisplay/Chat/constants";
 import useChatAttachmentUploads, { type ChatPendingAttachment } from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
-import type { ChatMessageInputHandle, ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
+import type { ChatAttachment, ChatMessageInputHandle, ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
 import createVoiceFile from "@/components/DataDisplay/Chat/utils/createVoiceFile";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
 import PlusIcon from "@/components/DataDisplay/Icons/PlusIcon";
@@ -44,7 +45,17 @@ const COUNTER_VISIBLE_FROM = 40;
 interface VoiceUpload {
   file: File;
   durationMs: number;
+  /** The text and files sent with it, kept for a retry */
+  body: string;
+  attachments: ChatAttachment[];
   status: "uploading" | "error";
+}
+
+/** A validated take waiting in the composer: listened to, removed or sent */
+interface PendingVoice {
+  file: File;
+  durationMs: number;
+  preview: ChatAttachment;
 }
 
 const ChatMessageInput = (
@@ -72,6 +83,9 @@ const ChatMessageInput = (
 ) => {
   const [message, setMessage] = useState("");
   const [voiceUpload, setVoiceUpload] = useState<VoiceUpload | null>(null);
+  const [pendingVoice, setPendingVoice] = useState<PendingVoice | null>(null);
+  // While recording, the recorder's validate button stands in the send slot
+  const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   // Bumped by every take and thread switch: a late upload result of a former one is dropped
   const voiceRequestRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -81,9 +95,13 @@ const ChatMessageInput = (
   const chatLabels = useChatLabels(labels);
   const uploads = useChatAttachmentUploads({ accept: attachmentAccept, maxAttachmentSize, maxAttachments, onUploadAttachment });
   // Files alone make a message; an upload still running blocks the send so nothing leaves half-way
-  const canSend = (!!message.trim() || uploads.hasUploaded) && !isSending && !uploads.isUploading;
+  const canSend =
+    (!!message.trim() || uploads.hasUploaded || !!pendingVoice) &&
+    !isSending &&
+    !uploads.isUploading &&
+    voiceUpload?.status !== "uploading";
   // Fi and Noom-like: only offered on an empty composer
-  const showQuickReplies = !!quickReplies?.length && !message && !uploads.items.length && !voiceUpload;
+  const showQuickReplies = !!quickReplies?.length && !message && !uploads.items.length && !voiceUpload && !pendingVoice;
 
   // Files waiting for the link dialog, opened one at a time
   const linkQueueRef = useRef<ChatPendingAttachment[]>([]);
@@ -132,30 +150,65 @@ const ChatMessageInput = (
   useImperativeHandle(ref, () => ({ addFiles }));
 
   /**
-   * A voice message leaves on its own, right after its upload: empty body, the audio as its only attachment
+   * The validated take is uploaded on send, then leaves with the text and the files of the composer
    */
-  const sendVoiceMessage = (file: File, durationMs: number) => {
+  const sendVoiceMessage = (file: File, durationMs: number, body = "", attachments: ChatAttachment[] = []) => {
     if (!onUploadAttachment) {
       return;
     }
 
     voiceRequestRef.current += 1;
     const request = voiceRequestRef.current;
-    setVoiceUpload({ durationMs, file, status: "uploading" });
+    setVoiceUpload({ attachments, body, durationMs, file, status: "uploading" });
 
     onUploadAttachment(file, () => {})
       .then((attachment) => {
         if (request === voiceRequestRef.current) {
           setVoiceUpload(null);
-          onSend("", [{ ...attachment, durationMs: attachment.durationMs ?? durationMs }]);
+          onSend(body, [...attachments, { ...attachment, durationMs: attachment.durationMs ?? durationMs }]);
         }
       })
       .catch(() => {
         if (request === voiceRequestRef.current) {
-          setVoiceUpload({ durationMs, file, status: "error" });
+          setVoiceUpload({ attachments, body, durationMs, file, status: "error" });
         }
       });
   };
+
+  /**
+   * WhatsApp-like: validating a take stops it and keeps it in the composer, to listen to it before sending
+   */
+  const stageVoice = (audio: Blob, durationMs: number) => {
+    const file = createVoiceFile(audio);
+
+    setPendingVoice((previous) => {
+      if (previous) {
+        URL.revokeObjectURL(previous.preview.url);
+      }
+
+      return {
+        durationMs,
+        file,
+        preview: {
+          durationMs,
+          fileName: file.name,
+          id: `voice-${Date.now()}`,
+          mimeType: file.type,
+          size: file.size,
+          url: URL.createObjectURL(file),
+        },
+      };
+    });
+  };
+
+  const discardVoice = () =>
+    setPendingVoice((previous) => {
+      if (previous) {
+        URL.revokeObjectURL(previous.preview.url);
+      }
+
+      return null;
+    });
 
   const handleSend = () => {
     if (!canSend) {
@@ -163,6 +216,13 @@ const ChatMessageInput = (
     }
 
     const attachments = uploads.takeUploaded();
+
+    if (pendingVoice) {
+      sendVoiceMessage(pendingVoice.file, pendingVoice.durationMs, message.trim(), attachments);
+      discardVoice();
+      setMessage("");
+      return;
+    }
 
     // Same call as before when there is no file, for the consumers asserting on the arguments
     if (attachments.length) {
@@ -206,6 +266,7 @@ const ChatMessageInput = (
     uploads.clear();
     voiceRequestRef.current += 1;
     setVoiceUpload(null);
+    discardVoice();
   }, [autoFocusKey]);
 
   return (
@@ -224,10 +285,23 @@ const ChatMessageInput = (
         onLinked={uploads.setLink}
         voiceFailure={
           voiceUpload?.status === "error"
-            ? { onDismiss: () => setVoiceUpload(null), onRetry: () => sendVoiceMessage(voiceUpload.file, voiceUpload.durationMs) }
+            ? {
+                onDismiss: () => setVoiceUpload(null),
+                onRetry: () => sendVoiceMessage(voiceUpload.file, voiceUpload.durationMs, voiceUpload.body, voiceUpload.attachments),
+              }
             : null
         }
       />
+      {pendingVoice && (
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }} data-test="chatPendingVoice">
+          <ChatVoiceMessage attachment={pendingVoice.preview} isOwn labels={chatLabels} />
+          <Tooltip title={chatLabels.removeAttachment}>
+            <IconButton aria-label={chatLabels.removeAttachment} onClick={discardVoice} sx={{ ...composerIconSx, color: "text.secondary" }}>
+              <ChatLineIcon d={LINE_ICON_PATHS.trash} />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      )}
       {showQuickReplies && (
         <Stack
           direction="row"
@@ -361,30 +435,34 @@ const ChatMessageInput = (
             )}
             {enableVoiceMessages && onUploadAttachment && (
               <ChatVoiceRecorder
-                onRecorded={(audio, durationMs) => sendVoiceMessage(createVoiceFile(audio), durationMs)}
+                onRecorded={stageVoice}
+                onRecordingChange={setIsRecordingVoice}
                 isProcessing={voiceUpload?.status === "uploading"}
                 disabled={isSending}
-                labels={{ cancel: chatLabels.cancelRecording, record: chatLabels.recordVoiceMessage, send: chatLabels.sendVoiceMessage }}
+                labels={{ cancel: chatLabels.cancelRecording, record: chatLabels.recordVoiceMessage, send: chatLabels.validateRecording }}
                 buttonSx={composerIconSx}
               />
             )}
-            {/* Send: a black button with an upward arrow, in the corner shape of the others */}
-            <IconButton
-              {...slotProps?.sendButton}
-              aria-label={labels?.send ?? "Send"}
-              title={labels?.send ?? "Send"}
-              onClick={handleSend}
-              disabled={!canSend}
-              sx={{
-                ...composerIconSx,
-                "&:hover": { backgroundColor: "primary.dark" },
-                "&.Mui-disabled": { backgroundColor: "action.disabledBackground", color: "action.disabled" },
-                backgroundColor: "primary.main",
-                color: "primary.contrastText",
-              }}
-            >
-              <ArrowUpwardRoundedIcon sx={{ fontSize: 20 }} />
-            </IconButton>
+            {/* Send: a black button with an upward arrow, in the corner shape of the others; while recording, the
+                recorder's validate button takes its place */}
+            {!isRecordingVoice && (
+              <IconButton
+                {...slotProps?.sendButton}
+                aria-label={labels?.send ?? "Send"}
+                title={labels?.send ?? "Send"}
+                onClick={handleSend}
+                disabled={!canSend}
+                sx={{
+                  ...composerIconSx,
+                  "&:hover": { backgroundColor: "primary.dark" },
+                  "&.Mui-disabled": { backgroundColor: "action.disabledBackground", color: "action.disabled" },
+                  backgroundColor: "primary.main",
+                  color: "primary.contrastText",
+                }}
+              >
+                <ArrowUpwardRoundedIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            )}
           </Stack>
         </Stack>
       </Box>

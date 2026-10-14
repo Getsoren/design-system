@@ -58,6 +58,7 @@ export default {
   tooManyFiles: "Trop de fichiers",
   unsupportedFileType: "Type de fichier non pris en charge",
   uploadFailed: "Échec de l'envoi",
+  validateRecording: "Valider le vocal",
   voiceMessage: "Message vocal",
   voiceMessageFailed: "Échec de l'envoi du vocal",
   week: "Semaine",

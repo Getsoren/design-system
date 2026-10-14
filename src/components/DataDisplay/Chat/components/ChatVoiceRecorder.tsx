@@ -29,6 +29,7 @@ const formatElapsed = (seconds: number): string =>
 export const ChatVoiceRecorder = ({
   onRecorded,
   onError,
+  onRecordingChange,
   labels,
   buttonSx,
   isProcessing = false,
@@ -173,6 +174,11 @@ export const ChatVoiceRecorder = ({
     };
   }, [isRecording, maxDurationMs]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only the take's start and end matter
+  useEffect(() => {
+    onRecordingChange?.(isRecording);
+  }, [isRecording]);
+
   /**
    * Release the microphone if the component unmounts mid-recording
    */
@@ -230,7 +236,19 @@ export const ChatVoiceRecorder = ({
         </IconButton>
       </Tooltip>
       <Tooltip title={labels?.send ?? "Use this recording"}>
-        <IconButton color="primary" onClick={() => stop(false)} data-test="chatVoiceSend" sx={iconButtonSx}>
+        {/* The step's main action, black as the send button it stands in for */}
+        <IconButton
+          onClick={() => stop(false)}
+          data-test="chatVoiceSend"
+          sx={[
+            ...iconButtonSx,
+            {
+              "&:hover": { backgroundColor: "primary.dark" },
+              backgroundColor: "primary.main",
+              color: "primary.contrastText",
+            },
+          ]}
+        >
           <ChatLineIcon d={LINE_ICON_PATHS.check} />
         </IconButton>
       </Tooltip>

@@ -51,10 +51,14 @@ const recordATake = async (container: HTMLElement) => {
   fireEvent.click(screen.getByRole("button", { name: "Record a voice message" }));
   await waitFor(() => expect(container.querySelector('[data-test="chatVoiceSend"]')).not.toBeNull());
   fireEvent.click(container.querySelector('[data-test="chatVoiceSend"]') as HTMLElement);
+  // Validated: the take waits in the composer
+  await waitFor(() => expect(container.querySelector('[data-test="chatPendingVoice"]')).not.toBeNull());
 };
 
 beforeAll(() => {
   Element.prototype.scrollTo = () => {};
+  URL.createObjectURL = () => "blob:preview";
+  URL.revokeObjectURL = () => {};
   vi.stubGlobal("MediaRecorder", FakeMediaRecorder);
   Object.defineProperty(navigator, "mediaDevices", {
     configurable: true,
@@ -99,7 +103,7 @@ describe("Chat voice messages", () => {
     expect(screen.getByText("0:09")).toBeInTheDocument();
   });
 
-  it("uploads a validated take and sends it at once, alone and with an empty body", async () => {
+  it("keeps a validated take in the composer, then uploads and sends it on Send", async () => {
     const onSendMessage = vi.fn();
     const onUploadAttachment = vi.fn((file: File) =>
       Promise.resolve<ChatAttachment>({
@@ -120,6 +124,9 @@ describe("Chat voice messages", () => {
     );
 
     await recordATake(container);
+    expect(onUploadAttachment).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
 
     await waitFor(() => expect(onSendMessage).toHaveBeenCalledTimes(1));
     const [file] = onUploadAttachment.mock.calls[0];
@@ -150,6 +157,7 @@ describe("Chat voice messages", () => {
     );
 
     await recordATake(container);
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
     expect(await screen.findByText("Voice message not sent")).toBeInTheDocument();
     expect(onSendMessage).not.toHaveBeenCalled();
 
@@ -158,6 +166,19 @@ describe("Chat voice messages", () => {
     await waitFor(() => expect(onSendMessage).toHaveBeenCalledWith("t1", "", [expect.objectContaining({ id: "uploaded-voice" })]));
     expect(onUploadAttachment.mock.calls[1][0]).toBe(onUploadAttachment.mock.calls[0][0]);
     expect(screen.queryByText("Voice message not sent")).toBeNull();
+  });
+
+  it("throws a validated take away from the composer", async () => {
+    const onUploadAttachment = vi.fn();
+    const { container } = render(
+      <ChatConversationDetail {...commonDetailProps} onSendMessage={vi.fn()} onUploadAttachment={onUploadAttachment} />,
+    );
+
+    await recordATake(container);
+    fireEvent.click(screen.getByRole("button", { name: "Remove" }));
+
+    expect(container.querySelector('[data-test="chatPendingVoice"]')).toBeNull();
+    expect(onUploadAttachment).not.toHaveBeenCalled();
   });
 
   it("leaves the mic out when voice messages are disabled", () => {

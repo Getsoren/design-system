@@ -58,6 +58,7 @@ export default {
   tooManyFiles: "Too many files",
   unsupportedFileType: "File type not supported",
   uploadFailed: "Upload failed",
+  validateRecording: "Done recording",
   voiceMessage: "Voice message",
   voiceMessageFailed: "Voice message not sent",
   week: "Week",

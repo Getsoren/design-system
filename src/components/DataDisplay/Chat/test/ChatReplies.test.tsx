@@ -60,7 +60,7 @@ describe("Chat replies", () => {
     expect(onSendMessage).toHaveBeenCalledWith("t1", "Merci");
   });
 
-  it("quotes the answered message on top of the answer", () => {
+  it("quotes the answered message above the answer", () => {
     render(
       <ChatConversationDetail
         {...detailProps}
@@ -78,9 +78,13 @@ describe("Chat replies", () => {
       />,
     );
 
-    expect(screen.getByText("Parfait").closest(".MuiPaper-root")?.querySelector('[data-test="chatReplyQuote"]')).toHaveTextContent(
-      "Livraison à 8 h",
-    );
+    const bubble = screen.getByText("Parfait").closest(".MuiPaper-root");
+    const quote = bubble?.closest('[data-test="chatMessage"]')?.querySelector('[data-test="chatReplyQuote"]');
+
+    // Above the answer's bubble, outside it
+    expect(quote).toHaveTextContent("Livraison à 8 h");
+    expect(bubble?.contains(quote ?? null)).toBe(false);
+    expect(quote?.compareDocumentPosition(bubble as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
   it("puts a divider above the first unread message", () => {

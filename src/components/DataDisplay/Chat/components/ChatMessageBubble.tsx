@@ -155,6 +155,8 @@ interface ReplyQuoteProps {
  * system's base radius), a tap
  * scrolls back to the quoted message
  */
+// Instagram and Messenger: the quoted message above the answer, outside it, as a hairline ghost of a bubble; a tinted
+// block inside the bubble would read grey on grey in one's own bubbles
 const ReplyQuote = ({ reply, onJump }: ReplyQuoteProps) => (
   <ButtonBase
     onClick={onJump}
@@ -162,19 +164,17 @@ const ReplyQuote = ({ reply, onJump }: ReplyQuoteProps) => (
     data-test="chatReplyQuote"
     sx={{
       "&.Mui-disabled": { color: "inherit" },
+      "&:hover": { backgroundColor: "action.hover" },
       alignItems: "stretch",
-      backgroundColor: "rgba(0, 0, 0, 0.05)",
-      borderRadius: `${BUBBLE_RADIUS - 4}px`,
+      border: "1px solid",
+      borderColor: "divider",
+      borderRadius: `${BUBBLE_RADIUS}px`,
       display: "flex",
       flexDirection: "column",
-      // The bubble's padding (16px, 10px) minus the 4px inset
-      mb: 0.75,
-      mt: "-6px",
-      mx: "-12px",
+      maxWidth: "100%",
       px: 1.5,
       py: 0.75,
       textAlign: "left",
-      width: "calc(100% + 24px)",
     }}
   >
     <Typography variant="caption" fontWeight={600} noWrap>
@@ -183,7 +183,7 @@ const ReplyQuote = ({ reply, onJump }: ReplyQuoteProps) => (
     <Typography
       variant="caption"
       color="text.secondary"
-      sx={{ display: "-webkit-box", overflow: "hidden", WebkitBoxOrient: "vertical", WebkitLineClamp: 2 }}
+      sx={{ display: "-webkit-box", overflow: "hidden", overflowWrap: "anywhere", WebkitBoxOrient: "vertical", WebkitLineClamp: 2 }}
     >
       {reply.body}
     </Typography>
@@ -260,7 +260,7 @@ const ChatMessageBubble = ({
   // ("Commande : https://…" included, the label the order drawer used to prefix)
   const isPreviewOnly = !!afterBubble && /^\s*(?:[^\s:]{1,20}\s?:\s*)?https?:\/\/\S+\s*$/.test(message.body);
   const replyTo = message.replyTo;
-  const hasTextBubble = !(message.action || isPreviewOnly) && (!!message.body.trim() || !attachments.length || !!replyTo);
+  const hasTextBubble = !(message.action || isPreviewOnly) && (!!message.body.trim() || !attachments.length);
   const myEmojis = currentUserId ? reactions.filter(({ userIds }) => userIds.includes(currentUserId)).map(({ emoji }) => emoji) : [];
 
   const getReadReceipt = (): { status: ChatReadReceiptStatus; label: string } => {
@@ -442,18 +442,18 @@ const ChatMessageBubble = ({
         }}
       >
         <Stack spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">
+          {replyTo && (
+            <ReplyQuote
+              reply={replyTo}
+              onJump={
+                replyTo.messageId !== undefined && onJumpToMessage
+                  ? () => onJumpToMessage(replyTo.messageId as ChatMessage["id"])
+                  : undefined
+              }
+            />
+          )}
           {hasTextBubble && (
             <Bubble isOwn={isOwn} hasTail={isLastInGroup}>
-              {replyTo && (
-                <ReplyQuote
-                  reply={replyTo}
-                  onJump={
-                    replyTo.messageId !== undefined && onJumpToMessage
-                      ? () => onJumpToMessage(replyTo.messageId as ChatMessage["id"])
-                      : undefined
-                  }
-                />
-              )}
               {!!message.body.trim() && (
                 <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
                   {renderMessageBody(message.body, chatLabels.callNumber)}

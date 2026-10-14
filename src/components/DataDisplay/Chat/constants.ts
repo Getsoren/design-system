@@ -39,6 +39,8 @@ export const LINE_ICON_PATHS = {
   flag: "M5 21V4h8.5l.5 2H19v9h-6.5l-.5-2H5",
   mic: "M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0ZM19 10v2a7 7 0 0 1-14 0v-2M12 19v3",
   panelRight: "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM15 3v18",
+  // The attachment sign users know, rather than ChatGPT's "+"
+  paperclip: "m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48",
   reply: "M9 17 4 12l5-5M20 18v-2a4 4 0 0 0-4-4H4",
   skipForward: "M5 4l10 8-10 8V4ZM19 5v14",
   stopCircle: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20ZM10 9h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z",

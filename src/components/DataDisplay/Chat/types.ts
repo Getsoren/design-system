@@ -399,6 +399,8 @@ export interface ChatConversationDetailProps {
   aside?: ReactNode;
   /** The side panel's title, also its header button's name */
   asideTitle?: string;
+  /** A count next to the title, in a small grey box */
+  asideCount?: number;
   /**
    * Unread messages when the thread was opened: a "New messages" divider above the first of them, where the thread
    * opens. Pass the count taken before it is marked read

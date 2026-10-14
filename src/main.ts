@@ -25,6 +25,7 @@ export * from "@/components/DataDisplay/Chat/Chat";
 export { default as Chat } from "@/components/DataDisplay/Chat/Chat";
 export { default as ChatConversationDetail } from "@/components/DataDisplay/Chat/components/ChatConversationDetail";
 export { default as ChatConversationList } from "@/components/DataDisplay/Chat/components/ChatConversationList";
+export { default as ChatIconTile } from "@/components/DataDisplay/Chat/components/ChatIconTile";
 export { default as ChatLineIcon } from "@/components/DataDisplay/Chat/components/ChatLineIcon";
 export { default as ChatMessageBubble } from "@/components/DataDisplay/Chat/components/ChatMessageBubble";
 export { default as ChatMessageInput } from "@/components/DataDisplay/Chat/components/ChatMessageInput";

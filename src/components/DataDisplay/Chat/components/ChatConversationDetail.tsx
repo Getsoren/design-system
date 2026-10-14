@@ -185,6 +185,7 @@ const ChatConversationDetail = ({
   quickReplies,
   aside,
   asideTitle,
+  asideCount,
   unreadCount,
   composerNotice,
 }: ChatConversationDetailProps) => {
@@ -653,9 +654,33 @@ const ChatConversationDetail = ({
               pr: 2,
             }}
           >
-            <Typography variant="subtitle1" fontWeight={600} noWrap>
-              {asideTitle}
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1} minWidth={0}>
+              <Typography variant="subtitle1" fontWeight={600} noWrap>
+                {asideTitle}
+              </Typography>
+              {asideCount !== undefined && (
+                <Box
+                  component="span"
+                  data-test="chatAsideCount"
+                  sx={{
+                    alignItems: "center",
+                    backgroundColor: ({ palette }) => (palette.mode === "dark" ? palette.grey[500] : palette.grey[100]),
+                    borderRadius: "6px",
+                    display: "inline-flex",
+                    fontFamily: ({ typography }) => typography.fontFamily,
+                    fontSize: 12,
+                    fontVariantNumeric: "tabular-nums",
+                    fontWeight: 600,
+                    height: 22,
+                    justifyContent: "center",
+                    minWidth: 22,
+                    px: 0.75,
+                  }}
+                >
+                  {asideCount}
+                </Box>
+              )}
+            </Stack>
             <IconButton size="small" aria-label={chatLabels.close} onClick={() => setAsideChoice(false)} sx={{ color: "text.primary" }}>
               <ChatLineIcon d={LINE_ICON_PATHS.close} />
             </IconButton>

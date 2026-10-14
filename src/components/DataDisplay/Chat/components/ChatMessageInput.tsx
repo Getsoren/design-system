@@ -32,7 +32,6 @@ import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatAttachment, ChatMessageInputHandle, ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
 import createVoiceFile from "@/components/DataDisplay/Chat/utils/createVoiceFile";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
-import PlusIcon from "@/components/DataDisplay/Icons/PlusIcon";
 
 // Concentric corners: the composer is rounded at 20px and its 40px buttons sit 9px from its outer edge (1px border
 // + 8px padding), so they take 20 - 9 = 11px: the slightly square shape of the app's buttons, hugging its corners
@@ -401,7 +400,7 @@ const ChatMessageInput = (
                     data-test="chatAttachFile"
                     sx={composerIconSx}
                   >
-                    <PlusIcon sx={{ fontSize: 20 }} />
+                    <ChatLineIcon d={LINE_ICON_PATHS.paperclip} />
                   </IconButton>
                 </Tooltip>
                 <input

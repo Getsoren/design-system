@@ -1,9 +1,9 @@
-import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
+import ChatIconTile from "@/components/DataDisplay/Chat/components/ChatIconTile";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatQuickAction } from "@/components/DataDisplay/Chat/types";
 import AttachFileIcon from "@/components/DataDisplay/Icons/AttachFileIcon";
@@ -42,23 +42,9 @@ interface ItemIconProps {
 }
 
 const ItemIcon = ({ children }: ItemIconProps) => (
-  <Box
-    component="span"
-    sx={{
-      alignItems: "center",
-      backgroundColor: "action.hover",
-      borderRadius: `${ITEM_RADIUS - ICON_INSET}px`,
-      color: "text.primary",
-      display: "inline-flex",
-      flexShrink: 0,
-      fontSize: 20,
-      height: ICON_SIZE,
-      justifyContent: "center",
-      width: ICON_SIZE,
-    }}
-  >
+  <ChatIconTile radius={ITEM_RADIUS - ICON_INSET} size={ICON_SIZE}>
     {children}
-  </Box>
+  </ChatIconTile>
 );
 
 /**

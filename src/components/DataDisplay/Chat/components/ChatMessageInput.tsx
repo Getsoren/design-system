@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import ButtonBase from "@mui/material/ButtonBase";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
+import type { Theme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -38,6 +39,29 @@ import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRo
 const RADIUS = 20;
 // Every icon of the bottom bar, in its own 40px cell
 const ICON_SIZE = 20;
+/**
+ * The bottom bar's named tools ("Attach a file", "Actions"): outlined, at the buttons' concentric 11px, their icon in a
+ * 40px cell as the icon buttons'; the label folds away on a phone
+ */
+const composerToolSx = (isActive: boolean) => ({
+  "& [data-label]": { display: { sm: "inline", xs: "none" } },
+  "&:hover": { backgroundColor: "action.hover", color: "text.primary" },
+  backgroundColor: isActive ? "action.hover" : "transparent",
+  border: "1px solid",
+  borderColor: "divider",
+  borderRadius: INNER_RADIUS,
+  color: isActive ? "text.primary" : "text.secondary",
+  fontFamily: ({ typography }: Theme) => typography.fontFamily,
+  fontSize: ({ typography }: Theme) => typography.body2.fontSize,
+  fontWeight: 500,
+  gap: 0.75,
+  height: 40,
+  minWidth: 0,
+  pl: `${(40 - ICON_SIZE) / 2 - 1}px`,
+  pr: { sm: 1.5, xs: `${(40 - ICON_SIZE) / 2 - 1}px` },
+  whiteSpace: "nowrap",
+});
+
 // The bolt's outline length in its 24px grid (six strokes), for its draw-in
 const BOLT_PATH_LENGTH = 61;
 const BUTTON_INSET = 9;
@@ -384,7 +408,8 @@ const ChatMessageInput = (
           autoFocus
           key={autoFocusKey}
           inputRef={inputRef}
-          maxRows={6}
+          minRows={2}
+          maxRows={8}
           variant="standard"
           placeholder={labels?.writeAMessage ?? "Write a message..."}
           value={message}
@@ -395,24 +420,25 @@ const ChatMessageInput = (
           sx={{
             // body1 (16px) is a step above every other field: align the composer on body2 like the rest.
             "& .MuiInputBase-root": { fontSize: ({ typography }) => typography.body2.fontSize },
-            pt: 1.75,
-            px: 2,
+            // A real space to type, as in Dia's or ChatGPT's composer: two lines from the start, the tools under it
+            pb: 1,
+            pt: 2,
+            px: 2.25,
           }}
         />
         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1} sx={{ pb: 1, pt: 0.5, px: 1 }}>
-          <Stack direction="row" alignItems="center" spacing={0.5} minWidth={0}>
+          <Stack direction="row" alignItems="center" spacing={1} minWidth={0}>
             {onUploadAttachment && (
               <>
-                <Tooltip title={chatLabels.attachFile}>
-                  <IconButton
-                    aria-label={chatLabels.attachFile}
-                    onClick={() => fileInputRef.current?.click()}
-                    data-test="chatAttachFile"
-                    sx={composerIconSx}
-                  >
-                    <ChatLineIcon d={LINE_ICON_PATHS.paperclip} />
-                  </IconButton>
-                </Tooltip>
+                <ButtonBase
+                  aria-label={chatLabels.attachFile}
+                  onClick={() => fileInputRef.current?.click()}
+                  data-test="chatAttachFile"
+                  sx={composerToolSx(false)}
+                >
+                  <ChatLineIcon d={LINE_ICON_PATHS.paperclip} size={ICON_SIZE} />
+                  <span data-label>{chatLabels.attachFile}</span>
+                </ButtonBase>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -438,21 +464,7 @@ const ChatMessageInput = (
                   disabled={isSending}
                   data-test="chatQuickActions"
                   sx={{
-                    "&:hover": { backgroundColor: "action.hover", color: "text.primary" },
-                    borderRadius: INNER_RADIUS,
-                    color: quickActionsAnchor ? "text.primary" : "text.secondary",
-                    fontFamily: ({ typography }) => typography.fontFamily,
-                    fontSize: ({ typography }) => typography.body2.fontSize,
-                    fontWeight: 500,
-                    gap: 0.75,
-                    height: 40,
-                    minWidth: 0,
-                    // One grid with the icon buttons: the bolt sits in a 40px cell (10px each side of its 20px), as the
-                    // paperclip and the mic do
-                    pl: `${(40 - ICON_SIZE) / 2}px`,
-                    pr: 1.5,
-                    whiteSpace: "nowrap",
-                    ...(quickActionsAnchor && { backgroundColor: "action.hover" }),
+                    ...composerToolSx(!!quickActionsAnchor),
                     // A little life on the bolt: drawn once when the composer appears, a zap on hover
                     "@keyframes chatBoltDraw": { to: { strokeDashoffset: 0 } },
                     "@keyframes chatBoltZap": {
@@ -473,7 +485,7 @@ const ChatMessageInput = (
                 >
                   {/* Order actions: a lightning bolt, not the AI assistant's spark */}
                   <ChatLineIcon d={LINE_ICON_PATHS.bolt} size={ICON_SIZE} data-bolt />
-                  {chatLabels.moreActions}
+                  <span data-label>{chatLabels.moreActions}</span>
                   <ChatLineIcon
                     d={LINE_ICON_PATHS.chevronDown}
                     size={16}

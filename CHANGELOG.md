@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.84.0](https://github.com/getsoren/design-system/compare/4.83.3...4.84.0) (2026-10-14)
+
+
+### Features
+
+* **inputs:** outlined look for the filled TextField, TextFieldGroup, PillGroup and Counter ([958086a](https://github.com/getsoren/design-system/commit/958086ae1f16561b07ea9501e6044c8c8c567dec))
+
 ## [4.83.3](https://github.com/getsoren/design-system/compare/4.83.2...4.83.3) (2026-10-04)
 
 

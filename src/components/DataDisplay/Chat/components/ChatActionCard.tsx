@@ -9,8 +9,9 @@ import Button from "@/components/Inputs/Button/Button";
 export const ACTION_CARD_WIDTH = 320;
 const CARD_RADIUS = 12;
 const CARD_PADDING = 12;
-// The answers sit 4px from the card's edges: 12 - 4 = 8, concentric with its corners
+// The answers sit 4px inside the card's 1px border, 5px from its outer edge: 12 - 5 = 7, concentric with its corners
 const BUTTONS_INSET = 4;
+const BORDER_WIDTH = 1;
 const PHOTO_SIZE = 48;
 
 interface ChatActionCardProps {
@@ -72,7 +73,7 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
       data-test="chatActionCard"
       sx={{
         backgroundColor: "background.paper",
-        border: "1px solid",
+        border: `${BORDER_WIDTH}px solid`,
         borderColor: "divider",
         borderRadius: `${CARD_RADIUS}px`,
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
@@ -138,7 +139,7 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
               disabled={!!pendingResponseId && pendingResponseId !== id}
               onClick={() => respond(id)}
               sx={{
-                borderRadius: `${CARD_RADIUS - BUTTONS_INSET}px`,
+                borderRadius: `${CARD_RADIUS - BORDER_WIDTH - BUTTONS_INSET}px`,
                 flex: 1,
                 lineHeight: 1.2,
                 minHeight: 44,

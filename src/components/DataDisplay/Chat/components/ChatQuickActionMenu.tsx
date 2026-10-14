@@ -18,8 +18,24 @@ interface ChatQuickActionMenuProps {
   labels: ChatLabels;
 }
 
-// Paper radius 16 with a 4px inset around the items: 16 - 4 = 12
-const itemSx = { borderRadius: 1.5, gap: 1.5, minHeight: 52, mx: 0.5, px: 1 };
+// Concentric corners, as in the composer: the menu takes its 20px radius, the items sit 5px from its outer edge (the
+// theme's 1px border + 4px) so 20 - 5 = 15, and their 40px icon tiles 6px inside an item, 15 - 6 = 9: the slightly
+// square shape of the composer's buttons
+const PAPER_RADIUS = 20;
+const PAPER_BORDER = 1;
+const ITEM_INSET = 4;
+const ITEM_RADIUS = PAPER_RADIUS - PAPER_BORDER - ITEM_INSET;
+const ICON_INSET = 6;
+const ICON_SIZE = 40;
+
+const itemSx = {
+  borderRadius: `${ITEM_RADIUS}px`,
+  gap: 1.5,
+  minHeight: ICON_SIZE + 2 * ICON_INSET,
+  mx: `${ITEM_INSET}px`,
+  px: `${ICON_INSET}px`,
+  py: `${ICON_INSET}px`,
+};
 
 interface ItemIconProps {
   children: ReactNode;
@@ -31,14 +47,14 @@ const ItemIcon = ({ children }: ItemIconProps) => (
     sx={{
       alignItems: "center",
       backgroundColor: "action.hover",
-      borderRadius: "50%",
+      borderRadius: `${ITEM_RADIUS - ICON_INSET}px`,
       color: "text.primary",
       display: "inline-flex",
       flexShrink: 0,
       fontSize: 20,
-      height: 36,
+      height: ICON_SIZE,
       justifyContent: "center",
-      width: 36,
+      width: ICON_SIZE,
     }}
   >
     {children}
@@ -46,7 +62,7 @@ const ItemIcon = ({ children }: ItemIconProps) => (
 );
 
 /**
- * ChatGPT-like menu of the composer's "+": a round icon and a label per entry, "File or photo" first.
+ * ChatGPT-like menu of the composer's "Actions": an icon tile and a label per entry, "File or photo" first when given.
  */
 const ChatQuickActionMenu = ({ anchorEl, onClose, actions, onAction, onPickFile, labels }: ChatQuickActionMenuProps) => (
   <Menu
@@ -56,8 +72,9 @@ const ChatQuickActionMenu = ({ anchorEl, onClose, actions, onAction, onPickFile,
     anchorOrigin={{ horizontal: "left", vertical: "top" }}
     transformOrigin={{ horizontal: "left", vertical: "bottom" }}
     slotProps={{
-      list: { sx: { py: 0.5 } },
-      paper: { sx: { borderRadius: 2, boxShadow: "0 8px 32px rgba(0, 0, 0, 0.16)", minWidth: 260, mt: -1 } },
+      // No side padding from the theme's list: the items' own 4px margin is the inset on every side
+      list: { sx: { px: 0, py: `${ITEM_INSET}px` } },
+      paper: { sx: { borderRadius: `${PAPER_RADIUS}px`, boxShadow: "0 8px 32px rgba(0, 0, 0, 0.16)", minWidth: 260, mt: -1 } },
     }}
   >
     {onPickFile && (
@@ -76,7 +93,7 @@ const ChatQuickActionMenu = ({ anchorEl, onClose, actions, onAction, onPickFile,
         </Typography>
       </MenuItem>
     )}
-    {onPickFile && <Divider sx={{ my: 0.5 }} />}
+    {onPickFile && <Divider sx={{ my: `${ITEM_INSET}px` }} />}
     {actions.map(({ id, label, icon }) => (
       <MenuItem
         key={id}

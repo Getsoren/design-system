@@ -239,8 +239,10 @@ export const ChatVoiceRecorder = ({
           animation: "chatVoicePulse 1.2s ease-in-out infinite",
           backgroundColor: "error.main",
           borderRadius: "50%",
-          height: 10,
-          width: 10,
+          // A discreet recording light beside the time, not a button
+          flexShrink: 0,
+          height: 6,
+          width: 6,
         }}
       />
       <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: "tabular-nums", minWidth: 40 }}>

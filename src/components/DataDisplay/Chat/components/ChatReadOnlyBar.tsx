@@ -31,11 +31,8 @@ const ChatReadOnlyBar = ({ readOnly, actionLabel }: ChatReadOnlyBarProps) => {
       alignItems={{ sm: "center", xs: "stretch" }}
       spacing={1.5}
       data-test="chatReadOnlyBar"
-      sx={{
-        backgroundColor: "grey.A100",
-        borderTop: ({ palette }) => `1px solid ${palette.divider}`,
-        p: 2,
-      }}
+      // On the conversation's background, like the composer it replaces
+      sx={{ p: 2 }}
     >
       <Typography variant="body2" color="text.secondary" flex={1}>
         {readOnly.label}

@@ -212,14 +212,9 @@ const ChatMessageInput = (
   }, [autoFocusKey]);
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "grey.A100",
-        // The composer surface is as light as the message list: without this line the two merge.
-        borderTop: ({ palette }) => `1px solid ${palette.divider}`,
-        p: 2,
-      }}
-    >
+    // No band of its own: the composer floats on the conversation's background, as in ChatGPT, and the messages fade
+    // out above it (see the message list's mask)
+    <Box sx={{ p: 2 }}>
       <ChatAttachmentTray
         items={uploads.items}
         rejectedFiles={uploads.rejectedFiles}
@@ -255,7 +250,8 @@ const ChatMessageInput = (
       {/* ChatGPT-like composer: one rounded surface with a soft shadow, the field on top and its tools below */}
       <Box
         sx={{
-          "&:focus-within": { borderColor: "text.disabled" },
+          // The theme's field outline: a grey step above the divider, never black
+          "&:focus-within": { borderColor: "border.outline" },
           backgroundColor: "background.paper",
           border: "1px solid",
           borderColor: "divider",

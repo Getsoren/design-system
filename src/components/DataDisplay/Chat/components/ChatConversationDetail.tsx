@@ -282,6 +282,8 @@ const ChatConversationDetail = ({
         data-test="chatMessages"
         sx={{
           flex: 1,
+          // Messages fade out over the last 16px instead of being cut by a line: at rest only the bottom padding is there
+          maskImage: "linear-gradient(to bottom, #000 calc(100% - 16px), transparent)",
           overflowY: "auto",
           // Containing block of the floating reaction bars: they scroll with the messages and are clipped by this area
           position: "relative",

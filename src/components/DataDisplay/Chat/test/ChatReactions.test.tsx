@@ -55,7 +55,7 @@ describe("Chat reactions", () => {
     fireEvent.click(summary);
     // One line per person and emoji: Alice reacted twice
     expect(screen.getAllByText("Alice Martin")).toHaveLength(2);
-    fireEvent.click(screen.getByText("Remove"));
+    fireEvent.click(screen.getByLabelText("Remove 👍"));
 
     expect(onToggleReaction).toHaveBeenCalledWith(42, "👍");
   });

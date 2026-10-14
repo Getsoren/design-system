@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import ButtonBase from "@mui/material/ButtonBase";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
-import SvgIcon, { type SvgIconProps } from "@mui/material/SvgIcon";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -17,24 +16,22 @@ import {
   useState,
 } from "react";
 import ChatAttachmentTray from "@/components/DataDisplay/Chat/components/ChatAttachmentTray";
+import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
 import ChatPill from "@/components/DataDisplay/Chat/components/ChatPill";
 import ChatQuickActionMenu from "@/components/DataDisplay/Chat/components/ChatQuickActionMenu";
 import ChatVoiceRecorder from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
-import { DEFAULT_ATTACHMENT_ACCEPT, DEFAULT_MAX_ATTACHMENT_SIZE, DEFAULT_MAX_ATTACHMENTS } from "@/components/DataDisplay/Chat/constants";
+import {
+  DEFAULT_ATTACHMENT_ACCEPT,
+  DEFAULT_MAX_ATTACHMENT_SIZE,
+  DEFAULT_MAX_ATTACHMENTS,
+  LINE_ICON_PATHS,
+} from "@/components/DataDisplay/Chat/constants";
 import useChatAttachmentUploads, { type ChatPendingAttachment } from "@/components/DataDisplay/Chat/hooks/useChatAttachmentUploads";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatMessageInputHandle, ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
 import createVoiceFile from "@/components/DataDisplay/Chat/utils/createVoiceFile";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
-import ChevronIcon from "@/components/DataDisplay/Icons/ChevronIcon";
 import PlusIcon from "@/components/DataDisplay/Icons/PlusIcon";
-
-// Order actions: a lightning bolt, not the AI assistant's spark
-const BoltIcon = (props: SvgIconProps) => (
-  <SvgIcon viewBox="0 0 24 24" {...props}>
-    <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinejoin="round" />
-  </SvgIcon>
-);
 
 // Concentric corners: the composer is rounded at 20px and its 40px buttons sit 9px from its outer edge (1px border
 // + 8px padding), so they take 20 - 9 = 11px: the slightly square shape of the app's buttons, hugging its corners
@@ -292,7 +289,7 @@ const ChatMessageInput = (
                     data-test="chatAttachFile"
                     sx={composerIconSx}
                   >
-                    <PlusIcon />
+                    <PlusIcon sx={{ fontSize: 20 }} />
                   </IconButton>
                 </Tooltip>
                 <input
@@ -334,10 +331,13 @@ const ChatMessageInput = (
                     ...(quickActionsAnchor && { backgroundColor: "action.hover" }),
                   }}
                 >
-                  <BoltIcon sx={{ fontSize: 18 }} />
+                  {/* Order actions: a lightning bolt, not the AI assistant's spark */}
+                  <ChatLineIcon d={LINE_ICON_PATHS.bolt} size={18} />
                   {chatLabels.moreActions}
-                  <ChevronIcon
-                    sx={{ fontSize: 16, transform: quickActionsAnchor ? "rotate(180deg)" : "none", transition: "transform 150ms" }}
+                  <ChatLineIcon
+                    d={LINE_ICON_PATHS.chevronDown}
+                    size={16}
+                    sx={{ transform: quickActionsAnchor ? "rotate(180deg)" : "none", transition: "transform 150ms" }}
                   />
                 </ButtonBase>
                 <ChatQuickActionMenu

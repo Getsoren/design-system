@@ -4,10 +4,9 @@ import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
+import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
+import { LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import type { ChatVoiceRecorderProps } from "@/components/DataDisplay/Chat/types";
-import CheckIcon from "@/components/DataDisplay/Icons/CheckIcon";
-import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
-import MicIcon from "@/components/DataDisplay/Icons/MicIcon";
 
 // Normalized RMS (0..1) above which the mic input counts as speech rather than ambient/room noise
 const SPEECH_RMS_THRESHOLD = 0.02;
@@ -196,7 +195,7 @@ export const ChatVoiceRecorder = ({
             data-test="chatVoiceStart"
             sx={iconButtonSx}
           >
-            {isProcessing ? <CircularProgress size={20} /> : <MicIcon />}
+            {isProcessing ? <CircularProgress size={20} /> : <ChatLineIcon d={LINE_ICON_PATHS.mic} />}
           </IconButton>
         </span>
       </Tooltip>
@@ -227,12 +226,12 @@ export const ChatVoiceRecorder = ({
       </Typography>
       <Tooltip title={labels?.cancel ?? "Cancel"}>
         <IconButton onClick={() => stop(true)} data-test="chatVoiceCancel" sx={iconButtonSx}>
-          <CloseIcon />
+          <ChatLineIcon d={LINE_ICON_PATHS.close} />
         </IconButton>
       </Tooltip>
       <Tooltip title={labels?.send ?? "Use this recording"}>
         <IconButton color="primary" onClick={() => stop(false)} data-test="chatVoiceSend" sx={iconButtonSx}>
-          <CheckIcon />
+          <ChatLineIcon d={LINE_ICON_PATHS.check} />
         </IconButton>
       </Tooltip>
     </Stack>

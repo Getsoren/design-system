@@ -1,3 +1,4 @@
+import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
@@ -10,6 +11,10 @@ import type { ChatVoiceRecorderProps } from "@/components/DataDisplay/Chat/types
 
 // Normalized RMS (0..1) above which the mic input counts as speech rather than ambient/room noise
 const SPEECH_RMS_THRESHOLD = 0.02;
+// WhatsApp-like live waveform: the last levels of the mic, scrolling to the left
+const LEVEL_BAR_COUNT = 16;
+const LEVEL_SAMPLE_MS = 70;
+const SILENT_LEVELS = Array.from({ length: LEVEL_BAR_COUNT }, () => 0);
 
 /** First recording mime the browser supports (Safari records mp4, everyone else webm/opus) */
 const pickMimeType = (): string | undefined =>
@@ -41,6 +46,8 @@ export const ChatVoiceRecorder = ({
   const [isRecording, setIsRecording] = useState(false);
   const iconButtonSx = [{ height: 44, width: 44 }, ...(Array.isArray(buttonSx) ? buttonSx : [buttonSx])];
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  // What the mic hears, 0 to 1: the user sees they are heard
+  const [levels, setLevels] = useState<number[]>(SILENT_LEVELS);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -77,14 +84,15 @@ export const ChatVoiceRecorder = ({
   };
 
   /**
-   * Watches the mic level and auto-validates the take after `silenceTimeoutMs` of trailing silence —
-   * but only once the user has actually started speaking, so a slow start is never cut off.
+   * Watches the mic level: it feeds the live waveform and, when `autoSubmitOnSilence` is on, validates the take after
+   * `silenceTimeoutMs` of trailing silence — but only once the user has actually started speaking, so a slow start is
+   * never cut off.
    */
-  const monitorSilence = (stream: MediaStream) => {
+  const monitorLevel = (stream: MediaStream) => {
     const AudioContextCtor =
       window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
 
-    if (!(autoSubmitOnSilence && silenceTimeoutMs && AudioContextCtor)) {
+    if (!AudioContextCtor) {
       return;
     }
 
@@ -97,6 +105,7 @@ export const ChatVoiceRecorder = ({
     const samples = new Uint8Array(analyser.fftSize);
     let hasSpoken = false;
     let lastSoundAt = performance.now();
+    let lastSampleAt = 0;
 
     const tick = () => {
       analyser.getByteTimeDomainData(samples);
@@ -104,12 +113,18 @@ export const ChatVoiceRecorder = ({
       const rms = Math.sqrt(samples.reduce((sum, value) => sum + (value - 128) ** 2, 0) / samples.length) / 128;
       const now = performance.now();
 
+      if (now - lastSampleAt >= LEVEL_SAMPLE_MS) {
+        lastSampleAt = now;
+        // Square root: a voice (RMS 0.02 to 0.25) fills the bars without shouting
+        setLevels((previous) => [...previous.slice(1), Math.min(1, Math.sqrt(rms) * 2)]);
+      }
+
       if (rms > SPEECH_RMS_THRESHOLD) {
         hasSpoken = true;
         lastSoundAt = now;
       }
 
-      if (hasSpoken && now - lastSoundAt >= silenceTimeoutMs) {
+      if (autoSubmitOnSilence && silenceTimeoutMs && hasSpoken && now - lastSoundAt >= silenceTimeoutMs) {
         stop(false);
         return;
       }
@@ -147,7 +162,8 @@ export const ChatVoiceRecorder = ({
       recorderRef.current = recorder;
       startedAtRef.current = Date.now();
       recorder.start();
-      monitorSilence(stream);
+      setLevels(SILENT_LEVELS);
+      monitorLevel(stream);
       setElapsedSeconds(0);
       setIsRecording(true);
     } catch (error) {
@@ -230,6 +246,22 @@ export const ChatVoiceRecorder = ({
       <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: "tabular-nums", minWidth: 40 }}>
         {formatElapsed(elapsedSeconds)}
       </Typography>
+      <Stack direction="row" alignItems="center" spacing="2px" aria-hidden data-test="chatVoiceLevels" sx={{ height: 24, px: 0.5 }}>
+        {levels.map((level, index) => (
+          <Box
+            // biome-ignore lint/suspicious/noArrayIndexKey: a fixed row of bars, the levels scroll through it
+            key={index}
+            sx={{
+              backgroundColor: "text.primary",
+              borderRadius: 1,
+              flexShrink: 0,
+              height: 4 + Math.round(level * 20),
+              transition: "height 70ms linear",
+              width: 3,
+            }}
+          />
+        ))}
+      </Stack>
       <Tooltip title={labels?.cancel ?? "Cancel"}>
         <IconButton onClick={() => stop(true)} data-test="chatVoiceCancel" sx={iconButtonSx}>
           <ChatLineIcon d={LINE_ICON_PATHS.close} />

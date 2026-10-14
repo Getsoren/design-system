@@ -36,6 +36,8 @@ import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRo
 // Concentric corners: the composer is rounded at 20px and its 40px buttons sit 9px from its outer edge (1px border
 // + 8px padding), so they take 20 - 9 = 11px: the slightly square shape of the app's buttons, hugging its corners
 const RADIUS = 20;
+// Every icon of the bottom bar, in its own 40px cell
+const ICON_SIZE = 20;
 const BUTTON_INSET = 9;
 const INNER_RADIUS = `${RADIUS - BUTTON_INSET}px`;
 const composerIconSx = { "@media (hover: none)": { height: 44, width: 44 }, borderRadius: INNER_RADIUS, height: 40, width: 40 };
@@ -437,13 +439,16 @@ const ChatMessageInput = (
                     gap: 0.75,
                     height: 40,
                     minWidth: 0,
-                    px: 1.5,
+                    // One grid with the icon buttons: the bolt sits in a 40px cell (10px each side of its 20px), as the
+                    // paperclip and the mic do
+                    pl: `${(40 - ICON_SIZE) / 2}px`,
+                    pr: 1.5,
                     whiteSpace: "nowrap",
                     ...(quickActionsAnchor && { backgroundColor: "action.hover" }),
                   }}
                 >
                   {/* Order actions: a lightning bolt, not the AI assistant's spark */}
-                  <ChatLineIcon d={LINE_ICON_PATHS.bolt} size={18} />
+                  <ChatLineIcon d={LINE_ICON_PATHS.bolt} size={ICON_SIZE} />
                   {chatLabels.moreActions}
                   <ChatLineIcon
                     d={LINE_ICON_PATHS.chevronDown}

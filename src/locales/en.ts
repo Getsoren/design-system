@@ -47,6 +47,7 @@ export default {
   removeReaction: "Remove",
   reset: "Reset",
   retryUpload: "Retry",
+  scrollToLatest: "Latest messages",
   searchEmoji: "Search an emoji",
   seenBy: "Seen by",
   selectAll: "Select all",

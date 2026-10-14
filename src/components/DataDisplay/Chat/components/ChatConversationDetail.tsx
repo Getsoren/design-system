@@ -1,16 +1,22 @@
 import Box from "@mui/material/Box";
+import ButtonBase from "@mui/material/ButtonBase";
 import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
+import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useEffect, useRef, useState } from "react";
 import ChatConversationDetailHeader from "@/components/DataDisplay/Chat/components/ChatConversationDetailHeader";
 import ChatDropOverlay from "@/components/DataDisplay/Chat/components/ChatDropOverlay";
 import ChatEventGroup from "@/components/DataDisplay/Chat/components/ChatEventGroup";
+import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
 import ChatMessageBubble from "@/components/DataDisplay/Chat/components/ChatMessageBubble";
 import ChatMessageInput from "@/components/DataDisplay/Chat/components/ChatMessageInput";
 import ChatPill from "@/components/DataDisplay/Chat/components/ChatPill";
 import ChatReadOnlyBar from "@/components/DataDisplay/Chat/components/ChatReadOnlyBar";
+import { CHAT_HEADER_HEIGHT, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import useChatLabels from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import useFileDrop from "@/components/DataDisplay/Chat/hooks/useFileDrop";
 import type { ChatConversationDetailProps, ChatMessage, ChatMessageInputHandle } from "@/components/DataDisplay/Chat/types";
@@ -42,6 +48,11 @@ const defaultFormatDayLabel = (date: string): string => {
 
 // Within this distance of the bottom, the reader counts as following the conversation
 const STICK_TO_BOTTOM_THRESHOLD_PX = 80;
+// Further up, a button brings the reader back to the latest messages
+const SCROLL_BUTTON_THRESHOLD_PX = 240;
+// Messages of one author within this delay form one run: one name, one time, one avatar
+const GROUP_WINDOW_MS = 5 * 60 * 1000;
+const ASIDE_WIDTH = 360;
 
 const isSameDay = (a: string, b: string): boolean => {
   const da = new Date(ensureUtc(a));
@@ -55,10 +66,27 @@ interface MessageRow {
   /** A single message, or a run of automatic messages of the same day */
   messages: ChatMessage[];
   showDayDivider: boolean;
+  /** Position of a single message in its author's run */
+  isFirstInGroup: boolean;
+  isLastInGroup: boolean;
 }
 
+const toTime = (date: string) => new Date(ensureUtc(date)).getTime();
+
 /**
- * Day dividers, and consecutive automatic messages of a day folded into one row
+ * Same author, same day, a few minutes apart, neither an automatic message: the second one continues the run
+ */
+const continuesRun = (previous: ChatMessage | undefined, message: ChatMessage | undefined) =>
+  !!previous &&
+  !!message &&
+  !previous.event &&
+  !message.event &&
+  previous.authorId === message.authorId &&
+  isSameDay(previous.createdAt, message.createdAt) &&
+  toTime(message.createdAt) - toTime(previous.createdAt) <= GROUP_WINDOW_MS;
+
+/**
+ * Day dividers, runs of messages from one author, and consecutive automatic messages of a day folded into one row
  */
 const toRows = (messages: ChatMessage[], groupEvents: boolean) =>
   messages.reduce<MessageRow[]>((rows, message, index) => {
@@ -69,11 +97,31 @@ const toRows = (messages: ChatMessage[], groupEvents: boolean) =>
     if (groupEvents && message.event && previousMessage?.event && !showDayDivider && lastRow) {
       lastRow.messages.push(message);
     } else {
-      rows.push({ messages: [message], showDayDivider });
+      rows.push({
+        isFirstInGroup: !continuesRun(previousMessage, message),
+        isLastInGroup: !continuesRun(message, messages[index + 1]),
+        messages: [message],
+        showDayDivider,
+      });
     }
 
     return rows;
   }, []);
+
+/**
+ * Room above a row: a day starts further, a new run a little, a message continuing its run sits tight
+ */
+const getRowGap = ({ showDayDivider, isFirstInGroup }: MessageRow, index: number) => {
+  if (index === 0) {
+    return 0;
+  }
+
+  if (showDayDivider) {
+    return 3;
+  }
+
+  return isFirstInGroup ? 2 : 0.5;
+};
 
 const ChatConversationDetail = ({
   threadId,
@@ -116,11 +164,23 @@ const ChatConversationDetail = ({
   onActionResponse,
   readOnly,
   quickReplies,
+  aside,
+  asideTitle,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<{ threadId?: string; value: MessagesFilter }>({ value: "all" });
   const previousThreadIdRef = useRef<string | undefined>(undefined);
   const isAtBottomRef = useRef(true);
+  const previousViewRef = useRef<string | undefined>(undefined);
+  const previousLastMessageIdRef = useRef<ChatMessage["id"] | undefined>(undefined);
+  const [isAwayFromBottom, setIsAwayFromBottom] = useState(false);
+  // Messages from the others received while the reader is up in the history
+  const [unseenCount, setUnseenCount] = useState(0);
+  // Beside the conversation on wide screens, over it on narrower ones, where it waits to be asked for
+  const { breakpoints } = useTheme();
+  const isWide = useMediaQuery(breakpoints.up("lg"));
+  const [asideChoice, setAsideChoice] = useState<boolean | null>(null);
+  const isAsideOpen = !!aside && (asideChoice ?? isWide);
   const messageInputRef = useRef<ChatMessageInputHandle>(null);
   const chatLabels = useChatLabels(labels);
   // Files dropped anywhere on the conversation join the composer
@@ -143,24 +203,49 @@ const ChatConversationDetail = ({
   const lastMessage = messages?.[messages.length - 1];
   const lastMessageId = lastMessage?.id;
 
+  const scrollToBottom = (behavior: ScrollBehavior) => {
+    isAtBottomRef.current = true;
+    setUnseenCount(0);
+    scrollContainerRef.current?.scrollTo({ behavior, top: scrollContainerRef.current.scrollHeight });
+  };
+
+  /**
+   * WhatsApp-like: a new thread or filter opens on its end, my own message and a message received while at the
+   * bottom follow it; a reader up in the history stays there and the button counts what arrived.
+   */
   // biome-ignore lint/correctness/useExhaustiveDependencies: the last message stands for the list
   useEffect(() => {
     if (!messages || isLoading) {
       return;
     }
 
-    const isNewThread = previousThreadIdRef.current !== threadId;
+    const view = `${threadId}:${activeFilter}`;
+    const isNewView = previousViewRef.current !== view;
+    const isNewMessage = previousLastMessageIdRef.current !== lastMessageId;
+    previousViewRef.current = view;
     previousThreadIdRef.current = threadId;
-    isAtBottomRef.current = true;
+    previousLastMessageIdRef.current = lastMessageId;
 
-    scrollContainerRef.current?.scrollTo({ behavior: isNewThread ? "instant" : "smooth", top: scrollContainerRef.current.scrollHeight });
+    if (isNewView) {
+      scrollToBottom("instant");
+    } else if (isNewMessage && (isAtBottomRef.current || lastMessage?.authorId === currentUserId)) {
+      scrollToBottom("smooth");
+    } else if (isNewMessage) {
+      setUnseenCount((count) => count + 1);
+    }
   }, [lastMessageId, messages?.length, threadId, isLoading, activeFilter]);
 
   const handleScroll = () => {
     const container = scrollContainerRef.current;
 
     if (container) {
-      isAtBottomRef.current = container.scrollHeight - container.scrollTop - container.clientHeight <= STICK_TO_BOTTOM_THRESHOLD_PX;
+      const distance = container.scrollHeight - container.scrollTop - container.clientHeight;
+      isAtBottomRef.current = distance <= STICK_TO_BOTTOM_THRESHOLD_PX;
+      setIsAwayFromBottom(distance > SCROLL_BUTTON_THRESHOLD_PX);
+
+      if (isAtBottomRef.current) {
+        setUnseenCount(0);
+      }
     }
   };
 
@@ -192,8 +277,10 @@ const ChatConversationDetail = ({
     return () => observer.disconnect();
   }, [threadId, isLoading]);
 
-  const renderMessage = (message: ChatMessage) => (
+  const renderMessage = (message: ChatMessage, position?: Pick<MessageRow, "isFirstInGroup" | "isLastInGroup">) => (
     <ChatMessageBubble
+      isFirstInGroup={position?.isFirstInGroup}
+      isLastInGroup={position?.isLastInGroup}
       message={message}
       isOwn={message.authorId === currentUserId}
       participants={participants}
@@ -235,133 +322,225 @@ const ChatConversationDetail = ({
   }
 
   return (
-    <Stack
-      data-chat-pane="detail"
-      data-selected
-      flex={1}
-      height="100%"
-      minWidth={{ sm: 300, xs: 0 }}
-      position="relative"
-      {...dropZoneProps}
-    >
-      <ChatConversationDetailHeader
-        threadId={threadId}
-        onBack={onBack}
-        participants={participants}
-        onDeleteConversation={onDeleteConversation}
-        onAddParticipants={onAddParticipants}
-        onSearchParticipants={onSearchParticipants}
-        searchResults={searchResults}
-        isSearchingParticipants={isSearchingParticipants}
-        avatarSrcResolver={avatarSrcResolver}
-        labels={labels}
-        formatParticipantName={formatParticipantName}
-        headerAction={headerAction}
-        onAddParticipantDialogOpenChange={onAddParticipantDialogOpenChange}
-        slotProps={slotProps}
-        readOnly={!!readOnly}
-      />
-      {showFilter && !isLoading && (
-        <Stack direction="row" spacing={1} sx={{ overflowX: "auto", px: 3, py: 1.5 }} data-test="chatMessagesFilter">
-          {(
-            [
-              ["all", chatLabels.filterAll],
-              ["messages", chatLabels.filterMessages],
-              ["updates", chatLabels.filterUpdates],
-            ] as const
-          ).map(([value, label]) => (
-            <ChatPill key={value} selected={activeFilter === value} onClick={() => setFilter({ threadId, value })}>
-              {label}
-            </ChatPill>
-          ))}
-        </Stack>
-      )}
-      <Box
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        data-test="chatMessages"
-        sx={{
-          flex: 1,
-          // Messages fade out over the last 16px instead of being cut by a line: at rest only the bottom padding is there
-          maskImage: "linear-gradient(to bottom, #000 calc(100% - 16px), transparent)",
-          overflowY: "auto",
-          // Containing block of the floating reaction bars: they scroll with the messages and are clipped by this area
-          position: "relative",
-          px: 3,
-          py: 2,
-        }}
-      >
-        {isLoading ? (
-          <Stack spacing={3}>
-            {Array.from({ length: 4 }, (_, i) => (
-              <Stack key={i} alignItems={i % 2 === 0 ? "flex-start" : "flex-end"} spacing={0.5}>
-                <Skeleton variant="rounded" width="40%" height={48} sx={{ borderRadius: 2 }} />
-                <Skeleton variant="text" width={60} />
-              </Stack>
+    <Stack data-chat-pane="detail" data-selected direction="row" flex={1} height="100%" minWidth={{ sm: 300, xs: 0 }} position="relative">
+      <Stack flex={1} minWidth={0} position="relative" {...dropZoneProps}>
+        <ChatConversationDetailHeader
+          threadId={threadId}
+          onBack={onBack}
+          participants={participants}
+          onDeleteConversation={onDeleteConversation}
+          onAddParticipants={onAddParticipants}
+          onSearchParticipants={onSearchParticipants}
+          searchResults={searchResults}
+          isSearchingParticipants={isSearchingParticipants}
+          avatarSrcResolver={avatarSrcResolver}
+          labels={labels}
+          formatParticipantName={formatParticipantName}
+          headerAction={headerAction}
+          onAddParticipantDialogOpenChange={onAddParticipantDialogOpenChange}
+          slotProps={slotProps}
+          readOnly={!!readOnly}
+          aside={aside ? { isOpen: isAsideOpen, onToggle: () => setAsideChoice(!isAsideOpen), title: asideTitle ?? "" } : undefined}
+        />
+        {showFilter && !isLoading && (
+          <Stack direction="row" spacing={1} sx={{ overflowX: "auto", px: 3, py: 1.5 }} data-test="chatMessagesFilter">
+            {(
+              [
+                ["all", chatLabels.filterAll],
+                ["messages", chatLabels.filterMessages],
+                ["updates", chatLabels.filterUpdates],
+              ] as const
+            ).map(([value, label]) => (
+              <ChatPill key={value} selected={activeFilter === value} onClick={() => setFilter({ threadId, value })}>
+                {label}
+              </ChatPill>
             ))}
           </Stack>
-        ) : (
-          <Stack spacing={3}>
-            {rows.map(({ messages: rowMessages, showDayDivider }) => {
-              const [message] = rowMessages;
-
-              return (
-                <Stack key={message.id} spacing={3}>
-                  {showDayDivider && (
-                    // Centered text rather than a full-width line: the ::before/::after keep their
-                    // flex (centering) but lose their line.
-                    <Divider
-                      sx={{
-                        // Just the text: no outline, no white pill
-                        "& .MuiDivider-wrapper": { alignItems: "center", display: "flex", paddingX: 1.5, paddingY: 0.75 },
-                        "&::after": { borderTop: "none" },
-                        "&::before": { borderTop: "none" },
-                      }}
-                    >
-                      {/* lineHeight 1: the tall caption line height (1.66) pushes the text below the optical center. */}
-                      <Typography variant="caption" color="text.secondary" lineHeight={1}>
-                        {getDayLabel(message.createdAt)}
-                      </Typography>
-                    </Divider>
-                  )}
-                  {rowMessages.length > 1 ? (
-                    <ChatEventGroup messages={rowMessages} label={chatLabels.orderUpdates} renderEvent={renderMessage} />
-                  ) : (
-                    renderMessage(message)
-                  )}
-                </Stack>
-              );
-            })}
-          </Stack>
         )}
-      </Box>
-      {readOnly ? (
-        <ChatReadOnlyBar readOnly={readOnly} actionLabel={readOnly.actionLabel ?? chatLabels.joinConversation} />
-      ) : (
-        <ChatMessageInput
-          ref={messageInputRef}
-          // Without files, the exact same call as before: (threadId, body)
-          onSend={(body, attachments) => (attachments ? onSendMessage(threadId, body, attachments) : onSendMessage(threadId, body))}
-          labels={{ ...chatLabels, enterToSend: labels?.enterToSend, send: labels?.send, writeAMessage: labels?.writeAMessage }}
-          autoFocusKey={threadId}
-          isSending={isSending}
-          defaultMessage={defaultMessage}
-          maxLength={messageMaxLength}
-          slotProps={slotProps}
-          onUploadAttachment={onUploadAttachment}
-          attachmentAccept={attachmentAccept}
-          maxAttachments={maxAttachments}
-          maxAttachmentSize={maxAttachmentSize}
-          onLinkAttachment={onLinkAttachment}
-          enableVoiceMessages={enableVoiceMessages}
-          linkAttachmentsOnAdd={linkAttachmentsOnAdd}
-          quickActions={quickActions}
-          onQuickAction={onQuickAction}
-          // Something to answer: the last message comes from someone else
-          quickReplies={lastMessage && lastMessage.authorId !== currentUserId ? quickReplies : undefined}
-        />
+        {/* Holds the floating "latest messages" button over the list, outside its fading mask */}
+        <Box sx={{ display: "flex", flex: 1, flexDirection: "column", minHeight: 0, position: "relative" }}>
+          <Box
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            data-test="chatMessages"
+            sx={{
+              flex: 1,
+              // Messages fade out over the last 16px instead of being cut by a line: at rest only the bottom padding is there
+              maskImage: "linear-gradient(to bottom, #000 calc(100% - 16px), transparent)",
+              overflowY: "auto",
+              // Containing block of the floating reaction bars: they scroll with the messages and are clipped by this area
+              position: "relative",
+              px: 3,
+              py: 2,
+            }}
+          >
+            {isLoading ? (
+              <Stack spacing={3}>
+                {Array.from({ length: 4 }, (_, i) => (
+                  <Stack key={i} alignItems={i % 2 === 0 ? "flex-start" : "flex-end"} spacing={0.5}>
+                    <Skeleton variant="rounded" width="40%" height={48} sx={{ borderRadius: 2 }} />
+                    <Skeleton variant="text" width={60} />
+                  </Stack>
+                ))}
+              </Stack>
+            ) : (
+              <Stack>
+                {rows.map((row, index) => {
+                  const { messages: rowMessages, showDayDivider } = row;
+                  const [message] = rowMessages;
+
+                  return (
+                    <Stack key={message.id} spacing={2} sx={{ mt: getRowGap(row, index) }}>
+                      {showDayDivider && (
+                        // Centered text rather than a full-width line: the ::before/::after keep their
+                        // flex (centering) but lose their line.
+                        <Divider
+                          sx={{
+                            // Just the text: no outline, no white pill
+                            "& .MuiDivider-wrapper": { alignItems: "center", display: "flex", paddingX: 1.5, paddingY: 0.75 },
+                            "&::after": { borderTop: "none" },
+                            "&::before": { borderTop: "none" },
+                          }}
+                        >
+                          {/* lineHeight 1: the tall caption line height (1.66) pushes the text below the optical center. */}
+                          <Typography variant="caption" color="text.secondary" lineHeight={1}>
+                            {getDayLabel(message.createdAt)}
+                          </Typography>
+                        </Divider>
+                      )}
+                      {rowMessages.length > 1 ? (
+                        <ChatEventGroup messages={rowMessages} label={chatLabels.orderUpdates} renderEvent={renderMessage} />
+                      ) : (
+                        renderMessage(message, row)
+                      )}
+                    </Stack>
+                  );
+                })}
+              </Stack>
+            )}
+          </Box>
+          {(isAwayFromBottom || unseenCount > 0) && (
+            <ButtonBase
+              aria-label={chatLabels.scrollToLatest}
+              title={chatLabels.scrollToLatest}
+              onClick={() => scrollToBottom("smooth")}
+              data-test="chatScrollToLatest"
+              sx={{
+                "&:hover": { backgroundColor: "action.hover" },
+                backgroundColor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: "12px",
+                bottom: 16,
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+                color: "text.primary",
+                height: 40,
+                position: "absolute",
+                right: 24,
+                width: 40,
+                zIndex: 1,
+              }}
+            >
+              <ChatLineIcon d={LINE_ICON_PATHS.arrowDown} />
+              {unseenCount > 0 && (
+                <Box
+                  component="span"
+                  sx={{
+                    alignItems: "center",
+                    backgroundColor: "text.primary",
+                    borderRadius: 999,
+                    color: "background.paper",
+                    display: "flex",
+                    fontFamily: ({ typography }) => typography.fontFamily,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    height: 18,
+                    justifyContent: "center",
+                    minWidth: 18,
+                    position: "absolute",
+                    px: 0.5,
+                    right: -6,
+                    top: -6,
+                  }}
+                >
+                  {unseenCount}
+                </Box>
+              )}
+            </ButtonBase>
+          )}
+        </Box>
+        {readOnly ? (
+          <ChatReadOnlyBar readOnly={readOnly} actionLabel={readOnly.actionLabel ?? chatLabels.joinConversation} />
+        ) : (
+          <ChatMessageInput
+            ref={messageInputRef}
+            // Without files, the exact same call as before: (threadId, body)
+            onSend={(body, attachments) => (attachments ? onSendMessage(threadId, body, attachments) : onSendMessage(threadId, body))}
+            labels={{ ...chatLabels, enterToSend: labels?.enterToSend, send: labels?.send, writeAMessage: labels?.writeAMessage }}
+            autoFocusKey={threadId}
+            isSending={isSending}
+            defaultMessage={defaultMessage}
+            maxLength={messageMaxLength}
+            slotProps={slotProps}
+            onUploadAttachment={onUploadAttachment}
+            attachmentAccept={attachmentAccept}
+            maxAttachments={maxAttachments}
+            maxAttachmentSize={maxAttachmentSize}
+            onLinkAttachment={onLinkAttachment}
+            enableVoiceMessages={enableVoiceMessages}
+            linkAttachmentsOnAdd={linkAttachmentsOnAdd}
+            quickActions={quickActions}
+            onQuickAction={onQuickAction}
+            // Something to answer: the last message comes from someone else
+            quickReplies={lastMessage && lastMessage.authorId !== currentUserId ? quickReplies : undefined}
+          />
+        )}
+        {isDraggingFiles && <ChatDropOverlay label={chatLabels.dropFilesHere} />}
+      </Stack>
+      {isAsideOpen && (
+        <Stack
+          component="aside"
+          data-test="chatAside"
+          sx={{
+            backgroundColor: "background.paper",
+            borderLeft: "1px solid",
+            borderLeftColor: "divider",
+            flexShrink: 0,
+            minHeight: 0,
+            width: ASIDE_WIDTH,
+            ...(!isWide && {
+              bottom: 0,
+              boxShadow: "-8px 0 32px rgba(0, 0, 0, 0.12)",
+              maxWidth: "100%",
+              position: "absolute",
+              right: 0,
+              top: 0,
+              zIndex: 2,
+            }),
+          }}
+        >
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{
+              borderBottom: ({ palette }) => `1px solid ${palette.divider}`,
+              flexShrink: 0,
+              minHeight: CHAT_HEADER_HEIGHT,
+              pl: 3,
+              pr: 2,
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={600} noWrap>
+              {asideTitle}
+            </Typography>
+            <IconButton size="small" aria-label={chatLabels.close} onClick={() => setAsideChoice(false)} sx={{ color: "text.primary" }}>
+              <ChatLineIcon d={LINE_ICON_PATHS.close} />
+            </IconButton>
+          </Stack>
+          <Box sx={{ flex: 1, overflowY: "auto" }}>{aside}</Box>
+        </Stack>
       )}
-      {isDraggingFiles && <ChatDropOverlay label={chatLabels.dropFilesHere} />}
     </Stack>
   );
 };

@@ -200,6 +200,11 @@ export interface ChatReadReceiptLabels {
   seenBy?: string;
 }
 
+export interface ChatThreadLabels {
+  /** Floating button back to the end of the conversation, with the count of messages received meanwhile */
+  scrollToLatest?: string;
+}
+
 export interface ChatEventLabels {
   /** Filter pills above the conversation */
   filterAll?: string;
@@ -242,7 +247,8 @@ export interface ChatConversationDetailLabels
     ChatQuickActionLabels,
     ChatTeamLabels,
     ChatQuickReplyLabels,
-    ChatPhoneLabels {
+    ChatPhoneLabels,
+    ChatThreadLabels {
   today?: string;
   yesterday?: string;
   createYourFirstConversation?: string;
@@ -367,6 +373,13 @@ export interface ChatConversationDetailProps {
   readOnly?: ChatConversationReadOnly | null;
   /** One-tap replies above the field, shown while it is empty and the last message comes from someone else */
   quickReplies?: string[];
+  /**
+   * Airbnb-like side panel next to the conversation, e.g. the orders it is about. Open by default on wide screens,
+   * over the conversation on narrower ones; a header button shows or hides it
+   */
+  aside?: ReactNode;
+  /** The side panel's title, also its header button's name */
+  asideTitle?: string;
 }
 
 export interface ChatMessageBubbleLabels
@@ -396,6 +409,10 @@ export interface ChatMessageBubbleProps {
   showReadReceipts?: boolean;
   /** Answer to an action card (`message.action`): its buttons only show to the recipient */
   onActionResponse?: ChatActionResponseHandler;
+  /** Opens a run of messages from one author: the author's name and the time above it. Default true */
+  isFirstInGroup?: boolean;
+  /** Closes a run: the avatar, the bubble's pointed corner and, under my messages, the time and the ticks. Default true */
+  isLastInGroup?: boolean;
 }
 
 /** `data-*` attributes forwarded to the message input's inner controls */

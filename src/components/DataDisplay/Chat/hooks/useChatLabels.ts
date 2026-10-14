@@ -7,6 +7,7 @@ import type {
   ChatReactionLabels,
   ChatReadReceiptLabels,
   ChatTeamLabels,
+  ChatThreadLabels,
   ChatVoiceMessageLabels,
 } from "@/components/DataDisplay/Chat/types";
 import useTranslation from "@/hooks/useTranslation/useTranslation";
@@ -18,6 +19,7 @@ type ChatLabelOverrides = ChatAttachmentLabels &
   ChatEventLabels &
   ChatQuickActionLabels &
   ChatTeamLabels &
+  ChatThreadLabels &
   ChatQuickReplyLabels &
   ChatPhoneLabels;
 
@@ -61,6 +63,7 @@ const useChatLabels = (labels?: ChatLabelOverrides): ChatLabels => {
     removeAttachment: labels?.removeAttachment ?? t("removeAttachment"),
     removeReaction: labels?.removeReaction ?? t("removeReaction"),
     retryUpload: labels?.retryUpload ?? t("retryUpload"),
+    scrollToLatest: labels?.scrollToLatest ?? t("scrollToLatest"),
     searchEmoji: labels?.searchEmoji ?? t("searchEmoji"),
     seenBy: labels?.seenBy ?? t("seenBy"),
     sending: labels?.sending ?? t("sending"),

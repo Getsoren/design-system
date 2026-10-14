@@ -1,4 +1,4 @@
-import { act, fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import ChatConversationDetail from "@/components/DataDisplay/Chat/components/ChatConversationDetail";
 
@@ -97,6 +97,35 @@ describe("Chat scroll", () => {
     notifyResize();
 
     expect(geometry.getScrollTop()).toBe(720);
+  });
+
+  it("counts what arrives while the reader is up in the history, and brings them back to it", () => {
+    const props = {
+      currentUserId: "me",
+      onAddParticipants: vi.fn(),
+      onDeleteConversation: vi.fn(),
+      onNewConversation: vi.fn(),
+      onSendMessage: vi.fn(),
+      participants: [],
+      threadId: "t1",
+    };
+    const first = { authorId: "u1", body: "Bonjour", createdAt: "2026-10-05T08:00:00Z", id: 1 };
+    const { container, rerender } = render(<ChatConversationDetail {...props} messages={[first]} />);
+    const scrollArea = container.querySelector<HTMLElement>('[data-test="chatMessages"]') as HTMLElement;
+    const geometry = mockGeometry(scrollArea, 1000);
+
+    scrollArea.scrollTop = 100;
+    fireEvent.scroll(scrollArea);
+    rerender(
+      <ChatConversationDetail {...props} messages={[first, { authorId: "u1", body: "Livré", createdAt: "2026-10-05T08:01:00Z", id: 2 }]} />,
+    );
+
+    // Not pulled down: the button counts the new message
+    expect(geometry.getScrollTop()).toBe(100);
+    expect(screen.getByLabelText("Latest messages")).toHaveTextContent("1");
+
+    fireEvent.click(screen.getByLabelText("Latest messages"));
+    expect(screen.getByLabelText("Latest messages")).not.toHaveTextContent("1");
   });
 
   it("leaves a reader up in the history where they are", () => {

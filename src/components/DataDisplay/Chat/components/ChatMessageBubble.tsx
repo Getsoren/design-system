@@ -113,19 +113,28 @@ const renderMessageBody = (body: string, callLabel: string): ReactNode => {
 interface BubbleProps {
   children: ReactNode;
   isOwn?: boolean;
+  /** Last bubble of a run: its bottom corner on the author's side points at them */
+  hasTail?: boolean;
 }
 
-const Bubble = ({ children, isOwn }: BubbleProps) => (
+const BUBBLE_RADIUS = 18;
+const TAIL_RADIUS = 6;
+const AVATAR_SIZE = 28;
+// A reading column rather than the whole width: long messages wrap as in Airbnb's or WhatsApp's threads
+const MESSAGE_MAX_WIDTH = { sm: "min(75%, 560px)", xs: "85%" };
+
+const Bubble = ({ children, isOwn, hasTail }: BubbleProps) => (
   <Paper
     sx={{
       backgroundColor: isOwn ? getOwnBubbleBackground : "tertiary.light",
       border: 0,
-      borderBottomLeftRadius: isOwn ? undefined : "5px ! important",
-      borderBottomRightRadius: isOwn ? "5px ! important" : undefined,
-      borderRadius: 2,
-      boxShadow: "0 0 #0000, 0 0 #0000, 0 0 #0000, 0 0 #0000, 0 1px 3px rgba(0,0,0,0.1)",
+      // "!important": the sorted keys put the borderRadius shorthand after the corner it refines
+      ...(hasTail && { [isOwn ? "borderBottomRightRadius" : "borderBottomLeftRadius"]: `${TAIL_RADIUS}px !important` }),
+      borderRadius: `${BUBBLE_RADIUS}px`,
+      // Only the white bubbles need a shadow to stand out of the conversation's grey
+      boxShadow: isOwn ? "none" : "0 1px 2px rgba(0, 0, 0, 0.08)",
       px: 2,
-      py: 1.3,
+      py: 1.25,
     }}
   >
     {children}
@@ -159,6 +168,8 @@ const ChatMessageBubble = ({
   labels,
   showReadReceipts = true,
   onActionResponse,
+  isFirstInGroup = true,
+  isLastInGroup = true,
 }: ChatMessageBubbleProps) => {
   const chatLabels = useChatLabels(labels);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -337,13 +348,14 @@ const ChatMessageBubble = ({
     : {};
 
   const author = participants?.find((p) => p.userId === message.authorId);
+  const authorName = author ? formatParticipantNames([author], formatParticipantName) : "";
 
   if (message.event) {
-    const authorName = isOwn ? chatLabels.you : author && capitalize(author.firstName);
+    const eventAuthor = isOwn ? chatLabels.you : author && capitalize(author.firstName);
 
     return (
       <Box data-test="chatMessage" display="flex" justifyContent="center">
-        <ChatEventMessage event={message.event} caption={authorName ? `${authorName} · ${formattedTime}` : formattedTime} />
+        <ChatEventMessage event={message.event} caption={eventAuthor ? `${eventAuthor} · ${formattedTime}` : formattedTime} />
       </Box>
     );
   }
@@ -364,7 +376,7 @@ const ChatMessageBubble = ({
       >
         <Stack spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">
           {hasTextBubble && (
-            <Bubble isOwn={isOwn}>
+            <Bubble isOwn={isOwn} hasTail={isLastInGroup}>
               <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
                 {renderMessageBody(message.body, chatLabels.callNumber)}
               </Typography>
@@ -423,47 +435,65 @@ const ChatMessageBubble = ({
         />
       </Box>
       {afterBubble}
-      {readReceipt ? (
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <Typography variant="caption" color="text.secondary">
-            {formattedTime}
-          </Typography>
-          <ChatReadReceipt status={readReceipt.status} label={readReceipt.label} />
-        </Stack>
-      ) : (
-        <Typography variant="caption" color="text.secondary">
-          {formattedTime}
-        </Typography>
-      )}
     </>
   );
 
   return (
     <Box data-test="chatMessage" data-active={!!barAnchor || !!pickerAnchor || undefined} sx={rowSx} {...reactionHandlers}>
+      {/* Airbnb-like runs: the time once under my last message, with its ticks; the author's name and the time once
+          above theirs, their avatar next to the last one */}
       {isOwn ? (
-        <Stack alignItems="flex-end" spacing={0.5} sx={{ maxWidth: "70%", ml: "auto" }}>
+        <Stack alignItems="flex-end" spacing={0.5} sx={{ maxWidth: MESSAGE_MAX_WIDTH, ml: "auto" }}>
           {content}
+          {isLastInGroup && (
+            <Stack direction="row" alignItems="center" spacing={0.5} data-test="chatMessageMeta">
+              <Typography variant="caption" color="text.secondary">
+                {formattedTime}
+              </Typography>
+              {readReceipt && <ChatReadReceipt status={readReceipt.status} label={readReceipt.label} />}
+            </Stack>
+          )}
         </Stack>
       ) : (
-        <Stack direction="row" spacing={1.5} alignItems="flex-start">
-          {!hideAvatar && (
-            <Avatar
-              src={avatarSrcResolver?.(author?.avatar)}
-              sx={{
-                backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
-                fontSize: 12,
-                height: 28,
-                mt: 0.5,
-                width: 28,
-              }}
-            >
-              {getInitials(
-                author ? { firstName: author.firstName, lastName: author.lastName } : { fullName: String(message.authorId).slice(0, 2) },
-                true,
-              )}
-            </Avatar>
-          )}
-          <Stack spacing={0.5} sx={{ maxWidth: "70%" }}>
+        <Stack direction="row" spacing={1} alignItems="flex-end">
+          {!hideAvatar &&
+            (isLastInGroup ? (
+              <Avatar
+                src={avatarSrcResolver?.(author?.avatar)}
+                sx={{
+                  backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
+                  flexShrink: 0,
+                  fontSize: 12,
+                  height: AVATAR_SIZE,
+                  // Level with the bubble rather than with the reactions hooked under it
+                  mb: hasReactions && !afterBubble ? "18px" : 0,
+                  width: AVATAR_SIZE,
+                }}
+              >
+                {getInitials(
+                  author ? { firstName: author.firstName, lastName: author.lastName } : { fullName: String(message.authorId).slice(0, 2) },
+                  true,
+                )}
+              </Avatar>
+            ) : (
+              <Box sx={{ flexShrink: 0, width: AVATAR_SIZE }} />
+            ))}
+          <Stack spacing={0.5} sx={{ maxWidth: MESSAGE_MAX_WIDTH, minWidth: 0 }}>
+            {isFirstInGroup && (
+              <Typography variant="caption" color="text.secondary" noWrap data-test="chatMessageMeta" sx={{ px: 0.5 }}>
+                {authorName && (
+                  <>
+                    <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>
+                      {authorName}
+                    </Box>
+                    <Box component="span" sx={{ mx: 0.5 }}>
+                      ·
+                    </Box>
+                  </>
+                )}
+                {formattedTime}
+              </Typography>
+            )}
             {content}
           </Stack>
         </Stack>

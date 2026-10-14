@@ -24,13 +24,18 @@ export const DEFAULT_QUICK_REACTIONS = ["👍", "✅", "👀", "🙏", "😂", "
 export const EMOJI_FONT_FAMILY =
   "'Apple Color Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', 'Android Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif";
 
+/** The conversation's header and the side panel's: one line runs under both (44px avatars, 12px above and below, 1px border) */
+export const CHAT_HEADER_HEIGHT = 69;
+
 /** Line icons of the composer and its recorder, in a 24px grid (see ChatLineIcon) */
 export const LINE_ICON_PATHS = {
+  arrowDown: "M12 5v14m7-7-7 7-7-7",
   bolt: "M13 2 4 14h7l-1 8 9-12h-7l1-8Z",
   check: "M20 6 9 17l-5-5",
   chevronDown: "m7 10 5 5 5-5",
   close: "M18 6 6 18M6 6l12 12",
   mic: "M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0ZM19 10v2a7 7 0 0 1-14 0v-2M12 19v3",
+  panelRight: "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM15 3v18",
 };
 
 export const EMOJI_PICKER_HEIGHT = 400;

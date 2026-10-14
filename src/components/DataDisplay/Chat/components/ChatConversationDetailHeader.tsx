@@ -11,7 +11,9 @@ import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import Avatar from "@/components/DataDisplay/Avatar/Avatar";
+import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
 import ChatParticipantDialog from "@/components/DataDisplay/Chat/components/ChatParticipantDialog";
+import { CHAT_HEADER_HEIGHT, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import type {
   ChatConversationDetailLabels,
   ChatConversationDetailSlotProps,
@@ -42,6 +44,8 @@ interface ChatConversationDetailHeaderProps {
   onBack?: () => void;
   /** A colleague's conversation read without being part of it: no add, no delete */
   readOnly?: boolean;
+  /** Button showing or hiding the side panel, named after it */
+  aside?: { isOpen: boolean; onToggle: () => void; title: string };
 }
 
 const ChatConversationDetailHeader = ({
@@ -60,6 +64,7 @@ const ChatConversationDetailHeader = ({
   slotProps,
   onBack,
   readOnly,
+  aside,
 }: ChatConversationDetailHeaderProps) => {
   const { isMenuOpen, anchorMenu, closeMenu, openMenu } = useMenu();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -82,7 +87,7 @@ const ChatConversationDetailHeader = ({
         direction="row"
         alignItems="center"
         justifyContent="space-between"
-        sx={{ borderBottom: ({ palette }) => `1px solid ${palette.divider}`, px: 3, py: 1.5 }}
+        sx={{ borderBottom: ({ palette }) => `1px solid ${palette.divider}`, minHeight: CHAT_HEADER_HEIGHT, px: 3, py: 1.5 }}
       >
         <Stack direction="row" alignItems="center" spacing={1.5} minWidth={0}>
           {/* Only on a phone, where the list is hidden while a conversation is open. */}
@@ -111,46 +116,68 @@ const ChatConversationDetailHeader = ({
             {participantNames}
           </Typography>
         </Stack>
-        {/* Adding a participant is the frequent action, so it gets a button of its own; the menu
+        <Stack direction="row" alignItems="center" spacing={1} flexShrink={0}>
+          {/* Adding a participant is the frequent action, so it gets a button of its own; the menu
             keeps what stays rare and destructive. */}
-        {readOnly
-          ? null
-          : (headerAction ?? (
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Tooltip arrow title={labels?.addParticipant ?? "Add Participant"}>
-                  <IconButton
-                    {...slotProps?.addParticipantsButton}
-                    size="small"
-                    aria-label={labels?.addParticipant ?? "Add Participant"}
-                    onClick={handleOpenAddDialog}
-                    sx={{
-                      "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.400" : "grey.200") },
-                      backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
-                      color: "text.primary",
-                    }}
-                  >
-                    <PersonAddIcon fontSize="small" />
+          {readOnly
+            ? null
+            : (headerAction ?? (
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Tooltip arrow title={labels?.addParticipant ?? "Add Participant"}>
+                    <IconButton
+                      {...slotProps?.addParticipantsButton}
+                      size="small"
+                      aria-label={labels?.addParticipant ?? "Add Participant"}
+                      onClick={handleOpenAddDialog}
+                      sx={{
+                        "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.400" : "grey.200") },
+                        backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
+                        color: "text.primary",
+                      }}
+                    >
+                      <PersonAddIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <IconButton size="small" onClick={openMenu}>
+                    <MoreHorizIcon fontSize="small" />
                   </IconButton>
-                </Tooltip>
-                <IconButton size="small" onClick={openMenu}>
-                  <MoreHorizIcon fontSize="small" />
-                </IconButton>
-                <Menu
-                  open={isMenuOpen}
-                  onClose={closeMenu}
-                  anchorEl={anchorMenu}
-                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                  transformOrigin={{ horizontal: "right", vertical: "top" }}
-                >
-                  <MenuItem onClick={handleDelete}>
-                    <ListItemIcon>
-                      <DeleteIcon fontSize="small" color="error" />
-                    </ListItemIcon>
-                    <Typography color="error">{labels?.deleteConversation ?? "Delete Conversation"}</Typography>
-                  </MenuItem>
-                </Menu>
-              </Stack>
-            ))}
+                  <Menu
+                    open={isMenuOpen}
+                    onClose={closeMenu}
+                    anchorEl={anchorMenu}
+                    anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                    transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  >
+                    <MenuItem onClick={handleDelete}>
+                      <ListItemIcon>
+                        <DeleteIcon fontSize="small" color="error" />
+                      </ListItemIcon>
+                      <Typography color="error">{labels?.deleteConversation ?? "Delete Conversation"}</Typography>
+                    </MenuItem>
+                  </Menu>
+                </Stack>
+              ))}
+          {aside && (
+            <Tooltip arrow title={aside.title}>
+              <IconButton
+                size="small"
+                aria-label={aside.title}
+                aria-pressed={aside.isOpen}
+                onClick={aside.onToggle}
+                data-test="chatAsideToggle"
+                sx={{
+                  "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.400" : "grey.200") },
+                  backgroundColor: aside.isOpen
+                    ? ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100")
+                    : "transparent",
+                  color: "text.primary",
+                }}
+              >
+                <ChatLineIcon d={LINE_ICON_PATHS.panelRight} />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Stack>
       </Stack>
       <ChatParticipantDialog
         open={addDialogOpen}

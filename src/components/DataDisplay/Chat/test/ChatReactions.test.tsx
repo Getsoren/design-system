@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import ChatMessageBubble from "@/components/DataDisplay/Chat/components/ChatMessageBubble";
 import type { ChatMessage } from "@/components/DataDisplay/Chat/types";
@@ -54,7 +54,7 @@ describe("Chat reactions", () => {
 
     fireEvent.click(summary);
     // One line per person and emoji: Alice reacted twice
-    expect(screen.getAllByText("Alice Martin")).toHaveLength(2);
+    expect(within(screen.getByRole("presentation")).getAllByText("Alice Martin")).toHaveLength(2);
     fireEvent.click(screen.getByLabelText("Remove 👍"));
 
     expect(onToggleReaction).toHaveBeenCalledWith(42, "👍");

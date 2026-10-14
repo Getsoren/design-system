@@ -38,6 +38,8 @@ export const LINE_ICON_PATHS = {
   // The order page's own signs, drawn in line: the event flag, "Terminer", "Prolonger", the delivery truck
   flag: "M5 21V4h8.5l.5 2H19v9h-6.5l-.5-2H5",
   mic: "M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0ZM19 10v2a7 7 0 0 1-14 0v-2M12 19v3",
+  // Three dots drawn as small rings, at the same line as the other icons
+  moreHorizontal: "M5 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2ZM12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2ZM19 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z",
   panelRight: "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM15 3v18",
   // The attachment sign users know, rather than ChatGPT's "+"
   paperclip: "m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48",
@@ -47,6 +49,7 @@ export const LINE_ICON_PATHS = {
   trash: "M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6",
   truck:
     "M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.36A1 1 0 0 0 17.52 8H14M17 16a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM7 16a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z",
+  userPlus: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM19 8v6M22 11h-6",
 };
 
 export const EMOJI_PICKER_HEIGHT = 400;

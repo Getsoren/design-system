@@ -38,6 +38,8 @@ import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRo
 const RADIUS = 20;
 // Every icon of the bottom bar, in its own 40px cell
 const ICON_SIZE = 20;
+// The bolt's outline length in its 24px grid (six strokes), for its draw-in
+const BOLT_PATH_LENGTH = 61;
 const BUTTON_INSET = 9;
 const INNER_RADIUS = `${RADIUS - BUTTON_INSET}px`;
 const composerIconSx = { "@media (hover: none)": { height: 44, width: 44 }, borderRadius: INNER_RADIUS, height: 40, width: 40 };
@@ -299,16 +301,7 @@ const ChatMessageInput = (
             : null
         }
       />
-      {pendingVoice && (
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }} data-test="chatPendingVoice">
-          <ChatVoiceMessage attachment={pendingVoice.preview} isOwn labels={chatLabels} />
-          <Tooltip title={chatLabels.removeAttachment}>
-            <IconButton aria-label={chatLabels.removeAttachment} onClick={discardVoice} sx={{ ...composerIconSx, color: "text.secondary" }}>
-              <ChatLineIcon d={LINE_ICON_PATHS.trash} />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-      )}
+
       {showQuickReplies && (
         <Stack
           direction="row"
@@ -338,6 +331,21 @@ const ChatMessageInput = (
           transition: "border-color 120ms",
         }}
       >
+        {/* A validated take waits inside the white card, not above it: it is not sent yet */}
+        {pendingVoice && (
+          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ m: 1, mb: 0 }} data-test="chatPendingVoice">
+            <ChatVoiceMessage attachment={pendingVoice.preview} variant="composer" labels={chatLabels} />
+            <Tooltip title={chatLabels.removeAttachment}>
+              <IconButton
+                aria-label={chatLabels.removeAttachment}
+                onClick={discardVoice}
+                sx={{ ...composerIconSx, color: "text.secondary" }}
+              >
+                <ChatLineIcon d={LINE_ICON_PATHS.trash} />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        )}
         {/* The message being answered, 9px inside the composer's corner (1px border + 8px): 20 - 9 = 11 */}
         {replyTo && (
           <Stack
@@ -445,10 +453,26 @@ const ChatMessageInput = (
                     pr: 1.5,
                     whiteSpace: "nowrap",
                     ...(quickActionsAnchor && { backgroundColor: "action.hover" }),
+                    // A little life on the bolt: drawn once when the composer appears, a zap on hover
+                    "@keyframes chatBoltDraw": { to: { strokeDashoffset: 0 } },
+                    "@keyframes chatBoltZap": {
+                      "0%, 100%": { transform: "rotate(0) scale(1)" },
+                      "30%": { transform: "rotate(-12deg) scale(1.15)" },
+                      "60%": { transform: "rotate(8deg) scale(1.1)" },
+                    },
+                    "@media (prefers-reduced-motion: reduce)": {
+                      "& [data-bolt], & [data-bolt] path": { animation: "none", strokeDashoffset: 0 },
+                    },
+                    "& [data-bolt] path": {
+                      animation: "chatBoltDraw 700ms ease-out 300ms forwards",
+                      strokeDasharray: BOLT_PATH_LENGTH,
+                      strokeDashoffset: BOLT_PATH_LENGTH,
+                    },
+                    "&:hover [data-bolt]": { animation: "chatBoltZap 420ms ease-in-out" },
                   }}
                 >
                   {/* Order actions: a lightning bolt, not the AI assistant's spark */}
-                  <ChatLineIcon d={LINE_ICON_PATHS.bolt} size={ICON_SIZE} />
+                  <ChatLineIcon d={LINE_ICON_PATHS.bolt} size={ICON_SIZE} data-bolt />
                   {chatLabels.moreActions}
                   <ChatLineIcon
                     d={LINE_ICON_PATHS.chevronDown}

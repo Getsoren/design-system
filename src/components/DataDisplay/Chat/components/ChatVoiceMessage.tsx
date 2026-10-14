@@ -20,9 +20,16 @@ const BUTTON_SIZE = 44;
 const BUTTON_RADIUS = BUBBLE_RADIUS - BUTTON_INSET;
 const BUTTON_TAIL_RADIUS = Math.max(TAIL_RADIUS - BUTTON_INSET, 2);
 
+// In the composer, before it is sent: 9px inside its 20px corner (20 - 9 = 11), its play button 4px inside (11 - 4 = 7)
+const COMPOSER_RADIUS = 11;
+const COMPOSER_INSET = 4;
+const COMPOSER_BUTTON_SIZE = 40;
+
 interface ChatVoiceMessageProps {
   attachment: ChatAttachment;
   isOwn?: boolean;
+  /** "composer": a take waiting to be sent, inside the composer's white card rather than as a sent bubble */
+  variant?: "bubble" | "composer";
   labels: ChatLabels;
 }
 
@@ -57,7 +64,8 @@ const getWaveform = (id: string): number[] => {
  * A voice message as a bubble: play / pause button, waveform filling up with the playback (a click moves the
  * playhead), the duration then the elapsed time.
  */
-const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) => {
+const ChatVoiceMessage = ({ attachment, isOwn, labels, variant = "bubble" }: ChatVoiceMessageProps) => {
+  const isInComposer = variant === "composer";
   const audioRef = useRef<HTMLAudioElement>(null);
   // MediaRecorder webm files have no duration in their header: seeking far away makes the browser compute it
   const isResolvingDurationRef = useRef(false);
@@ -178,16 +186,16 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
       data-test="chatVoiceMessage"
       sx={{
         alignItems: "center",
-        backgroundColor: isOwn ? getOwnBubbleBackground : "tertiary.light",
+        backgroundColor: isInComposer ? "action.hover" : isOwn ? getOwnBubbleBackground : "tertiary.light",
         border: 0,
-        borderRadius: `${BUBBLE_RADIUS}px`,
-        ...(isOwn ? { borderBottomRightRadius: `${TAIL_RADIUS}px` } : { borderBottomLeftRadius: `${TAIL_RADIUS}px` }),
-        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        borderRadius: `${isInComposer ? COMPOSER_RADIUS : BUBBLE_RADIUS}px`,
+        ...(!isInComposer && (isOwn ? { borderBottomRightRadius: `${TAIL_RADIUS}px` } : { borderBottomLeftRadius: `${TAIL_RADIUS}px` })),
+        boxShadow: isInComposer ? "none" : "0 1px 3px rgba(0,0,0,0.1)",
         color: "text.primary",
         display: "flex",
         gap: 1.25,
         maxWidth: "100%",
-        p: `${BUTTON_INSET}px`,
+        p: `${isInComposer ? COMPOSER_INSET : BUTTON_INSET}px`,
         pr: 1.5,
         width: 260,
       }}
@@ -199,12 +207,12 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels }: ChatVoiceMessageProps) 
           "&:hover": { backgroundColor: "primary.main", opacity: 0.85 },
           backgroundColor: "primary.main",
           // The corner next to the bubble's tail follows it, the others follow the bubble's 16px
-          borderRadius: `${BUTTON_RADIUS}px`,
+          borderRadius: `${isInComposer ? COMPOSER_RADIUS - COMPOSER_INSET : BUTTON_RADIUS}px`,
           color: "primary.contrastText",
-          ...(!isOwn && { borderBottomLeftRadius: `${BUTTON_TAIL_RADIUS}px` }),
+          ...(!(isOwn || isInComposer) && { borderBottomLeftRadius: `${BUTTON_TAIL_RADIUS}px` }),
           flexShrink: 0,
-          height: BUTTON_SIZE,
-          width: BUTTON_SIZE,
+          height: isInComposer ? COMPOSER_BUTTON_SIZE : BUTTON_SIZE,
+          width: isInComposer ? COMPOSER_BUTTON_SIZE : BUTTON_SIZE,
         }}
       >
         {isPlaying ? <PauseRoundedIcon /> : <PlayArrowRoundedIcon />}

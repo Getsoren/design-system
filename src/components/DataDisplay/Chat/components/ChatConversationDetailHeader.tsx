@@ -23,8 +23,6 @@ import type {
 import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";
 import DeleteIcon from "@/components/DataDisplay/Icons/DeleteIcon";
 import KeyboardArrowLeftRoundedIcon from "@/components/DataDisplay/Icons/KeyboardArrowLeftRoundedIcon";
-import MoreHorizIcon from "@/components/DataDisplay/Icons/MoreHorizIcon";
-import PersonAddIcon from "@/components/DataDisplay/Icons/PersonAddIcon";
 import useMenu from "@/hooks/useMenu/useMenu";
 
 interface ChatConversationDetailHeaderProps {
@@ -47,6 +45,19 @@ interface ChatConversationDetailHeaderProps {
   /** Button showing or hiding the side panel, named after it */
   aside?: { isOpen: boolean; onToggle: () => void; title: string };
 }
+
+/**
+ * The header's tools look alike: the same size, line icons and ink, and one grey, on hover and while what they open
+ * is open
+ */
+const headerButtonSx = (isActive: boolean) => ({
+  "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? palette.grey[500] : palette.grey[100]) },
+  backgroundColor: isActive ? ({ palette }: Theme) => (palette.mode === "dark" ? palette.grey[500] : palette.grey[100]) : "transparent",
+  borderRadius: "10px",
+  color: "text.primary",
+  height: 36,
+  width: 36,
+});
 
 const ChatConversationDetailHeader = ({
   threadId,
@@ -126,20 +137,19 @@ const ChatConversationDetailHeader = ({
                   <Tooltip arrow title={labels?.addParticipant ?? "Add Participant"}>
                     <IconButton
                       {...slotProps?.addParticipantsButton}
-                      size="small"
                       aria-label={labels?.addParticipant ?? "Add Participant"}
                       onClick={handleOpenAddDialog}
-                      sx={{
-                        "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.400" : "grey.200") },
-                        backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100"),
-                        color: "text.primary",
-                      }}
+                      sx={headerButtonSx(false)}
                     >
-                      <PersonAddIcon fontSize="small" />
+                      <ChatLineIcon d={LINE_ICON_PATHS.userPlus} />
                     </IconButton>
                   </Tooltip>
-                  <IconButton size="small" onClick={openMenu}>
-                    <MoreHorizIcon fontSize="small" />
+                  <IconButton
+                    aria-label={labels?.deleteConversation ?? "Delete Conversation"}
+                    onClick={openMenu}
+                    sx={headerButtonSx(isMenuOpen)}
+                  >
+                    <ChatLineIcon d={LINE_ICON_PATHS.moreHorizontal} />
                   </IconButton>
                   <Menu
                     open={isMenuOpen}
@@ -160,18 +170,11 @@ const ChatConversationDetailHeader = ({
           {aside && (
             <Tooltip arrow title={aside.title}>
               <IconButton
-                size="small"
                 aria-label={aside.title}
                 aria-pressed={aside.isOpen}
                 onClick={aside.onToggle}
                 data-test="chatAsideToggle"
-                sx={{
-                  "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.400" : "grey.200") },
-                  backgroundColor: aside.isOpen
-                    ? ({ palette }: Theme) => (palette.mode === "dark" ? "grey.500" : "grey.100")
-                    : "transparent",
-                  color: "text.primary",
-                }}
+                sx={headerButtonSx(aside.isOpen)}
               >
                 <ChatLineIcon d={LINE_ICON_PATHS.panelRight} />
               </IconButton>

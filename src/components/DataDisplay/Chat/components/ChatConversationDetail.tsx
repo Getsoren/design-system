@@ -306,20 +306,12 @@ const ChatConversationDetail = ({
               return (
                 <Stack key={message.id} spacing={3}>
                   {showDayDivider && (
-                    // Centered pill rather than a full-width line: the ::before/::after keep their
+                    // Centered text rather than a full-width line: the ::before/::after keep their
                     // flex (centering) but lose their line.
                     <Divider
                       sx={{
-                        "& .MuiDivider-wrapper": {
-                          alignItems: "center",
-                          backgroundColor: "background.paper",
-                          border: "1px solid",
-                          borderColor: "divider",
-                          borderRadius: 999,
-                          display: "flex",
-                          paddingX: 1.5,
-                          paddingY: 0.75,
-                        },
+                        // Just the text: no outline, no white pill
+                        "& .MuiDivider-wrapper": { alignItems: "center", display: "flex", paddingX: 1.5, paddingY: 0.75 },
                         "&::after": { borderTop: "none" },
                         "&::before": { borderTop: "none" },
                       }}

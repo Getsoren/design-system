@@ -36,10 +36,11 @@ const BoltIcon = (props: SvgIconProps) => (
   </SvgIcon>
 );
 
-// Concentric corners: the composer is rounded at 20px and its 40px buttons sit 8px from its edges, so they take
-// 20 - 8 = 12px, the slightly square shape of the app's buttons, hugging the composer's corners
+// Concentric corners: the composer is rounded at 20px and its 40px buttons sit 9px from its outer edge (1px border
+// + 8px padding), so they take 20 - 9 = 11px: the slightly square shape of the app's buttons, hugging its corners
 const RADIUS = 20;
-const INNER_RADIUS = "12px";
+const BUTTON_INSET = 9;
+const INNER_RADIUS = `${RADIUS - BUTTON_INSET}px`;
 const composerIconSx = { "@media (hover: none)": { height: 44, width: 44 }, borderRadius: INNER_RADIUS, height: 40, width: 40 };
 const COUNTER_VISIBLE_FROM = 40;
 

@@ -448,6 +448,8 @@ const ChatMessageBubble = ({
         }}
       >
         <Stack spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">
+          {/* A link alone shows its card in place of the bubble: the tools and the reactions then sit by the card */}
+          {isPreviewOnly && afterBubble}
           {hasTextBubble && (
             <Bubble isOwn={isOwn} hasTail={isLastInGroup}>
               {replyTo && (
@@ -493,6 +495,8 @@ const ChatMessageBubble = ({
               position: "absolute",
               top: hasReactions ? "calc(50% - 9px)" : "50%",
               transform: "translateY(-50%)",
+              // Above the cards that follow in the conversation
+              zIndex: 1,
               ...(isOwn ? { right: "100%" } : { left: "100%" }),
             }}
           >
@@ -524,7 +528,7 @@ const ChatMessageBubble = ({
           onToggle={canReact ? toggleReaction : undefined}
         />
       </Box>
-      {afterBubble}
+      {!isPreviewOnly && afterBubble}
     </>
   );
 
@@ -562,7 +566,7 @@ const ChatMessageBubble = ({
                   fontSize: 12,
                   height: AVATAR_SIZE,
                   // Level with the bubble rather than with the reactions hooked under it
-                  mb: hasReactions && !afterBubble ? "18px" : 0,
+                  mb: hasReactions && (!afterBubble || isPreviewOnly) ? "18px" : 0,
                   width: AVATAR_SIZE,
                 }}
               >

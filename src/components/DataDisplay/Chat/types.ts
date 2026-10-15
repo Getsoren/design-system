@@ -419,6 +419,8 @@ export interface ChatConversationDetailProps {
   unreadCount?: number;
   /** A line above the composer, e.g. the other side's usual response time (Airbnb) */
   composerNotice?: ReactNode;
+  /** A grey line under the participants' names in the header, e.g. the rentals under way with them */
+  subtitle?: ReactNode;
 }
 
 export interface ChatMessageBubbleLabels

@@ -42,6 +42,8 @@ interface ChatConversationDetailHeaderProps {
   onBack?: () => void;
   /** A colleague's conversation read without being part of it: no add, no delete */
   readOnly?: boolean;
+  /** A grey line under the names, e.g. the rentals under way with them */
+  subtitle?: ReactNode;
   /** Button showing or hiding the side panel, named after it */
   aside?: { isOpen: boolean; onToggle: () => void; title: string };
 }
@@ -75,6 +77,7 @@ const ChatConversationDetailHeader = ({
   slotProps,
   onBack,
   readOnly,
+  subtitle,
   aside,
 }: ChatConversationDetailHeaderProps) => {
   const { isMenuOpen, anchorMenu, closeMenu, openMenu } = useMenu();
@@ -123,9 +126,16 @@ const ChatConversationDetailHeader = ({
               </Avatar>
             ))}
           </AvatarGroup>
-          <Typography variant="subtitle2" fontWeight={600} noWrap>
-            {participantNames}
-          </Typography>
+          <Stack minWidth={0}>
+            <Typography variant="subtitle2" fontWeight={600} noWrap>
+              {participantNames}
+            </Typography>
+            {subtitle && (
+              <Typography variant="caption" color="text.secondary" noWrap data-test="chatHeaderSubtitle">
+                {subtitle}
+              </Typography>
+            )}
+          </Stack>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1} flexShrink={0}>
           {/* Adding a participant is the frequent action, so it gets a button of its own; the menu

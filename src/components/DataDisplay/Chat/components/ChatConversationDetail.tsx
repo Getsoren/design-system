@@ -188,6 +188,7 @@ const ChatConversationDetail = ({
   asideCount,
   unreadCount,
   composerNotice,
+  subtitle,
 }: ChatConversationDetailProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<{ threadId?: string; value: MessagesFilter }>({ value: "all" });
@@ -424,6 +425,7 @@ const ChatConversationDetail = ({
           onAddParticipantDialogOpenChange={onAddParticipantDialogOpenChange}
           slotProps={slotProps}
           readOnly={!!readOnly}
+          subtitle={subtitle}
           aside={aside ? { isOpen: isAsideOpen, onToggle: () => setAsideChoice(!isAsideOpen), title: asideTitle ?? "" } : undefined}
         />
         {showFilter && !isLoading && (

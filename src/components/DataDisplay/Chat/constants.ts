@@ -33,6 +33,7 @@ export const LINE_ICON_PATHS = {
   bolt: "M13 2 4 14h7l-1 8 9-12h-7l1-8Z",
   check: "M20 6 9 17l-5-5",
   chevronDown: "m7 10 5 5 5-5",
+  chevronRight: "m10 7 5 5-5 5",
   clock: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20ZM12 6v6l4 2",
   close: "M18 6 6 18M6 6l12 12",
   // The order page's own signs, drawn in line: the event flag, "Terminer", "Prolonger", the delivery truck

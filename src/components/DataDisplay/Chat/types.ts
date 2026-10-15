@@ -35,6 +35,10 @@ export interface ChatMessageBooking {
   label: string;
   image?: string | null;
   onClick?: () => void;
+  /** The machine and the order's number apart, for the order's own card inside a request card; label otherwise */
+  name?: string | null;
+  /** e.g. "N° 34126" */
+  reference?: string;
 }
 
 /** An automatic message (end of rental, order shared…), shown as a centered notice rather than a bubble */
@@ -64,6 +68,8 @@ export interface ChatMessageActionResponse {
 export interface ChatMessageAction {
   /** e.g. "Demande de prolongation" */
   title: string;
+  /** The request's icon, as in the composer's Actions menu */
+  icon?: ReactNode;
   /** e.g. "N° 34126 · Nacelle 16 m", with the machine's photo */
   booking?: ChatMessageBooking;
   /** e.g. ["Jusqu'au 12 oct."], one line each */

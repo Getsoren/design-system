@@ -1,9 +1,14 @@
 import Box from "@mui/material/Box";
+import ButtonBase from "@mui/material/ButtonBase";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import ChatBookingTag from "@/components/DataDisplay/Chat/components/ChatBookingTag";
-import type { ChatMessageAction, ChatMessageActionStatus } from "@/components/DataDisplay/Chat/types";
+import ChatIconTile from "@/components/DataDisplay/Chat/components/ChatIconTile";
+import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
+import { LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
+import type { ChatMessageAction, ChatMessageActionStatus, ChatMessageBooking } from "@/components/DataDisplay/Chat/types";
+import Chip from "@/components/DataDisplay/Chip/Chip";
 import Button from "@/components/Inputs/Button/Button";
 
 export const ACTION_CARD_WIDTH = 320;
@@ -12,7 +17,10 @@ const CARD_PADDING = 12;
 // The answers sit 4px inside the card's 1px border, 5px from its outer edge: 12 - 5 = 7, concentric with its corners
 const BUTTONS_INSET = 4;
 const BORDER_WIDTH = 1;
-const PHOTO_SIZE = 48;
+const PHOTO_SIZE = 40;
+// The design system's base radius for the order's card inside the request's
+const ORDER_RADIUS = 8;
+const ORDER_PADDING = 8;
 
 interface ChatActionCardProps {
   action: ChatMessageAction;
@@ -51,9 +59,68 @@ const StatusPill = ({ status }: StatusPillProps) => {
   );
 };
 
+interface OrderCardProps {
+  booking: ChatMessageBooking;
+}
+
 /**
- * Airbnb-like card of a request on an order: the machine's photo, the title and the order tag, the details, the status,
- * then the recipient's one-tap answers.
+ * The order the request is about, in a card of its own inside the request's: its machine, name and number, a tap away
+ */
+const OrderCard = ({ booking }: OrderCardProps) => (
+  <ButtonBase
+    onClick={booking.onClick}
+    disabled={!booking.onClick}
+    data-test="chatActionOrder"
+    sx={{
+      "&:hover": { backgroundColor: "action.hover" },
+      "&.Mui-disabled": { color: "inherit" },
+      alignItems: "center",
+      border: "1px solid",
+      borderColor: "divider",
+      borderRadius: `${ORDER_RADIUS}px`,
+      gap: 1.25,
+      justifyContent: "flex-start",
+      p: `${ORDER_PADDING - 1}px`,
+      textAlign: "left",
+      width: "100%",
+    }}
+  >
+    {booking.image && (
+      <Box
+        component="img"
+        src={booking.image}
+        alt=""
+        sx={{
+          backgroundColor: "action.hover",
+          // 8px inside an 8px corner: the smallest radius of the scale rather than a sharp square
+          borderRadius: 0.5,
+          flexShrink: 0,
+          height: PHOTO_SIZE,
+          objectFit: "cover",
+          width: PHOTO_SIZE,
+        }}
+      />
+    )}
+    {booking.name ? (
+      // The machine, its order's number right after it
+      <Stack direction="row" alignItems="center" spacing={1} flex={1} minWidth={0}>
+        <Typography variant="body2" fontWeight={500} noWrap minWidth={0} title={booking.name}>
+          {booking.name}
+        </Typography>
+        {booking.reference && <Chip label={booking.reference} variant="rounded" color="default" size="small" sx={{ flexShrink: 0 }} />}
+      </Stack>
+    ) : (
+      <Box flex={1} minWidth={0}>
+        <ChatBookingTag booking={{ ...booking, onClick: undefined }} />
+      </Box>
+    )}
+    {booking.onClick && <ChatLineIcon d={LINE_ICON_PATHS.chevronRight} size={16} sx={{ color: "text.secondary", flexShrink: 0 }} />}
+  </ButtonBase>
+);
+
+/**
+ * Airbnb-like card of a request on an order: the request first (its icon and title), then the order it is about in a
+ * card of its own, so it doesn't read as the order's name; the details, the status, then the recipient's one-tap answers.
  */
 const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
   const [pendingResponseId, setPendingResponseId] = useState<string | null>(null);
@@ -84,30 +151,13 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
       }}
     >
       <Stack spacing={1.25} sx={{ p: `${CARD_PADDING}px` }}>
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          {action.booking?.image && (
-            <Box
-              component="img"
-              src={action.booking.image}
-              alt=""
-              sx={{
-                backgroundColor: "action.hover",
-                // Inset 12px from the card's corner: the smallest radius of the scale rather than a sharp square
-                borderRadius: 0.5,
-                flexShrink: 0,
-                height: PHOTO_SIZE,
-                objectFit: "cover",
-                width: PHOTO_SIZE,
-              }}
-            />
-          )}
-          <Stack spacing={0.75} alignItems="flex-start" flex={1} minWidth={0}>
-            <Typography variant="body2" fontWeight={600}>
-              {action.title}
-            </Typography>
-            {action.booking && <ChatBookingTag booking={action.booking} />}
-          </Stack>
+        <Stack direction="row" spacing={1.25} alignItems="center">
+          {action.icon && <ChatIconTile radius={ORDER_RADIUS}>{action.icon}</ChatIconTile>}
+          <Typography variant="body2" fontWeight={600}>
+            {action.title}
+          </Typography>
         </Stack>
+        {action.booking && <OrderCard booking={action.booking} />}
         {!!action.details?.length && (
           <Stack spacing={0.25}>
             {action.details.map((detail) => (

@@ -739,8 +739,15 @@ const clientQuickActions: ChatQuickAction[] = [
   { icon: <FileTextIcon fontSize="inherit" />, id: "document", label: "Demander un document" },
 ];
 
-const nacelle: ChatMessageBooking = { ...nacelleBooking, label: "N° 34126 · Nacelle 16 m" };
-const minipelle: ChatMessageBooking = { image: "https://picsum.photos/seed/minipelle/96/96", label: "N° 34188 · Mini-pelle 2,5 t" };
+const nacelle: ChatMessageBooking = { ...nacelleBooking, label: "N° 34126 · Nacelle 16 m", name: "Nacelle 16 m", reference: "N° 34126" };
+const minipelle: ChatMessageBooking = {
+  image: "https://picsum.photos/seed/minipelle/96/96",
+  label: "N° 34188 · Mini-pelle 2,5 t",
+  name: "Mini-pelle 2,5 t",
+  onClick: () => console.info("Open order 34188"),
+  reference: "N° 34188",
+};
+const actionIcon = (id: string) => clientQuickActions.find((action) => action.id === id)?.icon;
 
 /**
  * The composer's "+" opens the quick actions (the app's dialog is simulated: the request leaves at once). Requests
@@ -752,6 +759,7 @@ export const QuickActions: StoryFn = () => {
       action: {
         booking: minipelle,
         details: ["Mardi 14 oct.", "Matin"],
+        icon: actionIcon("pickup"),
         status: { label: "Acceptée par Kiloutou · 09:12", tone: "success" },
         title: "Demande de reprise",
       },
@@ -763,6 +771,7 @@ export const QuickActions: StoryFn = () => {
     {
       action: {
         booking: nacelle,
+        icon: actionIcon("document"),
         responses: [{ id: "upload", label: "Déposer le document" }],
         status: { label: "En attente", tone: "pending" },
         title: "Demande du bon de commande",

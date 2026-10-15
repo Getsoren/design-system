@@ -74,6 +74,8 @@ export interface ChatMessageAction {
   booking?: ChatMessageBooking;
   /** e.g. ["Jusqu'au 12 oct."], one line each */
   details?: string[];
+  /** A date moved by the request: the current one struck through, the asked one beside it, e.g. "Fin : 15 oct. → 24 oct." */
+  change?: { label?: string; before: string; after: string };
   status?: ChatMessageActionStatus;
   /** Buttons for the recipient only */
   responses?: ChatMessageActionResponse[];

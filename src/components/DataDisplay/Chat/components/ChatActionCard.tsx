@@ -158,6 +158,21 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
           </Typography>
         </Stack>
         {action.booking && <OrderCard booking={action.booking} />}
+        {action.change && (
+          // What the request moves: the current date struck through, then the asked one
+          <Typography variant="body2" color="text.secondary" data-test="chatActionChange">
+            {action.change.label && `${action.change.label} `}
+            <Box component="s" sx={{ textDecorationColor: "currentColor" }}>
+              {action.change.before}
+            </Box>
+            <Box component="span" sx={{ mx: 0.5 }}>
+              →
+            </Box>
+            <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>
+              {action.change.after}
+            </Box>
+          </Typography>
+        )}
         {!!action.details?.length && (
           <Stack spacing={0.25}>
             {action.details.map((detail) => (

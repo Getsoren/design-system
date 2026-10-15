@@ -64,4 +64,5 @@ export const getEmojiPickerWidth = (columns: number) => columns * EMOJI_CELL_SIZ
 export const getOwnBubbleBackground = ({ palette }: Theme) =>
   palette.mode === "dark"
     ? palette.grey[900]
-    : ((palette.tertiary as unknown as Partial<Record<string, string>> | undefined)?.["12p"] ?? palette.grey[200]);
+    : // The design system's lighter tertiary step: a soft grey on the conversation's background
+      ((palette.tertiary as unknown as Partial<Record<string, string>> | undefined)?.["8p"] ?? palette.grey[100]);

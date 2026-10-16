@@ -60,7 +60,7 @@ describe("Chat reactions", () => {
     expect(onToggleReaction).toHaveBeenCalledWith(42, "👍");
   });
 
-  it("puts a thumb up on a double click, never takes it back", () => {
+  it("puts a thumb up on a double click, takes it back on the next", () => {
     const onToggleReaction = vi.fn();
     const { rerender } = render(
       <ChatMessageBubble
@@ -75,7 +75,7 @@ describe("Chat reactions", () => {
     fireEvent.doubleClick(screen.getByText("Livraison confirmée"));
     expect(onToggleReaction).toHaveBeenCalledWith(42, "👍");
 
-    // Already mine: a double click leaves it (a fresh bubble, out of the double tap debounce)
+    // Already mine: a double click takes it back (a fresh bubble, out of the double tap debounce)
     onToggleReaction.mockClear();
     rerender(
       <ChatMessageBubble
@@ -88,7 +88,7 @@ describe("Chat reactions", () => {
       />,
     );
     fireEvent.doubleClick(screen.getByText("Livraison confirmée"));
-    expect(onToggleReaction).not.toHaveBeenCalled();
+    expect(onToggleReaction).toHaveBeenCalledWith(43, "👍");
   });
 
   it("leaves the message's controls to their own double click", () => {

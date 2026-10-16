@@ -337,7 +337,7 @@ const ChatMessageBubble = ({
   };
 
   /**
-   * Double click or double tap: a thumb up, never a removal (Instagram's double tap only likes)
+   * Double click or double tap: a thumb up, taken back by the next one
    */
   const reactWithThumb = () => {
     const now = Date.now();
@@ -347,10 +347,8 @@ const ChatMessageBubble = ({
     }
 
     lastDoubleTapAtRef.current = now;
-
-    if (!myEmojis.some((emoji) => stripVariationSelectors(emoji) === stripVariationSelectors(DOUBLE_TAP_REACTION))) {
-      toggleReaction(DOUBLE_TAP_REACTION);
-    }
+    // Mine already: the toggle takes it back
+    toggleReaction(DOUBLE_TAP_REACTION);
   };
 
   const handlePointerUp = (e: PointerEvent) => {

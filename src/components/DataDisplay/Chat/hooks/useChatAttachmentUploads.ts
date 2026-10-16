@@ -123,7 +123,7 @@ const useChatAttachmentUploads = ({ onUploadAttachment, accept, maxAttachments, 
     setItems(itemsRef.current);
     setRejectedFiles([]);
 
-    return uploaded.map(({ attachment, link }) => ({ ...(attachment as ChatAttachment), link: link ?? attachment?.link }));
+    return uploaded.flatMap(({ attachment, link }) => (attachment ? [{ ...attachment, link: link ?? attachment.link }] : []));
   };
 
   const clear = () => {

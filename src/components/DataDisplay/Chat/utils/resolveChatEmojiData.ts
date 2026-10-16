@@ -1,4 +1,4 @@
-import type { EmojiData, EmojiDataResolver } from "frimousse";
+import type { EmojiDataResolver } from "frimousse";
 import { EMOJI_FONT_FAMILY } from "@/components/DataDisplay/Chat/constants";
 
 interface EmojibaseEmoji {
@@ -19,7 +19,7 @@ interface EmojibaseMessages {
 }
 
 // Bundled with the picker chunk rather than fetched from a CDN: the apps work without third-party hosts
-const loaders: Record<string, () => Promise<[{ default: unknown }, { default: unknown }]>> = {
+const loaders: Record<"en" | "fr", () => Promise<[{ default: EmojibaseEmoji[] }, { default: EmojibaseMessages }]>> = {
   en: () => Promise.all([import("emojibase-data/en/data.json"), import("emojibase-data/en/messages.json")]),
   fr: () => Promise.all([import("emojibase-data/fr/data.json"), import("emojibase-data/fr/messages.json")]),
 };
@@ -92,10 +92,9 @@ const stripAccents = (value: string) => value.normalize("NFD").replace(/[̀-ͯ]/
  */
 const resolveChatEmojiData: EmojiDataResolver = async (locale) => {
   const datasetLocale = locale === "fr" ? "fr" : "en";
-  const [{ default: emojisModule }, { default: messagesModule }] = await loaders[datasetLocale]();
-  const emojis = emojisModule as EmojibaseEmoji[];
-  const messages = messagesModule as EmojibaseMessages;
+  const [{ default: emojis }, { default: messages }] = await loaders[datasetLocale]();
   const support = getEmojiSupport();
+  const getSkinToneLabel = (key: string) => capitalize(messages.skinTones.find((skinTone) => skinTone.key === key)?.message ?? key);
   const componentGroup = messages.groups.find((group) => group.key === "component")?.order;
   const flagSubgroups = messages.subgroups
     .filter((subgroup) => subgroup.key === "country-flag" || subgroup.key === "subdivision-flag")
@@ -105,30 +104,33 @@ const resolveChatEmojiData: EmojiDataResolver = async (locale) => {
     categories: messages.groups
       .filter((group) => group.order !== componentGroup)
       .map((group) => ({ index: group.order, label: capitalize(group.message) })),
-    emojis: emojis
-      .filter(
-        (emoji) =>
-          emoji.group !== undefined &&
-          emoji.group !== componentGroup &&
-          emoji.version <= support.version &&
-          (support.flags || !flagSubgroups.includes(emoji.subgroup ?? -1)),
-      )
-      .map((emoji) => {
-        const tags = emoji.tags ?? [];
+    emojis: emojis.flatMap((emoji) => {
+      const tags = emoji.tags ?? [];
 
-        return {
-          category: emoji.group as number,
-          // "👍️" → "👍": the same string as the quick reactions, so a reaction never splits into two pills
-          emoji: emoji.type === 1 ? emoji.emoji.replace(/\uFE0F$/, "") : emoji.emoji,
-          label: capitalize(emoji.label),
-          tags: [...tags, ...[emoji.label, ...tags].map(stripAccents)],
-          version: emoji.version,
-        };
-      }),
+      return emoji.group === undefined ||
+        emoji.group === componentGroup ||
+        emoji.version > support.version ||
+        (!support.flags && flagSubgroups.includes(emoji.subgroup ?? -1))
+        ? []
+        : [
+            {
+              category: emoji.group,
+              // "👍️" → "👍": the same string as the quick reactions, so a reaction never splits into two pills
+              emoji: emoji.type === 1 ? emoji.emoji.replace(/\uFE0F$/, "") : emoji.emoji,
+              label: capitalize(emoji.label),
+              tags: [...tags, ...[emoji.label, ...tags].map(stripAccents)],
+              version: emoji.version,
+            },
+          ];
+    }),
     locale: datasetLocale,
-    skinTones: Object.fromEntries(
-      messages.skinTones.map((skinTone) => [skinTone.key, capitalize(skinTone.message)]),
-    ) as EmojiData["skinTones"],
+    skinTones: {
+      dark: getSkinToneLabel("dark"),
+      light: getSkinToneLabel("light"),
+      medium: getSkinToneLabel("medium"),
+      "medium-dark": getSkinToneLabel("medium-dark"),
+      "medium-light": getSkinToneLabel("medium-light"),
+    },
   };
 };
 

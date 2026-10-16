@@ -80,7 +80,7 @@ export interface ChatMessageAction {
    */
   changes?: { label?: string; before: string; after: string }[];
   status?: ChatMessageActionStatus;
-  /** Buttons for the recipient only */
+  /** Buttons under the card: the app gives them to whoever may answer, its author included (closing an event) */
   responses?: ChatMessageActionResponse[];
   /** Comment typed with the request */
   note?: string;

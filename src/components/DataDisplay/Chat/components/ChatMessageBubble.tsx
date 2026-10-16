@@ -128,7 +128,7 @@ const ChatMessageBubble = ({
           {message.action && (
             <ChatActionCard
               action={message.action}
-              onRespond={!isOwn && onActionResponse ? (responseId) => onActionResponse(message.id, responseId) : undefined}
+              onRespond={onActionResponse && ((responseId) => onActionResponse(message.id, responseId))}
             />
           )}
           {attachments.length > 0 && (

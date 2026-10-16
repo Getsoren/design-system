@@ -68,10 +68,17 @@ describe("Chat quick actions", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Refuser" })).toBeEnabled());
   });
 
-  it("shows the card without answers to its author", () => {
-    render(<ChatMessageBubble isOwn currentUserId="client" message={request} onActionResponse={vi.fn()} />);
+  it("shows its author the buttons the app gives the card, none otherwise", () => {
+    const onActionResponse = vi.fn();
+    const action = { status: { label: "Déclaré", tone: "success" as const }, title: "Événement déclaré" };
+    const event: ChatMessage = { ...request, action: { ...action, responses: [{ id: "closeEvent", label: "Clôturer" }] } };
+    const { rerender } = render(<ChatMessageBubble isOwn currentUserId="client" message={event} onActionResponse={onActionResponse} />);
 
-    expect(screen.getByText("Demande de prolongation")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Accepter" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Clôturer" }));
+    expect(onActionResponse).toHaveBeenCalledWith(12, "closeEvent");
+
+    rerender(<ChatMessageBubble isOwn currentUserId="client" message={{ ...request, action }} onActionResponse={vi.fn()} />);
+    expect(screen.getByText("Événement déclaré")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Clôturer" })).toBeNull();
   });
 });

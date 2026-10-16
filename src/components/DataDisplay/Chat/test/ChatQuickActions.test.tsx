@@ -68,7 +68,7 @@ describe("Chat quick actions", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Refuser" })).toBeEnabled());
   });
 
-  it("opens the card's event on a click anywhere but its order, the action left to do under it", () => {
+  it("opens the card's event on a click anywhere but its order and its buttons", () => {
     const onClick = vi.fn();
     const onOpenOrder = vi.fn();
     const onActionResponse = vi.fn();
@@ -76,8 +76,8 @@ describe("Chat quick actions", () => {
       ...request,
       action: {
         booking: { label: "N° 34126 · Nacelle 16 m", onClick: onOpenOrder },
-        callToAction: { id: "closeEvent", label: "Clôturer" },
         onClick,
+        responses: [{ id: "closeEvent", label: "Clôturer" }],
         title: "Événement déclaré",
       },
     };

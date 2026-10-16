@@ -24,7 +24,7 @@ const ORDER_PADDING = 8;
 
 interface ChatActionCardProps {
   action: ChatMessageAction;
-  /** Shows the answers and the action left to do. May return a promise: the button spins until it settles */
+  /** Shows the answers. May return a promise: the button spins until it settles */
   onRespond?: (responseId: string) => unknown;
 }
 
@@ -173,12 +173,10 @@ const EventContent = ({ action }: EventContentProps) => {
 /**
  * Airbnb-like card of a request on an order: the request first (its icon and title), then the order it is about in a
  * card of its own, so it doesn't read as the order's name; the details, the status, then the recipient's one-tap answers.
- * The action left to do on it comes under it, out of the card.
  */
 const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
   const [pendingResponseId, setPendingResponseId] = useState<string | null>(null);
   const responses = onRespond ? (action.responses ?? []) : [];
-  const callToAction = onRespond && action.callToAction;
   const { onClick } = action;
 
   const respond = (event: MouseEvent, responseId: string) => {
@@ -200,128 +198,108 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
   };
 
   return (
-    <Stack spacing={1} sx={{ maxWidth: "100%", width: ACTION_CARD_WIDTH }}>
-      <Box
-        data-test="chatActionCard"
-        role={onClick ? "button" : undefined}
-        tabIndex={onClick ? 0 : undefined}
-        onClick={onClick}
-        onKeyDown={handleKeyDown}
-        sx={{
-          backgroundColor: "background.paper",
-          border: `${BORDER_WIDTH}px solid`,
-          borderColor: "divider",
-          borderRadius: `${CARD_RADIUS}px`,
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
-          color: "text.primary",
-          overflow: "hidden",
-          // The whole card opens what it stands for (an order's event)
-          ...(onClick && {
-            "&:focus-visible": { outline: "2px solid", outlineColor: "text.primary", outlineOffset: 2 },
-            "&:hover": { borderColor: "text.disabled", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" },
-            cursor: "pointer",
-            transition: "border-color 120ms, box-shadow 120ms",
-          }),
-        }}
-      >
-        {action.variant === "event" ? (
-          <EventContent action={action} />
-        ) : (
-          <Stack spacing={1.25} sx={{ p: `${CARD_PADDING}px` }}>
-            <Stack direction="row" spacing={1.25} alignItems="center">
-              {action.icon && <ChatIconTile radius={ORDER_RADIUS}>{action.icon}</ChatIconTile>}
-              <Typography variant="body2" fontWeight={600}>
-                {action.title}
-              </Typography>
+    <Box
+      data-test="chatActionCard"
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      sx={{
+        backgroundColor: "background.paper",
+        border: `${BORDER_WIDTH}px solid`,
+        borderColor: "divider",
+        borderRadius: `${CARD_RADIUS}px`,
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
+        color: "text.primary",
+        maxWidth: "100%",
+        overflow: "hidden",
+        width: ACTION_CARD_WIDTH,
+        // The whole card opens what it stands for (an order's event)
+        ...(onClick && {
+          "&:focus-visible": { outline: "2px solid", outlineColor: "text.primary", outlineOffset: 2 },
+          "&:hover": { borderColor: "text.disabled", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" },
+          cursor: "pointer",
+          transition: "border-color 120ms, box-shadow 120ms",
+        }),
+      }}
+    >
+      {action.variant === "event" ? (
+        <EventContent action={action} />
+      ) : (
+        <Stack spacing={1.25} sx={{ p: `${CARD_PADDING}px` }}>
+          <Stack direction="row" spacing={1.25} alignItems="center">
+            {action.icon && <ChatIconTile radius={ORDER_RADIUS}>{action.icon}</ChatIconTile>}
+            <Typography variant="body2" fontWeight={600}>
+              {action.title}
+            </Typography>
+          </Stack>
+          {action.booking && <OrderCard booking={action.booking} />}
+          {action.changes?.map(({ label, before, after }) => (
+            // What the request moves: the current date struck through, then the asked one
+            <Typography key={`${label}-${before}`} variant="body2" color="text.secondary" data-test="chatActionChange">
+              {label && `${label} `}
+              <Box component="s" sx={{ textDecorationColor: "currentColor" }}>
+                {before}
+              </Box>
+              <Box component="span" sx={{ mx: 0.5 }}>
+                →
+              </Box>
+              <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>
+                {after}
+              </Box>
+            </Typography>
+          ))}
+          {!!action.details?.length && (
+            <Stack spacing={0.25}>
+              {action.details.map((detail) => (
+                <Typography key={detail} variant="body2" color="text.secondary">
+                  {detail}
+                </Typography>
+              ))}
             </Stack>
-            {action.booking && <OrderCard booking={action.booking} />}
-            {action.changes?.map(({ label, before, after }) => (
-              // What the request moves: the current date struck through, then the asked one
-              <Typography key={`${label}-${before}`} variant="body2" color="text.secondary" data-test="chatActionChange">
-                {label && `${label} `}
-                <Box component="s" sx={{ textDecorationColor: "currentColor" }}>
-                  {before}
-                </Box>
-                <Box component="span" sx={{ mx: 0.5 }}>
-                  →
-                </Box>
-                <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>
-                  {after}
-                </Box>
-              </Typography>
-            ))}
-            {!!action.details?.length && (
-              <Stack spacing={0.25}>
-                {action.details.map((detail) => (
-                  <Typography key={detail} variant="body2" color="text.secondary">
-                    {detail}
-                  </Typography>
-                ))}
-              </Stack>
-            )}
-            {action.note && (
-              <Typography variant="body2" sx={{ borderLeft: "2px solid", borderLeftColor: "divider", pl: 1.25, whiteSpace: "pre-wrap" }}>
-                {action.note}
-              </Typography>
-            )}
-            {action.status && <StatusPill status={action.status} />}
-          </Stack>
-        )}
-        {responses.length > 0 && (
-          <Stack
-            direction={responses.length > 2 ? "column" : "row"}
-            spacing={`${BUTTONS_INSET}px`}
-            sx={{ pb: `${BUTTONS_INSET}px`, px: `${BUTTONS_INSET}px` }}
-          >
-            {responses.map(({ id, label, variant = "primary" }) => (
-              <Button
-                key={id}
-                variant={variant === "primary" ? "contained" : "outlined"}
-                color="primary"
-                isLoading={pendingResponseId === id}
-                disabled={!!pendingResponseId && pendingResponseId !== id}
-                onClick={(event: MouseEvent) => respond(event, id)}
-                sx={{
-                  borderRadius: `${CARD_RADIUS - BORDER_WIDTH - BUTTONS_INSET}px`,
-                  flex: 1,
-                  lineHeight: 1.2,
-                  minHeight: 44,
-                  px: 1.5,
-                  ...(variant === "secondary" && { backgroundColor: "background.paper", borderColor: "divider" }),
-                  // The answer being sent keeps its colors around the spinner
-                  ...(pendingResponseId === id && {
-                    "&.Mui-disabled":
-                      variant === "primary"
-                        ? { backgroundColor: "primary.main", color: "primary.contrastText" }
-                        : { color: "text.primary" },
-                  }),
-                }}
-              >
-                {label}
-              </Button>
-            ))}
-          </Stack>
-        )}
-      </Box>
-      {callToAction && (
-        <Button
-          variant="contained"
-          color="primary"
-          isLoading={pendingResponseId === callToAction.id}
-          onClick={(event: MouseEvent) => respond(event, callToAction.id)}
-          data-test="chatActionCallToAction"
-          sx={{
-            borderRadius: `${CARD_RADIUS}px`,
-            minHeight: 44,
-            ...(pendingResponseId === callToAction.id && {
-              "&.Mui-disabled": { backgroundColor: "primary.main", color: "primary.contrastText" },
-            }),
-          }}
-        >
-          {callToAction.label}
-        </Button>
+          )}
+          {action.note && (
+            <Typography variant="body2" sx={{ borderLeft: "2px solid", borderLeftColor: "divider", pl: 1.25, whiteSpace: "pre-wrap" }}>
+              {action.note}
+            </Typography>
+          )}
+          {action.status && <StatusPill status={action.status} />}
+        </Stack>
       )}
-    </Stack>
+      {responses.length > 0 && (
+        <Stack
+          direction={responses.length > 2 ? "column" : "row"}
+          spacing={`${BUTTONS_INSET}px`}
+          sx={{ pb: `${BUTTONS_INSET}px`, px: `${BUTTONS_INSET}px` }}
+        >
+          {responses.map(({ id, label, variant = "primary" }) => (
+            <Button
+              key={id}
+              variant={variant === "primary" ? "contained" : "outlined"}
+              color="primary"
+              isLoading={pendingResponseId === id}
+              disabled={!!pendingResponseId && pendingResponseId !== id}
+              onClick={(event: MouseEvent) => respond(event, id)}
+              sx={{
+                borderRadius: `${CARD_RADIUS - BORDER_WIDTH - BUTTONS_INSET}px`,
+                flex: 1,
+                lineHeight: 1.2,
+                minHeight: 44,
+                px: 1.5,
+                ...(variant === "secondary" && { backgroundColor: "background.paper", borderColor: "divider" }),
+                // The answer being sent keeps its colors around the spinner
+                ...(pendingResponseId === id && {
+                  "&.Mui-disabled":
+                    variant === "primary" ? { backgroundColor: "primary.main", color: "primary.contrastText" } : { color: "text.primary" },
+                }),
+              }}
+            >
+              {label}
+            </Button>
+          ))}
+        </Stack>
+      )}
+    </Box>
   );
 };
 

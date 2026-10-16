@@ -798,14 +798,14 @@ export const QuickActions: StoryFn = () => {
       id: "qa-3",
     },
     {
-      // An order's event as a media card: the whole card opens it, closing it is the action left under it
+      // An order's event as a media card: the whole card opens it, its button closes it
       action: {
         booking: nacelle,
-        callToAction: { id: "close", label: "Clôturer" },
         cover: "https://picsum.photos/seed/casse/640/360",
         details: ["Nacelle 16 m", "Le 16 oct."],
         note: "Vitre brisée à la réception, je l'ajoute à la facture.",
         onClick: () => console.info("Open the event"),
+        responses: [{ id: "close", label: "Clôturer" }],
         status: { label: "Déclaré sur la commande", tone: "warning" },
         title: "Casse constatée",
         variant: "event",
@@ -820,9 +820,7 @@ export const QuickActions: StoryFn = () => {
   const updateAction = (messageId: ChatMessage["id"], update: Partial<ChatMessageAction>) =>
     setMessages((previous) =>
       previous.map((message) =>
-        message.id === messageId && message.action
-          ? { ...message, action: { ...message.action, callToAction: undefined, responses: [], ...update } }
-          : message,
+        message.id === messageId && message.action ? { ...message, action: { ...message.action, responses: [], ...update } } : message,
       ),
     );
 

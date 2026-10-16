@@ -87,10 +87,8 @@ export interface ChatMessageAction {
    */
   changes?: { label?: string; before: string; after: string }[];
   status?: ChatMessageActionStatus;
-  /** Buttons inside the card: the app gives them to whoever may answer */
+  /** Buttons at the foot of the card: the app gives them to whoever may answer, its author included (closing an event) */
   responses?: ChatMessageActionResponse[];
-  /** The action left to do on the card, under it and out of it (closing an event), for whoever may, its author included */
-  callToAction?: ChatMessageActionResponse;
   /** Opens what the card stands for (an order's event): the whole card is clickable, its order and buttons aside */
   onClick?: () => void;
   /** Comment typed with the request */

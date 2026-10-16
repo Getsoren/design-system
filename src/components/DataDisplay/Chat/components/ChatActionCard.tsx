@@ -14,8 +14,9 @@ import Button from "@/components/Inputs/Button/Button";
 export const ACTION_CARD_WIDTH = 320;
 const CARD_RADIUS = 12;
 const CARD_PADDING = 12;
-// The answers sit 4px inside the card's 1px border, 5px from its outer edge: 12 - 5 = 7, concentric with its corners
-const BUTTONS_INSET = 4;
+// The answers line up with the card's text, the design system's base radius for their corners
+const BUTTON_RADIUS = 8;
+const BUTTONS_GAP = 8;
 const BORDER_WIDTH = 1;
 const PHOTO_SIZE = 40;
 // The design system's base radius for the order's card inside the request's
@@ -269,8 +270,8 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
       {responses.length > 0 && (
         <Stack
           direction={responses.length > 2 ? "column" : "row"}
-          spacing={`${BUTTONS_INSET}px`}
-          sx={{ pb: `${BUTTONS_INSET}px`, px: `${BUTTONS_INSET}px` }}
+          spacing={`${BUTTONS_GAP}px`}
+          sx={{ pb: `${CARD_PADDING}px`, px: `${CARD_PADDING}px` }}
         >
           {responses.map(({ id, label, variant = "primary" }) => (
             <Button
@@ -281,7 +282,7 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
               disabled={!!pendingResponseId && pendingResponseId !== id}
               onClick={(event: MouseEvent) => respond(event, id)}
               sx={{
-                borderRadius: `${CARD_RADIUS - BORDER_WIDTH - BUTTONS_INSET}px`,
+                borderRadius: `${BUTTON_RADIUS}px`,
                 flex: 1,
                 lineHeight: 1.2,
                 minHeight: 44,

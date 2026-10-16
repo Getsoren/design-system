@@ -62,8 +62,8 @@ export const getEmojiPickerWidth = (columns: number) => columns * EMOJI_CELL_SIZ
 // The design system's scale: a bubble is rounded as its cards (borderRadiusL)
 export const BUBBLE_RADIUS = 12;
 
-/** My messages in grey, the others' in white */
-export const getOwnBubbleBackground = ({ palette }: Theme) =>
+/** The others' messages in grey, mine in white */
+export const getReceivedBubbleBackground = ({ palette }: Theme) =>
   palette.mode === "dark"
     ? palette.grey[900]
     : // The design system's lighter tertiary step, a soft grey on the conversation's background; MUI's grey without its palette

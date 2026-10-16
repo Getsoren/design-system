@@ -4,7 +4,7 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
-import { BUBBLE_RADIUS, getOwnBubbleBackground, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
+import { BUBBLE_RADIUS, getReceivedBubbleBackground, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatAttachment } from "@/components/DataDisplay/Chat/types";
 import PauseRoundedIcon from "@/components/DataDisplay/Icons/PauseRoundedIcon";
@@ -190,7 +190,7 @@ const ChatVoiceMessage = ({ attachment, isOwn, labels, variant = "bubble", onRem
       data-test="chatVoiceMessage"
       sx={{
         alignItems: "center",
-        backgroundColor: isInComposer ? "action.hover" : isOwn ? getOwnBubbleBackground : "tertiary.light",
+        backgroundColor: isInComposer ? "action.hover" : isOwn ? "tertiary.light" : getReceivedBubbleBackground,
         border: 0,
         borderRadius: `${isInComposer ? COMPOSER_RADIUS : BUBBLE_RADIUS}px`,
         ...(!isInComposer && (isOwn ? { borderBottomRightRadius: `${TAIL_RADIUS}px` } : { borderBottomLeftRadius: `${TAIL_RADIUS}px` })),

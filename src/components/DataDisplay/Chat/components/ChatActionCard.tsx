@@ -7,7 +7,7 @@ import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import ChatBookingTag from "@/components/DataDisplay/Chat/components/ChatBookingTag";
 import ChatIconTile from "@/components/DataDisplay/Chat/components/ChatIconTile";
 import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
-import { getOwnBubbleBackground, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
+import { getReceivedBubbleBackground, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import type { ChatMessageAction, ChatMessageActionStatus, ChatMessageBooking } from "@/components/DataDisplay/Chat/types";
 import Chip from "@/components/DataDisplay/Chip/Chip";
 import Button from "@/components/Inputs/Button/Button";
@@ -26,7 +26,7 @@ const ORDER_PADDING = 8;
 
 interface ChatActionCardProps {
   action: ChatMessageAction;
-  /** Sent by me: in the colour of my bubbles */
+  /** Sent by me: white as my bubbles, the others' cards grey as theirs */
   isOwn?: boolean;
   /** Shows the answers. May return a promise: the button spins until it settles */
   onRespond?: (responseId: string) => unknown;
@@ -213,7 +213,7 @@ const EventContent = ({ action, isOwn }: EventContentProps) => {
                 {action.booking.name}
               </Typography>
             )}
-            <ChatBookingTag booking={{ ...action.booking, label: action.booking.reference ?? action.booking.label }} contrast={isOwn} />
+            <ChatBookingTag booking={{ ...action.booking, label: action.booking.reference ?? action.booking.label }} contrast={!isOwn} />
           </Stack>
         )}
         <ChangeLines changes={action.changes} />
@@ -280,12 +280,12 @@ const ChatActionCard = ({ action, isOwn, onRespond }: ChatActionCardProps) => {
       onClick={onClick}
       onKeyDown={handleKeyDown}
       sx={{
-        // Mine in the colour of my bubbles, without their outline either
-        backgroundColor: isOwn ? getOwnBubbleBackground : "background.paper",
+        // In the colour of the bubbles around it: mine white and outlined, the others' grey without outline
+        backgroundColor: isOwn ? "background.paper" : getReceivedBubbleBackground,
         border: `${BORDER_WIDTH}px solid`,
-        borderColor: isOwn ? "transparent" : "divider",
+        borderColor: isOwn ? "divider" : "transparent",
         borderRadius: `${CARD_RADIUS}px`,
-        boxShadow: isOwn ? "none" : "0 1px 3px rgba(0, 0, 0, 0.06)",
+        boxShadow: isOwn ? "0 1px 3px rgba(0, 0, 0, 0.06)" : "none",
         color: "text.primary",
         maxWidth: "100%",
         overflow: "hidden",

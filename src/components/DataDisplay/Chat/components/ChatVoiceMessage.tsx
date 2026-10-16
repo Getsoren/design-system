@@ -4,7 +4,7 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
-import { getOwnBubbleBackground, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
+import { BUBBLE_RADIUS, getOwnBubbleBackground, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import type { ChatLabels } from "@/components/DataDisplay/Chat/hooks/useChatLabels";
 import type { ChatAttachment } from "@/components/DataDisplay/Chat/types";
 import PauseRoundedIcon from "@/components/DataDisplay/Icons/PauseRoundedIcon";
@@ -14,7 +14,6 @@ const BAR_COUNT = 32;
 const KEYBOARD_STEP = 0.05;
 // Same shape as the text bubble: 16px corners, the 5px tail on the author's side
 // As the text bubbles: the design system's borderRadiusL, the pointed corner at its borderRadiusS
-const BUBBLE_RADIUS = 12;
 const TAIL_RADIUS = 4;
 // Even inset around the button, so its corners are concentric with the bubble's (inner = outer - inset)
 const BUTTON_INSET = 6;

@@ -18,6 +18,7 @@ import type {
   ChatUploadAttachment,
 } from "@/components/DataDisplay/Chat/types";
 import FileTextIcon from "@/components/DataDisplay/Icons/FileTextIcon";
+import FlagOutlinedIcon from "@/components/DataDisplay/Icons/FlagOutlinedIcon";
 import LinkIcon from "@/components/DataDisplay/Icons/LinkIcon";
 import SportsScoreIcon from "@/components/DataDisplay/Icons/SportsScoreIcon";
 import { ThemeContext } from "@/context/Theme/ThemeProvider";
@@ -803,6 +804,7 @@ export const QuickActions: StoryFn = () => {
         booking: nacelle,
         cover: "https://picsum.photos/seed/casse/640/360",
         details: ["Nacelle 16 m", "Le 16 oct."],
+        icon: <FlagOutlinedIcon fontSize="inherit" />,
         note: "Vitre brisée à la réception, je l'ajoute à la facture.",
         onClick: () => console.info("Open the event"),
         responses: [{ id: "close", label: "Clôturer" }],

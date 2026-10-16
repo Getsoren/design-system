@@ -148,19 +148,20 @@ const ChangeLines = ({ changes }: ChangeLinesProps) =>
     </Typography>
   ));
 
+// The order timeline's event node: an outlined disc in the status' colour around the event's icon
+const ICON_CHIP_COLORS = { error: "error", neutral: "default", pending: "default", success: "success", warning: "warning" } as const;
+
 interface EventContentProps {
   action: ChatMessageAction;
 }
 
 /**
- * An order's event as a media card: its photo, its kind and order in its status' colour, the dates it moves, what
- * happened, then a grey line with the machine, the day and, once settled, who closed it
+ * An order's event as a media card: its photo, its icon as on the order's timeline (in its status' colour), its kind and
+ * order, the dates it moves, what happened, then a grey line with the machine, the day and, once settled, who closed it
  */
 const EventContent = ({ action }: EventContentProps) => {
   const tone = action.status?.tone;
-  // The dot and the title in one colour, the status': ink without one
-  const color = tone ? STATUS_COLORS[tone].color : "text.primary";
-  // An open event says so by its colour: no status line until it is settled
+  // An open event says so by its icon's colour: no status line until it is settled
   const caption = [...(action.details ?? []), tone === "warning" ? null : action.status?.label].filter(Boolean).join(" · ");
 
   return (
@@ -175,8 +176,27 @@ const EventContent = ({ action }: EventContentProps) => {
       )}
       <Stack spacing={0.75} sx={{ p: `${CARD_PADDING}px` }} data-test="chatEventCard">
         <Stack direction="row" alignItems="center" spacing={0.75} minWidth={0}>
-          {tone && <Box component="span" sx={{ backgroundColor: color, borderRadius: "50%", flexShrink: 0, height: 8, width: 8 }} />}
-          <Typography variant="body2" fontWeight={600} color={color} noWrap>
+          {action.icon && (
+            <Chip
+              size="small"
+              color={tone ? ICON_CHIP_COLORS[tone] : "default"}
+              variant="outlined-rounded"
+              label={
+                <Box component="span" sx={{ display: "flex", fontSize: 16 }}>
+                  {action.icon}
+                </Box>
+              }
+              sx={{
+                "& .MuiChip-label": { alignItems: "center", display: "flex", px: 0 },
+                borderRadius: "50%",
+                flexShrink: 0,
+                height: 24,
+                minWidth: 0,
+                width: 24,
+              }}
+            />
+          )}
+          <Typography variant="body2" fontWeight={600} noWrap>
             {[action.title, action.booking?.reference].filter(Boolean).join(" — ")}
           </Typography>
         </Stack>

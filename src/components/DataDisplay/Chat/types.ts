@@ -69,9 +69,9 @@ export interface ChatMessageAction {
   /** e.g. "Demande de prolongation", or an event's kind: "Casse constatée" */
   title: string;
   /**
-   * "event": a media card (an order's event, any request on it), its photo across the top, its kind and
-   * order in its status' colour, the dates it moves (`changes`), what happened (`note`) and a grey line (`details`, the
-   * status once settled). A request card by default
+   * "event": a media card (an order's event, any request on it), its photo across the top, its icon in its status'
+   * colour as on the order's timeline, its kind and order, the dates it moves (`changes`), what happened (`note`) and a
+   * grey line (`details`, the status once settled). A request card by default
    */
   variant?: "request" | "event";
   /** The event card's photo: the event's own, or its machine's */

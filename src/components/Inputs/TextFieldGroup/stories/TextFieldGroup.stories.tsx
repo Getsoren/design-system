@@ -1,5 +1,6 @@
 import { FormHelperText, MenuItem, Stack, TextField } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
+import ArrowForwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowForwardRoundedIcon";
 import TextFieldGroup from "@/components/Inputs/TextFieldGroup/TextFieldGroup";
 
 const HOURS = ["08:00", "09:00", "10:00", "11:00", "12:00"];
@@ -53,6 +54,16 @@ export const WarningError: StoryFn<typeof TextFieldGroup> = () => (
     <TextFieldGroup error errorColor="warning">
       <TextField variant="filled" label="Name" />
       <TextField variant="filled" label="Phone" type="tel" />
+    </TextFieldGroup>
+  </Stack>
+);
+
+/** A period picked end by end: the focused field lifted on a grey track, an arrow from one to the other */
+export const Segmented: StoryFn<typeof TextFieldGroup> = () => (
+  <Stack width={480} marginX="auto" justifyContent="center" height="100%">
+    <TextFieldGroup direction="row" variant="segmented" separator={<ArrowForwardRoundedIcon fontSize="small" />}>
+      <TextField variant="filled" label="Start" defaultValue="Wednesday 25 Nov" slotProps={{ htmlInput: { readOnly: true } }} />
+      <TextField variant="filled" label="End" placeholder="Add a date" slotProps={{ inputLabel: { shrink: true } }} />
     </TextFieldGroup>
   </Stack>
 );

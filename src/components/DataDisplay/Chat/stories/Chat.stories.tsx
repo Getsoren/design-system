@@ -831,7 +831,7 @@ export const QuickActions: StoryFn = () => {
     const time = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 
     if (responseId === "close") {
-      updateAction(messageId, { status: { label: `Clôturé par Louis · ${time}`, tone: "success" } });
+      updateAction(messageId, { status: { avatar: { name: "Louis Dupont" }, label: "Clôturé par Louis Dupont", tone: "success" } });
     } else if (responseId === "upload") {
       updateAction(messageId, { status: { label: `Déposé · ${time}`, tone: "success" } });
     } else {

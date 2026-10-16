@@ -52,9 +52,11 @@ export interface ChatMessageEvent {
 }
 
 export interface ChatMessageActionStatus {
-  /** e.g. "Acceptée par Kiloutou · 14:32" */
+  /** e.g. "Clôturé par Louis Chalret" */
   label: string;
   tone: "pending" | "warning" | "success" | "neutral" | "error";
+  /** Who settled it, their face beside the label on the media card */
+  avatar?: { name: string; src?: string | null };
 }
 
 export interface ChatMessageActionResponse {

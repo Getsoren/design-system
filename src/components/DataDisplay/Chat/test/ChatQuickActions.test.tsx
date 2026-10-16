@@ -115,10 +115,15 @@ describe("Chat quick actions", () => {
       <ChatMessageBubble
         isOwn={false}
         currentUserId="client"
-        message={{ ...request, action: { ...action, status: { label: "Clôturé par Marc · 14:25", tone: "success" } } }}
+        message={{
+          ...request,
+          action: { ...action, status: { avatar: { name: "Marc Durand" }, label: "Clôturé par Marc Durand", tone: "success" } },
+        }}
       />,
     );
-    expect(screen.getByText("Chariot télescopique · Le 16 oct. · Clôturé par Marc · 14:25")).toBeInTheDocument();
+    expect(screen.getByText("Chariot télescopique · Le 16 oct.")).toBeInTheDocument();
+    expect(screen.getByText("Clôturé par Marc Durand")).toBeInTheDocument();
+    expect(screen.getByText("M")).toBeInTheDocument();
   });
 
   it("shows its author the buttons the app gives the card, none otherwise", () => {

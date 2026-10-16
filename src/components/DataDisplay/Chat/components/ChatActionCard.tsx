@@ -3,6 +3,7 @@ import ButtonBase from "@mui/material/ButtonBase";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { type KeyboardEvent, type MouseEvent, useState } from "react";
+import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import ChatBookingTag from "@/components/DataDisplay/Chat/components/ChatBookingTag";
 import ChatIconTile from "@/components/DataDisplay/Chat/components/ChatIconTile";
 import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
@@ -162,7 +163,7 @@ interface EventContentProps {
 const EventContent = ({ action }: EventContentProps) => {
   const tone = action.status?.tone;
   // An open event says so by its icon's colour: no status line until it is settled
-  const caption = [...(action.details ?? []), tone === "warning" ? null : action.status?.label].filter(Boolean).join(" · ");
+  const settled = tone !== "warning" && action.status?.label ? action.status : null;
 
   return (
     <>
@@ -207,10 +208,23 @@ const EventContent = ({ action }: EventContentProps) => {
             {action.note}
           </Typography>
         )}
-        {caption && (
+        {!!action.details?.length && (
           <Typography variant="caption" color="text.secondary">
-            {caption}
+            {action.details.join(" · ")}
           </Typography>
+        )}
+        {settled && (
+          // Who settled it, their face beside their name, as on the order's timeline
+          <Stack direction="row" alignItems="center" spacing={0.75} data-test="chatActionSettledBy">
+            {settled.avatar && (
+              <Avatar src={settled.avatar.src ?? undefined} alt={settled.avatar.name} sx={{ fontSize: 9, height: 18, width: 18 }}>
+                {settled.avatar.name.charAt(0)}
+              </Avatar>
+            )}
+            <Typography variant="caption" color="text.secondary" noWrap>
+              {settled.label}
+            </Typography>
+          </Stack>
         )}
       </Stack>
     </>

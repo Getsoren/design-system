@@ -196,7 +196,7 @@ const EventContent = ({ action }: EventContentProps) => {
               }}
             />
           )}
-          <Typography variant="body2" fontWeight={600} noWrap>
+          <Typography variant="body2" fontWeight={500} noWrap>
             {[action.title, action.booking?.reference].filter(Boolean).join(" — ")}
           </Typography>
         </Stack>

@@ -68,6 +68,32 @@ describe("Chat quick actions", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Refuser" })).toBeEnabled());
   });
 
+  it("opens the card's event on a click anywhere but its order, the action left to do under it", () => {
+    const onClick = vi.fn();
+    const onOpenOrder = vi.fn();
+    const onActionResponse = vi.fn();
+    const event: ChatMessage = {
+      ...request,
+      action: {
+        booking: { label: "N° 34126 · Nacelle 16 m", onClick: onOpenOrder },
+        callToAction: { id: "closeEvent", label: "Clôturer" },
+        onClick,
+        title: "Événement déclaré",
+      },
+    };
+    render(<ChatMessageBubble isOwn currentUserId="client" message={event} onActionResponse={onActionResponse} />);
+
+    fireEvent.click(screen.getByText("Événement déclaré"));
+    expect(onClick).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByText("N° 34126 · Nacelle 16 m"));
+    expect(onOpenOrder).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Clôturer" }));
+    expect(onActionResponse).toHaveBeenCalledWith(12, "closeEvent");
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
   it("shows its author the buttons the app gives the card, none otherwise", () => {
     const onActionResponse = vi.fn();
     const action = { status: { label: "Déclaré", tone: "success" as const }, title: "Événement déclaré" };

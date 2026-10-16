@@ -125,13 +125,36 @@ const OrderCard = ({ booking }: OrderCardProps) => (
   </ButtonBase>
 );
 
+interface ChangeLinesProps {
+  changes?: ChatMessageAction["changes"];
+}
+
+/**
+ * What a request moves: the current date struck through, then the asked one
+ */
+const ChangeLines = ({ changes }: ChangeLinesProps) =>
+  changes?.map(({ label, before, after }) => (
+    <Typography key={`${label}-${before}`} variant="body2" color="text.secondary" data-test="chatActionChange">
+      {label && `${label} `}
+      <Box component="s" sx={{ textDecorationColor: "currentColor" }}>
+        {before}
+      </Box>
+      <Box component="span" sx={{ mx: 0.5 }}>
+        →
+      </Box>
+      <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>
+        {after}
+      </Box>
+    </Typography>
+  ));
+
 interface EventContentProps {
   action: ChatMessageAction;
 }
 
 /**
- * An order's event as a media card: its photo, its kind and order in its status' colour, what happened, then a grey line
- * with the machine, the day and, once settled, who closed it
+ * An order's event as a media card: its photo, its kind and order in its status' colour, the dates it moves, what
+ * happened, then a grey line with the machine, the day and, once settled, who closed it
  */
 const EventContent = ({ action }: EventContentProps) => {
   const tone = action.status?.tone ?? "neutral";
@@ -156,6 +179,7 @@ const EventContent = ({ action }: EventContentProps) => {
             {[action.title, action.booking?.reference].filter(Boolean).join(" — ")}
           </Typography>
         </Stack>
+        <ChangeLines changes={action.changes} />
         {action.note && (
           <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
             {action.note}
@@ -235,21 +259,7 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
             </Typography>
           </Stack>
           {action.booking && <OrderCard booking={action.booking} />}
-          {action.changes?.map(({ label, before, after }) => (
-            // What the request moves: the current date struck through, then the asked one
-            <Typography key={`${label}-${before}`} variant="body2" color="text.secondary" data-test="chatActionChange">
-              {label && `${label} `}
-              <Box component="s" sx={{ textDecorationColor: "currentColor" }}>
-                {before}
-              </Box>
-              <Box component="span" sx={{ mx: 0.5 }}>
-                →
-              </Box>
-              <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>
-                {after}
-              </Box>
-            </Typography>
-          ))}
+          <ChangeLines changes={action.changes} />
           {!!action.details?.length && (
             <Stack spacing={0.25}>
               {action.details.map((detail) => (

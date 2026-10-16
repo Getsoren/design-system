@@ -44,8 +44,6 @@ interface ChatConversationDetailHeaderProps {
   readOnly?: boolean;
   /** A grey line under the names, e.g. the rentals under way with them */
   subtitle?: ReactNode;
-  /** Button showing or hiding the side panel, named after it */
-  aside?: { isOpen: boolean; onToggle: () => void; title: string };
 }
 
 /**
@@ -78,7 +76,6 @@ const ChatConversationDetailHeader = ({
   onBack,
   readOnly,
   subtitle,
-  aside,
 }: ChatConversationDetailHeaderProps) => {
   const { isMenuOpen, anchorMenu, closeMenu, openMenu } = useMenu();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -177,19 +174,6 @@ const ChatConversationDetailHeader = ({
                   </Menu>
                 </Stack>
               ))}
-          {aside && (
-            <Tooltip arrow title={aside.title}>
-              <IconButton
-                aria-label={aside.title}
-                aria-pressed={aside.isOpen}
-                onClick={aside.onToggle}
-                data-test="chatAsideToggle"
-                sx={headerButtonSx(aside.isOpen)}
-              >
-                <ChatLineIcon d={LINE_ICON_PATHS.panelRight} />
-              </IconButton>
-            </Tooltip>
-          )}
         </Stack>
       </Stack>
       <ChatParticipantDialog

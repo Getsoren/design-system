@@ -404,15 +404,6 @@ export interface ChatConversationDetailProps {
   /** One-tap replies above the field, shown while it is empty and the last message comes from someone else */
   quickReplies?: string[];
   /**
-   * Airbnb-like side panel next to the conversation, e.g. the orders it is about. Open by default on wide screens,
-   * over the conversation on narrower ones; a header button shows or hides it
-   */
-  aside?: ReactNode;
-  /** The side panel's title, also its header button's name */
-  asideTitle?: string;
-  /** A count next to the title, in a small grey box */
-  asideCount?: number;
-  /**
    * Unread messages when the thread was opened: a "New messages" divider above the first of them, where the thread
    * opens. Pass the count taken before it is marked read
    */

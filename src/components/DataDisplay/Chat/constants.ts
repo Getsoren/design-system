@@ -41,7 +41,6 @@ export const LINE_ICON_PATHS = {
   mic: "M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0ZM19 10v2a7 7 0 0 1-14 0v-2M12 19v3",
   // Three dots drawn as small rings, at the same line as the other icons
   moreHorizontal: "M5 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2ZM12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2ZM19 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z",
-  panelRight: "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM15 3v18",
   // The attachment sign users know, rather than ChatGPT's "+"
   paperclip: "m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48",
   reply: "M9 17 4 12l5-5M20 18v-2a4 4 0 0 0-4-4H4",

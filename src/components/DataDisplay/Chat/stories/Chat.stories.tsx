@@ -1016,40 +1016,6 @@ export const QuickReplies: StoryFn = () => {
  * Airbnb-like side panel: the app puts there what the conversation is about (its orders). Open by default on a wide
  * screen, over the conversation on a narrower one; the header button shows or hides it.
  */
-export const SidePanel: StoryFn = () => (
-  <ThemeContext.Provider value={{ language: "fr" }}>
-    <Chat height="100vh">
-      <Chat.ConversationDetail
-        threadId="thread-1"
-        participants={[participants[0]]}
-        messages={[
-          { authorId: "user-1", body: "La pelle est livrée, le bon est signé.", createdAt: minutesAgo(30), id: "sp-1" },
-          { authorId: "user-1", body: "Vous la gardez jusqu'à quand ?", createdAt: minutesAgo(29), id: "sp-2" },
-          { authorId: CURRENT_USER_ID, body: "Jusqu'au 15, merci !", createdAt: minutesAgo(5), id: "sp-3" },
-        ]}
-        currentUserId={CURRENT_USER_ID}
-        onDeleteConversation={() => {}}
-        onNewConversation={() => {}}
-        onSendMessage={() => {}}
-        onAddParticipants={() => {}}
-        asideTitle="Commandes"
-        aside={
-          <Stack spacing={1} sx={{ p: 3 }}>
-            <Box sx={{ aspectRatio: "16 / 10", backgroundColor: "action.hover", borderRadius: "12px" }} />
-            <Box sx={{ fontWeight: 600 }}>Pelle à pneus 9-10 T</Box>
-            <Box sx={{ color: "text.secondary", fontSize: 14 }}>N° 17280 · du 3 au 15 oct.</Box>
-          </Stack>
-        }
-        labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message" }}
-      />
-    </Chat>
-  </ThemeContext.Provider>
-);
-
-/**
- * WhatsApp's answer to a precise message (hover a bubble, then the arrow; a long press on a tablet), the "New messages"
- * divider where the reader left off, and Airbnb's usual response time above the field.
- */
 export const RepliesAndUnread: StoryFn = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { authorId: CURRENT_USER_ID, body: "Bonjour, la pelle arrive à quelle heure ?", createdAt: minutesAgo(180), id: "ru-1" },

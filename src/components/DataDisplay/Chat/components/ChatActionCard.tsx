@@ -7,7 +7,7 @@ import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import ChatBookingTag from "@/components/DataDisplay/Chat/components/ChatBookingTag";
 import ChatIconTile from "@/components/DataDisplay/Chat/components/ChatIconTile";
 import ChatLineIcon from "@/components/DataDisplay/Chat/components/ChatLineIcon";
-import { LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
+import { getOwnBubbleBackground, LINE_ICON_PATHS } from "@/components/DataDisplay/Chat/constants";
 import type { ChatMessageAction, ChatMessageActionStatus, ChatMessageBooking } from "@/components/DataDisplay/Chat/types";
 import Chip from "@/components/DataDisplay/Chip/Chip";
 import Button from "@/components/Inputs/Button/Button";
@@ -26,6 +26,8 @@ const ORDER_PADDING = 8;
 
 interface ChatActionCardProps {
   action: ChatMessageAction;
+  /** Sent by me: in the colour of my bubbles */
+  isOwn?: boolean;
   /** Shows the answers. May return a promise: the button spins until it settles */
   onRespond?: (responseId: string) => unknown;
 }
@@ -154,13 +156,14 @@ const ICON_CHIP_COLORS = { error: "error", neutral: "default", pending: "default
 
 interface EventContentProps {
   action: ChatMessageAction;
+  isOwn?: boolean;
 }
 
 /**
- * An order's event as a media card: its photo, its icon as on the order's timeline (in its status' colour), its kind and
- * order, the dates it moves, what happened, then a grey line with the machine, the day and, once settled, who closed it
+ * An order's event as a media card: its photo, its icon as on the order's timeline (in its status' colour), its kind,
+ * the machine and its order's number, the dates it moves, what happened, the day and, once settled, who closed it
  */
-const EventContent = ({ action }: EventContentProps) => {
+const EventContent = ({ action, isOwn }: EventContentProps) => {
   const tone = action.status?.tone;
   // An open event says so by its icon's colour: no status line until it is settled
   const settled = tone !== "warning" && action.status?.label ? action.status : null;
@@ -199,9 +202,20 @@ const EventContent = ({ action }: EventContentProps) => {
           )}
           {/* The design system's card title, as on the kanban's and the timeline's cards */}
           <Typography variant="h6" noWrap>
-            {[action.title, action.booking?.reference].filter(Boolean).join(" — ")}
+            {action.title}
           </Typography>
         </Stack>
+        {action.booking && (
+          // The machine, its order's number in a tag on its right: the tag opens the order, the rest of the card the event
+          <Stack direction="row" alignItems="center" spacing={1} minWidth={0}>
+            {action.booking.name && (
+              <Typography variant="body2" color="text.secondary" noWrap minWidth={0} title={action.booking.name}>
+                {action.booking.name}
+              </Typography>
+            )}
+            <ChatBookingTag booking={{ ...action.booking, label: action.booking.reference ?? action.booking.label }} contrast={isOwn} />
+          </Stack>
+        )}
         <ChangeLines changes={action.changes} />
         {action.note && (
           <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
@@ -235,7 +249,7 @@ const EventContent = ({ action }: EventContentProps) => {
  * Airbnb-like card of a request on an order: the request first (its icon and title), then the order it is about in a
  * card of its own, so it doesn't read as the order's name; the details, the status, then the recipient's one-tap answers.
  */
-const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
+const ChatActionCard = ({ action, isOwn, onRespond }: ChatActionCardProps) => {
   const [pendingResponseId, setPendingResponseId] = useState<string | null>(null);
   const responses = onRespond ? (action.responses ?? []) : [];
   const { onClick } = action;
@@ -266,11 +280,12 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
       onClick={onClick}
       onKeyDown={handleKeyDown}
       sx={{
-        backgroundColor: "background.paper",
+        // Mine in the colour of my bubbles, without their outline either
+        backgroundColor: isOwn ? getOwnBubbleBackground : "background.paper",
         border: `${BORDER_WIDTH}px solid`,
-        borderColor: "divider",
+        borderColor: isOwn ? "transparent" : "divider",
         borderRadius: `${CARD_RADIUS}px`,
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
+        boxShadow: isOwn ? "none" : "0 1px 3px rgba(0, 0, 0, 0.06)",
         color: "text.primary",
         maxWidth: "100%",
         overflow: "hidden",
@@ -285,7 +300,7 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
       }}
     >
       {action.variant === "event" ? (
-        <EventContent action={action} />
+        <EventContent action={action} isOwn={isOwn} />
       ) : (
         <Stack spacing={1.25} sx={{ p: `${CARD_PADDING}px` }}>
           <Stack direction="row" spacing={1.25} alignItems="center">

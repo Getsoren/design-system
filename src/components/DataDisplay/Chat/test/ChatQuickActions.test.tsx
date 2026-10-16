@@ -94,12 +94,15 @@ describe("Chat quick actions", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it("shows an event as a media card: its photo, its kind and order, what happened, its status once settled", () => {
+  it("shows an event as a media card: its photo, its kind, its machine and order's tag, what happened, its status once settled", () => {
+    const onOpenOrder = vi.fn();
+    const onClick = vi.fn();
     const action = {
-      booking: { label: "N° 284 · Chariot télescopique", reference: "N° 284" },
+      booking: { label: "N° 284 · Chariot télescopique", name: "Chariot télescopique", onClick: onOpenOrder, reference: "N° 284" },
       cover: "https://example.com/vitre.jpg",
-      details: ["Chariot télescopique", "Le 16 oct."],
+      details: ["Le 16 oct."],
       note: "Vitre brisée à la réception.",
+      onClick,
       status: { label: "Déclaré sur la commande", tone: "warning" as const },
       title: "Casse constatée",
       variant: "event" as const,
@@ -107,9 +110,17 @@ describe("Chat quick actions", () => {
     const { container, rerender } = render(<ChatMessageBubble isOwn={false} currentUserId="client" message={{ ...request, action }} />);
 
     expect(container.querySelector("img")?.getAttribute("src")).toBe("https://example.com/vitre.jpg");
-    expect(screen.getByText("Casse constatée — N° 284")).toBeInTheDocument();
+    expect(screen.getByText("Casse constatée")).toBeInTheDocument();
     expect(screen.getByText("Vitre brisée à la réception.")).toBeInTheDocument();
-    expect(screen.getByText("Chariot télescopique · Le 16 oct.")).toBeInTheDocument();
+    expect(screen.getByText("Chariot télescopique")).toBeInTheDocument();
+    expect(screen.getByText("Le 16 oct.")).toBeInTheDocument();
+
+    // The order's number in a tag opens the order, the rest of the card its event
+    fireEvent.click(screen.getByText("N° 284"));
+    expect(onOpenOrder).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText("Casse constatée"));
+    expect(onClick).toHaveBeenCalledTimes(1);
 
     rerender(
       <ChatMessageBubble
@@ -121,7 +132,7 @@ describe("Chat quick actions", () => {
         }}
       />,
     );
-    expect(screen.getByText("Chariot télescopique · Le 16 oct.")).toBeInTheDocument();
+    expect(screen.getByText("Le 16 oct.")).toBeInTheDocument();
     expect(screen.getByText("Clôturé par Marc Durand")).toBeInTheDocument();
     expect(screen.getByText("M")).toBeInTheDocument();
   });

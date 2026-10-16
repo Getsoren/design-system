@@ -786,9 +786,10 @@ export const QuickActions: StoryFn = () => {
       action: {
         booking: nacelle,
         details: ["Fin prévue le 12 oct."],
+        // The main answer last, on the right as in the dialogs
         responses: [
-          { id: "stop", label: "Oui, arrêter" },
           { id: "extend", label: "Non, prolonger", variant: "secondary" },
+          { id: "stop", label: "Oui, arrêter" },
         ],
         status: { label: "En attente", tone: "pending" },
         title: "Confirmer la fin de location ?",
@@ -803,7 +804,7 @@ export const QuickActions: StoryFn = () => {
       action: {
         booking: nacelle,
         cover: "https://picsum.photos/seed/casse/640/360",
-        details: ["Nacelle 16 m", "Le 16 oct."],
+        details: ["Le 16 oct."],
         icon: <FlagOutlinedIcon fontSize="inherit" />,
         note: "Vitre brisée à la réception, je l'ajoute à la facture.",
         onClick: () => console.info("Open the event"),

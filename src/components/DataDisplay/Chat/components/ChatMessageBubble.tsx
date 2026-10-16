@@ -128,6 +128,7 @@ const ChatMessageBubble = ({
           {message.action && (
             <ChatActionCard
               action={message.action}
+              isOwn={isOwn}
               onRespond={onActionResponse && ((responseId) => onActionResponse(message.id, responseId))}
             />
           )}

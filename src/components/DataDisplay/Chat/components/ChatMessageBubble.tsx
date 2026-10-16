@@ -443,8 +443,8 @@ const ChatMessageBubble = ({
           maxWidth: "100%",
           pb: hasReactions ? "18px" : 0,
           position: "relative",
-          // A double tap reacts rather than zooming the page
-          ...(canReact && { touchAction: "manipulation" }),
+          // A double tap reacts rather than zooming the page; the hand says a double click likes
+          ...(canReact && { cursor: "pointer", touchAction: "manipulation" }),
         }}
       >
         <Stack spacing={0.5} alignItems={isOwn ? "flex-end" : "flex-start"} maxWidth="100%">

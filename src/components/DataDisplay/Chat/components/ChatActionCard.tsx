@@ -128,6 +128,45 @@ const OrderCard = ({ booking }: OrderCardProps) => (
   </ButtonBase>
 );
 
+interface OrderLinkProps {
+  booking: ChatMessageBooking;
+  isOwn?: boolean;
+}
+
+/**
+ * The machine, its order's number in a tag on its right: a link to the order, its name underlined on hover, while the
+ * rest of the card opens the event
+ */
+const OrderLink = ({ booking, isOwn }: OrderLinkProps) => (
+  <ButtonBase
+    onClick={(event: MouseEvent) => {
+      // The order, not what the whole card opens
+      event.stopPropagation();
+      booking.onClick?.();
+    }}
+    disabled={!booking.onClick}
+    data-test="chatActionOrder"
+    sx={{
+      // A 44px hit area around the 24px tag
+      "&::after": { bottom: -10, content: '""', left: -4, position: "absolute", right: -4, top: -10 },
+      "&:hover .MuiTypography-root": { textDecoration: "underline" },
+      "&.Mui-disabled": { color: "inherit" },
+      "&.Mui-focusVisible": { outline: "2px solid", outlineColor: "text.primary", outlineOffset: 2 },
+      alignSelf: "flex-start",
+      gap: 1,
+      maxWidth: "100%",
+      position: "relative",
+    }}
+  >
+    {booking.name && (
+      <Typography variant="body2" color="text.secondary" noWrap minWidth={0} title={booking.name}>
+        {booking.name}
+      </Typography>
+    )}
+    <ChatBookingTag booking={{ ...booking, label: booking.reference ?? booking.label, onClick: undefined }} contrast={!isOwn} />
+  </ButtonBase>
+);
+
 interface ChangeLinesProps {
   changes?: ChatMessageAction["changes"];
 }
@@ -205,17 +244,7 @@ const EventContent = ({ action, isOwn }: EventContentProps) => {
             {action.title}
           </Typography>
         </Stack>
-        {action.booking && (
-          // The machine, its order's number in a tag on its right: the tag opens the order, the rest of the card the event
-          <Stack direction="row" alignItems="center" spacing={1} minWidth={0}>
-            {action.booking.name && (
-              <Typography variant="body2" color="text.secondary" noWrap minWidth={0} title={action.booking.name}>
-                {action.booking.name}
-              </Typography>
-            )}
-            <ChatBookingTag booking={{ ...action.booking, label: action.booking.reference ?? action.booking.label }} contrast={!isOwn} />
-          </Stack>
-        )}
+        {action.booking && <OrderLink booking={action.booking} isOwn={isOwn} />}
         <ChangeLines changes={action.changes} />
         {action.note && (
           <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>

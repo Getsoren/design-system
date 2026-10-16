@@ -196,7 +196,8 @@ const EventContent = ({ action }: EventContentProps) => {
               }}
             />
           )}
-          <Typography variant="body2" fontWeight={500} noWrap>
+          {/* The design system's card title, as on the kanban's and the timeline's cards */}
+          <Typography variant="h6" noWrap>
             {[action.title, action.booking?.reference].filter(Boolean).join(" — ")}
           </Typography>
         </Stack>
@@ -275,9 +276,7 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
         <Stack spacing={1.25} sx={{ p: `${CARD_PADDING}px` }}>
           <Stack direction="row" spacing={1.25} alignItems="center">
             {action.icon && <ChatIconTile radius={ORDER_RADIUS}>{action.icon}</ChatIconTile>}
-            <Typography variant="body2" fontWeight={600}>
-              {action.title}
-            </Typography>
+            <Typography variant="h6">{action.title}</Typography>
           </Stack>
           {action.booking && <OrderCard booking={action.booking} />}
           <ChangeLines changes={action.changes} />

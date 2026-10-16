@@ -69,7 +69,7 @@ export interface ChatMessageAction {
   /** e.g. "Demande de prolongation", or an event's kind: "Casse constatée" */
   title: string;
   /**
-   * "event": an order's event as a media card (a declared event, an extension), its photo across the top, its kind and
+   * "event": a media card (an order's event, any request on it), its photo across the top, its kind and
    * order in its status' colour, the dates it moves (`changes`), what happened (`note`) and a grey line (`details`, the
    * status once settled). A request card by default
    */

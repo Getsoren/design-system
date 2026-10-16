@@ -157,8 +157,9 @@ interface EventContentProps {
  * happened, then a grey line with the machine, the day and, once settled, who closed it
  */
 const EventContent = ({ action }: EventContentProps) => {
-  const tone = action.status?.tone ?? "neutral";
-  const { color, dot } = STATUS_COLORS[tone];
+  const tone = action.status?.tone;
+  // The dot and the title in one colour, the status': ink without one
+  const color = tone ? STATUS_COLORS[tone].color : "text.primary";
   // An open event says so by its colour: no status line until it is settled
   const caption = [...(action.details ?? []), tone === "warning" ? null : action.status?.label].filter(Boolean).join(" · ");
 
@@ -174,7 +175,7 @@ const EventContent = ({ action }: EventContentProps) => {
       )}
       <Stack spacing={0.75} sx={{ p: `${CARD_PADDING}px` }} data-test="chatEventCard">
         <Stack direction="row" alignItems="center" spacing={0.75} minWidth={0}>
-          {dot && <Box component="span" sx={{ backgroundColor: dot, borderRadius: "50%", flexShrink: 0, height: 8, width: 8 }} />}
+          {tone && <Box component="span" sx={{ backgroundColor: color, borderRadius: "50%", flexShrink: 0, height: 8, width: 8 }} />}
           <Typography variant="body2" fontWeight={600} color={color} noWrap>
             {[action.title, action.booking?.reference].filter(Boolean).join(" — ")}
           </Typography>

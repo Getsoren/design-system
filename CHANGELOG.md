@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.85.1](https://github.com/getsoren/design-system/compare/4.85.0...4.85.1) (2026-10-16)
+
+
+### Bug Fixes
+
+* **PillGroup:** mark the group invalid in error and describe it with the helper text ([8209180](https://github.com/getsoren/design-system/commit/82091809c6eb4a49d67955e206c70955c5bc7fad))
+
 ## [4.85.0](https://github.com/getsoren/design-system/compare/4.84.0...4.85.0) (2026-10-14)
 
 

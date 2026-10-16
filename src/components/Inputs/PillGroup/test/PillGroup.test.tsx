@@ -36,4 +36,20 @@ describe("Test <PillGroup/>", () => {
 
     expect(getByText("Required")).toBeInTheDocument();
   });
+
+  it("marks the group invalid in error and describes it with the helper text", () => {
+    const { getByRole } = render(
+      <PillGroup aria-label="Operator" options={OPTIONS} onChange={() => undefined} error helperText="Required" />,
+    );
+
+    expect(getByRole("radiogroup", { name: "Operator" })).toHaveAttribute("aria-invalid", "true");
+    expect(getByRole("radiogroup", { name: "Operator" })).toHaveAccessibleDescription("Required");
+  });
+
+  it("leaves a valid group unmarked", () => {
+    const { getByRole } = render(<PillGroup aria-label="Operator" options={OPTIONS} onChange={() => undefined} />);
+
+    expect(getByRole("radiogroup", { name: "Operator" })).not.toHaveAttribute("aria-invalid");
+    expect(getByRole("radiogroup", { name: "Operator" })).not.toHaveAttribute("aria-describedby");
+  });
 });

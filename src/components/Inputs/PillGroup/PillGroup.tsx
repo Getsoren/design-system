@@ -1,5 +1,5 @@
 import { ButtonBase, FormHelperText, Stack } from "@mui/material";
-import type { KeyboardEvent, ReactNode } from "react";
+import { type KeyboardEvent, type ReactNode, useId } from "react";
 import getInvalidColor, { type InvalidColor } from "@/utils/getInvalidColor";
 import getOutlineColor from "@/utils/getOutlineColor";
 
@@ -12,7 +12,7 @@ export interface PillOption {
 
 interface PillGroupBaseProps {
   options: PillOption[];
-  /** Draws the pills in the invalid colour */
+  /** Draws the pills in the invalid colour and marks the group invalid for assistive technologies */
   error?: boolean;
   /** Palette of the invalid state and of the helper text */
   errorColor?: InvalidColor;
@@ -50,6 +50,7 @@ const PREVIOUS_KEYS = new Set(["ArrowLeft", "ArrowUp"]);
 /** Short options as pills: a radio group, or a checkbox group when `multiple` */
 const PillGroup = (props: PillGroupProps) => {
   const { options, error, errorColor, helperText, disabled, "aria-label": ariaLabel } = props;
+  const helperTextId = useId();
   const selectedValues = new Set(toValues(props.value));
 
   // Arrow keys move the focus along the pills; in a radio group they select as they go, as MUI's RadioGroup does
@@ -89,6 +90,8 @@ const PillGroup = (props: PillGroupProps) => {
         flexWrap="wrap"
         role={props.multiple ? "group" : "radiogroup"}
         aria-label={ariaLabel}
+        aria-invalid={error || undefined}
+        aria-describedby={helperText ? helperTextId : undefined}
         onKeyDown={handleKeyDown}
       >
         {options.map((option) => {
@@ -126,7 +129,10 @@ const PillGroup = (props: PillGroupProps) => {
         })}
       </Stack>
       {helperText && (
-        <FormHelperText sx={(theme) => ({ color: error ? getInvalidColor(theme, errorColor) : undefined, marginLeft: 0 })}>
+        <FormHelperText
+          id={helperTextId}
+          sx={(theme) => ({ color: error ? getInvalidColor(theme, errorColor) : undefined, marginLeft: 0 })}
+        >
           {helperText}
         </FormHelperText>
       )}

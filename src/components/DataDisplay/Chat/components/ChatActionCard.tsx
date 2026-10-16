@@ -33,6 +33,8 @@ const STATUS_COLORS: Record<ChatMessageActionStatus["tone"], { backgroundColor: 
   neutral: { backgroundColor: "action.hover", color: "text.secondary" },
   pending: { backgroundColor: "action.hover", color: "text.primary", dot: "text.secondary" },
   success: { backgroundColor: "success.8p", color: "success.dark", dot: "success.main" },
+  // An open event, as on the orders' event list
+  warning: { backgroundColor: "warning.8p", color: "warning.dark", dot: "warning.main" },
 };
 
 interface StatusPillProps {
@@ -122,6 +124,52 @@ const OrderCard = ({ booking }: OrderCardProps) => (
   </ButtonBase>
 );
 
+interface EventContentProps {
+  action: ChatMessageAction;
+}
+
+/**
+ * An order's event as a media card: its photo, its kind and order in its status' colour, what happened, then a grey line
+ * with the machine, the day and, once settled, who closed it
+ */
+const EventContent = ({ action }: EventContentProps) => {
+  const tone = action.status?.tone ?? "neutral";
+  const { color, dot } = STATUS_COLORS[tone];
+  // An open event says so by its colour: no status line until it is settled
+  const caption = [...(action.details ?? []), tone === "warning" ? null : action.status?.label].filter(Boolean).join(" · ");
+
+  return (
+    <>
+      {action.cover && (
+        <Box
+          component="img"
+          src={action.cover}
+          alt=""
+          sx={{ aspectRatio: "16 / 9", backgroundColor: "action.hover", display: "block", objectFit: "cover", width: "100%" }}
+        />
+      )}
+      <Stack spacing={0.75} sx={{ p: `${CARD_PADDING}px` }} data-test="chatEventCard">
+        <Stack direction="row" alignItems="center" spacing={0.75} minWidth={0}>
+          {dot && <Box component="span" sx={{ backgroundColor: dot, borderRadius: "50%", flexShrink: 0, height: 8, width: 8 }} />}
+          <Typography variant="body2" fontWeight={600} color={color} noWrap>
+            {[action.title, action.booking?.reference].filter(Boolean).join(" — ")}
+          </Typography>
+        </Stack>
+        {action.note && (
+          <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+            {action.note}
+          </Typography>
+        )}
+        {caption && (
+          <Typography variant="caption" color="text.secondary">
+            {caption}
+          </Typography>
+        )}
+      </Stack>
+    </>
+  );
+};
+
 /**
  * Airbnb-like card of a request on an order: the request first (its icon and title), then the order it is about in a
  * card of its own, so it doesn't read as the order's name; the details, the status, then the recipient's one-tap answers.
@@ -176,45 +224,49 @@ const ChatActionCard = ({ action, onRespond }: ChatActionCardProps) => {
           }),
         }}
       >
-        <Stack spacing={1.25} sx={{ p: `${CARD_PADDING}px` }}>
-          <Stack direction="row" spacing={1.25} alignItems="center">
-            {action.icon && <ChatIconTile radius={ORDER_RADIUS}>{action.icon}</ChatIconTile>}
-            <Typography variant="body2" fontWeight={600}>
-              {action.title}
-            </Typography>
-          </Stack>
-          {action.booking && <OrderCard booking={action.booking} />}
-          {action.changes?.map(({ label, before, after }) => (
-            // What the request moves: the current date struck through, then the asked one
-            <Typography key={`${label}-${before}`} variant="body2" color="text.secondary" data-test="chatActionChange">
-              {label && `${label} `}
-              <Box component="s" sx={{ textDecorationColor: "currentColor" }}>
-                {before}
-              </Box>
-              <Box component="span" sx={{ mx: 0.5 }}>
-                →
-              </Box>
-              <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>
-                {after}
-              </Box>
-            </Typography>
-          ))}
-          {!!action.details?.length && (
-            <Stack spacing={0.25}>
-              {action.details.map((detail) => (
-                <Typography key={detail} variant="body2" color="text.secondary">
-                  {detail}
-                </Typography>
-              ))}
+        {action.variant === "event" ? (
+          <EventContent action={action} />
+        ) : (
+          <Stack spacing={1.25} sx={{ p: `${CARD_PADDING}px` }}>
+            <Stack direction="row" spacing={1.25} alignItems="center">
+              {action.icon && <ChatIconTile radius={ORDER_RADIUS}>{action.icon}</ChatIconTile>}
+              <Typography variant="body2" fontWeight={600}>
+                {action.title}
+              </Typography>
             </Stack>
-          )}
-          {action.note && (
-            <Typography variant="body2" sx={{ borderLeft: "2px solid", borderLeftColor: "divider", pl: 1.25, whiteSpace: "pre-wrap" }}>
-              {action.note}
-            </Typography>
-          )}
-          {action.status && <StatusPill status={action.status} />}
-        </Stack>
+            {action.booking && <OrderCard booking={action.booking} />}
+            {action.changes?.map(({ label, before, after }) => (
+              // What the request moves: the current date struck through, then the asked one
+              <Typography key={`${label}-${before}`} variant="body2" color="text.secondary" data-test="chatActionChange">
+                {label && `${label} `}
+                <Box component="s" sx={{ textDecorationColor: "currentColor" }}>
+                  {before}
+                </Box>
+                <Box component="span" sx={{ mx: 0.5 }}>
+                  →
+                </Box>
+                <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>
+                  {after}
+                </Box>
+              </Typography>
+            ))}
+            {!!action.details?.length && (
+              <Stack spacing={0.25}>
+                {action.details.map((detail) => (
+                  <Typography key={detail} variant="body2" color="text.secondary">
+                    {detail}
+                  </Typography>
+                ))}
+              </Stack>
+            )}
+            {action.note && (
+              <Typography variant="body2" sx={{ borderLeft: "2px solid", borderLeftColor: "divider", pl: 1.25, whiteSpace: "pre-wrap" }}>
+                {action.note}
+              </Typography>
+            )}
+            {action.status && <StatusPill status={action.status} />}
+          </Stack>
+        )}
         {responses.length > 0 && (
           <Stack
             direction={responses.length > 2 ? "column" : "row"}

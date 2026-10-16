@@ -94,6 +94,33 @@ describe("Chat quick actions", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it("shows an event as a media card: its photo, its kind and order, what happened, its status once settled", () => {
+    const action = {
+      booking: { label: "N° 284 · Chariot télescopique", reference: "N° 284" },
+      cover: "https://example.com/vitre.jpg",
+      details: ["Chariot télescopique", "Le 16 oct."],
+      note: "Vitre brisée à la réception.",
+      status: { label: "Déclaré sur la commande", tone: "warning" as const },
+      title: "Casse constatée",
+      variant: "event" as const,
+    };
+    const { container, rerender } = render(<ChatMessageBubble isOwn={false} currentUserId="client" message={{ ...request, action }} />);
+
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("https://example.com/vitre.jpg");
+    expect(screen.getByText("Casse constatée — N° 284")).toBeInTheDocument();
+    expect(screen.getByText("Vitre brisée à la réception.")).toBeInTheDocument();
+    expect(screen.getByText("Chariot télescopique · Le 16 oct.")).toBeInTheDocument();
+
+    rerender(
+      <ChatMessageBubble
+        isOwn={false}
+        currentUserId="client"
+        message={{ ...request, action: { ...action, status: { label: "Clôturé par Marc · 14:25", tone: "success" } } }}
+      />,
+    );
+    expect(screen.getByText("Chariot télescopique · Le 16 oct. · Clôturé par Marc · 14:25")).toBeInTheDocument();
+  });
+
   it("shows its author the buttons the app gives the card, none otherwise", () => {
     const onActionResponse = vi.fn();
     const action = { status: { label: "Déclaré", tone: "success" as const }, title: "Événement déclaré" };

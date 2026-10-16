@@ -797,12 +797,32 @@ export const QuickActions: StoryFn = () => {
       createdAt: minutesAgo(40),
       id: "qa-3",
     },
+    {
+      // An order's event as a media card: the whole card opens it, closing it is the action left under it
+      action: {
+        booking: nacelle,
+        callToAction: { id: "close", label: "Clôturer" },
+        cover: "https://picsum.photos/seed/casse/640/360",
+        details: ["Nacelle 16 m", "Le 16 oct."],
+        note: "Vitre brisée à la réception, je l'ajoute à la facture.",
+        onClick: () => console.info("Open the event"),
+        status: { label: "Déclaré sur la commande", tone: "warning" },
+        title: "Casse constatée",
+        variant: "event",
+      },
+      authorId: SUPPLIER.userId,
+      body: "Casse constatée sur la commande 34126",
+      createdAt: minutesAgo(20),
+      id: "qa-4",
+    },
   ]);
 
   const updateAction = (messageId: ChatMessage["id"], update: Partial<ChatMessageAction>) =>
     setMessages((previous) =>
       previous.map((message) =>
-        message.id === messageId && message.action ? { ...message, action: { ...message.action, responses: [], ...update } } : message,
+        message.id === messageId && message.action
+          ? { ...message, action: { ...message.action, callToAction: undefined, responses: [], ...update } }
+          : message,
       ),
     );
 
@@ -810,7 +830,9 @@ export const QuickActions: StoryFn = () => {
     await wait(800);
     const time = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 
-    if (responseId === "upload") {
+    if (responseId === "close") {
+      updateAction(messageId, { status: { label: `Clôturé par Louis · ${time}`, tone: "success" } });
+    } else if (responseId === "upload") {
       updateAction(messageId, { status: { label: `Déposé · ${time}`, tone: "success" } });
     } else {
       updateAction(messageId, {

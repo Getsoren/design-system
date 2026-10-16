@@ -54,7 +54,7 @@ export interface ChatMessageEvent {
 export interface ChatMessageActionStatus {
   /** e.g. "Acceptée par Kiloutou · 14:32" */
   label: string;
-  tone: "pending" | "success" | "neutral" | "error";
+  tone: "pending" | "warning" | "success" | "neutral" | "error";
 }
 
 export interface ChatMessageActionResponse {
@@ -66,8 +66,15 @@ export interface ChatMessageActionResponse {
 
 /** A request on an order (extend, pick up, send a document…), shown as a card with one-tap answers */
 export interface ChatMessageAction {
-  /** e.g. "Demande de prolongation" */
+  /** e.g. "Demande de prolongation", or an event's kind: "Casse constatée" */
   title: string;
+  /**
+   * "event": an order's event as a media card, its photo across the top, its kind and order in its status' colour, then
+   * what happened (`note`) and a grey line (`details`, the status once settled). A request card by default
+   */
+  variant?: "request" | "event";
+  /** The event card's photo: the event's own, or its machine's */
+  cover?: string | null;
   /** The request's icon, as in the composer's Actions menu */
   icon?: ReactNode;
   /** e.g. "N° 34126 · Nacelle 16 m", with the machine's photo */

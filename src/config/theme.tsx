@@ -31,6 +31,7 @@ type OverridesStyleRules<
 import { ButtonProps } from "@/components/Inputs/Button/Button";
 import { dark, light } from "@/constants/colors";
 import { defaultFontFamily } from "@/constants/fonts";
+import getOutlineColor from "@/utils/getOutlineColor";
 import pxToRem from "@/utils/pxToRem";
 
 // Components module augmentation
@@ -214,6 +215,16 @@ const actionStyleOverrides: Partial<
 
     return undefined;
   },
+};
+
+type FilledInputSize = "tiny" | "xSmall" | "small" | "medium";
+
+/** Paddings of a filled field's value, above and below it, under the label (the theme's for tiny and xSmall) */
+const FILLED_INPUT_PADDINGS: Record<FilledInputSize, { top: number; bottom: number }> = {
+  medium: { bottom: 9, top: 23 },
+  small: { bottom: 6, top: 19 },
+  tiny: { bottom: 2.5, top: 5.5 },
+  xSmall: { bottom: 3.5, top: 13.5 },
 };
 
 const commonThemeOptions: MuiThemeOptions = {
@@ -1200,19 +1211,21 @@ const commonThemeOptions: MuiThemeOptions = {
         {
           props: { size: "tiny" },
           style: {
-            // Filled
+            // Filled: the shrunk label clears the top border
             "&.MuiInputLabel-filled.MuiInputLabel-sizeTiny": {
-              transform: "translate(12px, 0px) scale(0.65)",
+              transform: "translate(12px, 2px) scale(0.65)",
+            },
+            "&.MuiInputLabel-filled.MuiInputLabel-sizeTiny:not(.MuiInputLabel-shrink)": {
+              transform: "translate(12px, 6px) scale(1)",
             },
             // Outlined
             "&.MuiInputLabel-outlined.MuiInputLabel-shrink": {
               display: "none",
             },
             // Label when not shrunk
-            "&.MuiInputLabel-outlined.MuiInputLabel-sizeTiny:not(.MuiInputLabel-shrink), &.MuiInputLabel-filled.MuiInputLabel-sizeTiny:not(.MuiInputLabel-shrink)":
-              {
-                transform: "translate(12px, 5px) scale(1)",
-              },
+            "&.MuiInputLabel-outlined.MuiInputLabel-sizeTiny:not(.MuiInputLabel-shrink)": {
+              transform: "translate(12px, 5px) scale(1)",
+            },
             // Standard shrink
             "&.MuiInputLabel-standard.MuiInputLabel-sizeTiny.MuiInputLabel-shrink": {
               transform: "translate(0, 6.5px) scale(0.75)",
@@ -1223,18 +1236,25 @@ const commonThemeOptions: MuiThemeOptions = {
         {
           props: { size: "xSmall" },
           style: {
+            // Filled: the shrunk label clears the top border
             "&.MuiInputLabel-filled.MuiInputLabel-sizeXSmall": {
-              transform: "translate(12px, 0px) scale(0.75)",
+              transform: "translate(12px, 2px) scale(0.75)",
             },
-            "&.MuiInputLabel-outlined.MuiInputLabel-sizeXSmall:not(.MuiInputLabel-shrink), &.MuiInputLabel-filled.MuiInputLabel-sizeXSmall:not(.MuiInputLabel-shrink)":
-              {
-                transform: "translate(14px, 8px) scale(1)",
-              },
+            "&.MuiInputLabel-filled.MuiInputLabel-sizeXSmall:not(.MuiInputLabel-shrink)": {
+              transform: "translate(14px, 9px) scale(1)",
+            },
+            "&.MuiInputLabel-outlined.MuiInputLabel-sizeXSmall:not(.MuiInputLabel-shrink)": {
+              transform: "translate(14px, 8px) scale(1)",
+            },
           },
         },
         {
           props: { size: "small" },
           style: {
+            // Filled: the same gap between the shrunk label and the value as in the default size
+            "&.MuiInputLabel-filled.MuiInputLabel-sizeSmall.MuiInputLabel-shrink": {
+              transform: "translate(12px, 6px) scale(0.75)",
+            },
             "&.MuiInputLabel-outlined.MuiInputLabel-sizeSmall:not(.MuiInputLabel-shrink)": {
               transform: "translate(14px, 12px) scale(1)",
             },
@@ -1399,11 +1419,82 @@ const commonThemeOptions: MuiThemeOptions = {
         },
         {
           props: { variant: "filled" },
-          style: {
-            "& .MuiInputBase-root": {
-              borderTopLeftRadius: 8,
-              borderTopRightRadius: 8,
-            },
+          style: ({ theme, ...props }) => {
+            // The style callback receives the field's props at runtime; MUI only types the theme
+            const { size } = props as { size?: FilledInputSize };
+            const { top, bottom } = FILLED_INPUT_PADDINGS[size ?? "medium"];
+            const centred = (top + bottom) / 2;
+            const isMedium = !size || size === "medium";
+            // The same surface as the other inputs: paper in light mode, the page's own in dark mode
+            const background = theme.palette.mode === "light" ? theme.palette.background.paper : "transparent";
+
+            return {
+              // Outlined frame with the label inside the field: no fill, no underline
+              "& .MuiFilledInput-root": {
+                "&::after, &::before": { display: "none" },
+                "&:hover:not(.Mui-disabled, .Mui-error)": { backgroundColor: background, borderColor: theme.palette.text.primary },
+                "&.Mui-disabled": { backgroundColor: theme.palette.action.disabledBackground, borderColor: theme.palette.divider },
+                "&.Mui-error": { borderColor: theme.palette.error.main },
+                "&.Mui-error.Mui-focused": {
+                  borderColor: theme.palette.error.main,
+                  boxShadow: `inset 0 0 0 1px ${theme.palette.error.main}`,
+                },
+                "&.Mui-focused": {
+                  backgroundColor: background,
+                  borderColor: theme.palette.text.primary,
+                  boxShadow: `inset 0 0 0 1px ${theme.palette.text.primary}`,
+                },
+                backgroundColor: background,
+                border: `1px solid ${getOutlineColor(theme)}`,
+                borderRadius: theme.shape.borderRadius,
+                transition: theme.transitions.create(["border-color", "box-shadow"], { duration: theme.transitions.duration.shorter }),
+              },
+              // The value sits under the label. A multiline field and an Autocomplete pad themselves
+              "& .MuiFilledInput-root:not(.MuiAutocomplete-inputRoot) .MuiFilledInput-input:not(.MuiInputBase-inputMultiline)": {
+                paddingBottom: bottom,
+                paddingTop: top,
+              },
+              "& .MuiFormHelperText-root": { marginLeft: 0 },
+              // A prefix or suffix sits on the value line and never moves; pass `slotProps.inputLabel.shrink` to keep the
+              // label out of its way while the field is empty
+              "& .MuiInputAdornment-root": { color: theme.palette.text.secondary, marginTop: "0 !important" },
+              // Above the focused input, which is lifted by its focus ring
+              "& .MuiInputLabel-filled": { zIndex: 2 },
+              // A muted label, focused or not; in error or disabled it keeps MUI's own colour
+              "& .MuiInputLabel-filled:not(.Mui-error):not(.Mui-disabled), & .MuiInputLabel-root.Mui-focused:not(.Mui-error)": {
+                color: theme.palette.text.secondary,
+              },
+              // An empty field's label stays clear of the suffix; once shrunk it spans the field
+              "&:has(.MuiInputBase-adornedEnd) .MuiInputLabel-filled:not(.MuiInputLabel-shrink)": { maxWidth: "calc(100% - 64px)" },
+              "&:has(.MuiInputLabel-root) .MuiInputAdornment-root": { marginTop: `${top - bottom}px !important` },
+              // Without a label the value is centred
+              "&:not(:has(.MuiInputLabel-root)) .MuiFilledInput-root:not(.MuiAutocomplete-inputRoot) .MuiFilledInput-input:not(.MuiInputBase-inputMultiline)":
+                { paddingBottom: centred, paddingTop: centred },
+              ...(isMedium && {
+                "& .MuiFilledInput-input.MuiInputBase-inputMultiline": { padding: 0 },
+                // An Autocomplete pads its root by 19px and its input by 7px: bring the value back on the value line
+                "& .MuiFilledInput-root.MuiAutocomplete-inputRoot": { paddingTop: top - 7 },
+                "& .MuiFilledInput-root.MuiInputBase-multiline": { paddingBottom: 12, paddingTop: 26 },
+                "& .MuiInputLabel-filled": { fontSize: pxToRem(14), zIndex: 2 },
+                // MUI centres its 16px label on a 25px top padding: re-centre the 14px one on the 23px padding above
+                "& .MuiInputLabel-filled:not(.MuiInputLabel-shrink)": { transform: "translate(12px, 18px)" },
+                // The shrunk label is not scaled, so MUI's 133% max width would overflow the field
+                "& .MuiInputLabel-filled.MuiInputLabel-shrink": {
+                  fontSize: pxToRem(12),
+                  maxWidth: "calc(100% - 24px)",
+                  transform: "translate(12px, 8px)",
+                },
+                "& .MuiSelect-select": { paddingBottom: bottom, paddingTop: top },
+                "&:has(.MuiInputLabel-root) .MuiFilledInput-root.MuiAutocomplete-inputRoot .MuiAutocomplete-input": {
+                  paddingBottom: bottom,
+                },
+                "&:not(:has(.MuiInputLabel-root)) .MuiFilledInput-root.MuiAutocomplete-inputRoot": {
+                  paddingBottom: centred - 7,
+                  paddingTop: centred - 7,
+                },
+                "&:not(:has(.MuiInputLabel-root)) .MuiFilledInput-root.MuiInputBase-multiline": { paddingBottom: 16, paddingTop: 16 },
+              }),
+            };
           },
         },
         {

@@ -4,8 +4,7 @@ import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import { RailSegment } from "@/components/DataDisplay/BookingTimeline/components/Rail";
 import { ANCHOR_COL, EVENT_NODE_GAP, NODE_SIZE } from "@/components/DataDisplay/BookingTimeline/constants";
 import { BookingTimelineEvent, BookingTimelineLabels } from "@/components/DataDisplay/BookingTimeline/types";
-import Chip from "@/components/DataDisplay/Chip/Chip";
-import FlagOutlinedIcon from "@/components/DataDisplay/Icons/FlagOutlinedIcon";
+import EventFlag from "@/components/DataDisplay/EventFlag/EventFlag";
 import KeyboardArrowRightRoundedIcon from "@/components/DataDisplay/Icons/KeyboardArrowRightRoundedIcon";
 
 /** Single-line event name revealing the full text in a tooltip, only when ellipsised. */
@@ -134,21 +133,7 @@ const TimelineEvent = ({ event, labels }: TimelineEventProps) => {
           {event.status ? (
             // Hover on the flag says whether the event is still open or closed.
             <Tooltip title={statusLabel}>
-              <Chip
-                size="small"
-                color={event.status === "closed" ? "success" : "warning"}
-                variant="outlined-rounded"
-                aria-label={statusLabel}
-                label={<FlagOutlinedIcon sx={{ display: "block", fontSize: 16 }} />}
-                sx={{
-                  "& .MuiChip-label": { alignItems: "center", display: "flex", px: 0 },
-                  borderRadius: "50%",
-                  flexShrink: 0,
-                  height: 24,
-                  minWidth: 0,
-                  width: 24,
-                }}
-              />
+              <EventFlag status={event.status === "closed" ? "closed" : "open"} aria-label={statusLabel} />
             </Tooltip>
           ) : (
             <Box

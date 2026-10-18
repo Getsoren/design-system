@@ -32,6 +32,8 @@ export { default as ChatVoiceRecorder } from "@/components/DataDisplay/Chat/comp
 export * from "@/components/DataDisplay/Chat/types";
 export * from "@/components/DataDisplay/Chip/Chip";
 export { default as Chip } from "@/components/DataDisplay/Chip/Chip";
+export * from "@/components/DataDisplay/EventFlag/EventFlag";
+export { default as EventFlag } from "@/components/DataDisplay/EventFlag/EventFlag";
 export * from "@/components/DataDisplay/FileViewer/FileViewer";
 export { default as FileViewer } from "@/components/DataDisplay/FileViewer/FileViewer";
 export { default as AiSparkIcon } from "@/components/DataDisplay/Icons/AiSparkIcon";

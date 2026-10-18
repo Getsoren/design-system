@@ -1,6 +1,32 @@
 import Grow from "@mui/material/Grow";
 import Paper from "@mui/material/Paper";
+import {
+  AI_ASSISTANT_DOCKED_INSET,
+  AI_ASSISTANT_DOCKED_RADIUS,
+  AI_ASSISTANT_DOCKED_SHADOW,
+  AI_ASSISTANT_DOCKED_WIDTH,
+} from "@/components/DataDisplay/AiAssistant/constants";
 import type { AiAssistantPanelProps } from "@/components/DataDisplay/AiAssistant/types";
+
+const DOCKED_SX = {
+  border: 1,
+  borderColor: "divider",
+  borderRadius: `${AI_ASSISTANT_DOCKED_RADIUS}px`,
+  bottom: AI_ASSISTANT_DOCKED_INSET,
+  boxShadow: AI_ASSISTANT_DOCKED_SHADOW,
+  height: "auto",
+  maxHeight: "none",
+  right: AI_ASSISTANT_DOCKED_INSET,
+  transformOrigin: "100% 50%",
+  width: { md: AI_ASSISTANT_DOCKED_WIDTH, xs: `calc(100vw - ${2 * AI_ASSISTANT_DOCKED_INSET}px)` },
+} as const;
+
+const CORNER_SX = {
+  bottom: { sm: 24, xs: 16 },
+  height: { sm: 640, xs: "calc(100dvh - 32px)" },
+  maxHeight: "calc(100dvh - 48px)",
+  transformOrigin: "100% 100%",
+} as const;
 
 /**
  * Floating chat widget — no modal backdrop, so the host app stays visible (and usable)
@@ -10,7 +36,15 @@ import type { AiAssistantPanelProps } from "@/components/DataDisplay/AiAssistant
  * iridescent aura breathes around the panel; every animation frame keeps an ambient
  * depth shadow (the animation overrides the elevation one).
  */
-const AiAssistantPanel = ({ open, isBusy = false, children, dataTestId = "assistantPanel" }: AiAssistantPanelProps) => (
+const AiAssistantPanel = ({
+  open,
+  isBusy = false,
+  docked = false,
+  dockedTop = 0,
+  withFab = true,
+  children,
+  dataTestId = "assistantPanel",
+}: AiAssistantPanelProps) => (
   <Grow
     in={open}
     unmountOnExit
@@ -19,7 +53,8 @@ const AiAssistantPanel = ({ open, isBusy = false, children, dataTestId = "assist
   >
     <Paper
       data-testid={dataTestId}
-      elevation={8}
+      data-docked={docked || undefined}
+      elevation={docked ? 0 : 8}
       sx={{
         "@keyframes aiAssistantPanelAura": {
           "0%": {
@@ -37,7 +72,7 @@ const AiAssistantPanel = ({ open, isBusy = false, children, dataTestId = "assist
           "&&": { animation: "none" },
         },
         animation: isBusy ? "aiAssistantPanelAura 2.4s ease-out infinite" : "none",
-        borderRadius: 3,
+        borderRadius: 2,
         bottom: 96,
         display: "flex",
         flexDirection: "column",
@@ -53,6 +88,9 @@ const AiAssistantPanel = ({ open, isBusy = false, children, dataTestId = "assist
         // Snackbar level, like the Fab it grows from: a Fab clickable above a modal
         // backdrop must open a panel that is not buried under that same backdrop
         zIndex: (theme) => theme.zIndex.snackbar,
+        ...(!withFab && CORNER_SX),
+        // Small screens have no app bar: dockedTop only applies from md up.
+        ...(docked && { ...DOCKED_SX, top: { md: dockedTop + AI_ASSISTANT_DOCKED_INSET, xs: AI_ASSISTANT_DOCKED_INSET } }),
       }}
     >
       {children}

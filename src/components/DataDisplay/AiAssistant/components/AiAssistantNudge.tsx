@@ -5,7 +5,6 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import type { AiAssistantNudgeProps } from "@/components/DataDisplay/AiAssistant/types";
-import AiSparkIcon from "@/components/DataDisplay/Icons/AiSparkIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 
 /**
@@ -62,12 +61,9 @@ const AiAssistantNudge = ({
         }}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-          <Stack direction="row" alignItems="center" spacing={1} minWidth={0}>
-            <AiSparkIcon variant="gradient" size={20} />
-            <Typography variant="subtitle2" fontWeight={600}>
-              {title}
-            </Typography>
-          </Stack>
+          <Typography variant="subtitle2" fontWeight={600} minWidth={0}>
+            {title}
+          </Typography>
           <IconButton onClick={onClose} size="small" data-testid={`${dataTestId}Close`}>
             <CloseIcon />
           </IconButton>

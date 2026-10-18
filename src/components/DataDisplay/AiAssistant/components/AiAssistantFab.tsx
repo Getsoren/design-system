@@ -1,10 +1,180 @@
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import AiAssistantAvatar from "@/components/DataDisplay/AiAssistant/components/AiAssistantAvatar";
+import AiAssistantMark from "@/components/DataDisplay/AiAssistant/components/AiAssistantMark";
 import type { AiAssistantFabProps } from "@/components/DataDisplay/AiAssistant/types";
-import { assistantOrbGradient } from "@/components/DataDisplay/AiAssistant/utils/gradient";
-import AiSparkIcon from "@/components/DataDisplay/Icons/AiSparkIcon";
+import { assistantGlowTrail, assistantOrbGradient } from "@/components/DataDisplay/AiAssistant/utils/gradient";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
+import NumberBadge from "@/components/DataDisplay/NumberBadge/NumberBadge";
+
+const BADGE_SIZE = 20;
+const DOT_SIZE = 10;
+const PILL_HEIGHT = 44;
+const PILL_AVATAR_SIZE = 28;
+// Even padding around the avatar, so the folded pill is a circle.
+const PILL_INSET = (PILL_HEIGHT - PILL_AVATAR_SIZE) / 2;
+const PILL_EASING = "cubic-bezier(0.2, 0, 0, 1)";
+
+interface FabBadgeProps {
+  badge: AiAssistantFabProps["badge"];
+  dataTestId: string;
+}
+
+const FabBadge = ({ badge, dataTestId }: FabBadgeProps) => {
+  if (typeof badge === "number" && badge > 0) {
+    return (
+      <Box data-testid={`${dataTestId}Badge`} sx={{ position: "absolute", right: -4, top: -4 }}>
+        <NumberBadge width={BADGE_SIZE} height={BADGE_SIZE} sx={{ boxShadow: "none" }}>
+          {badge > 9 ? "9+" : badge}
+        </NumberBadge>
+      </Box>
+    );
+  }
+
+  if (badge === true) {
+    return (
+      <Box
+        data-testid={`${dataTestId}Dot`}
+        sx={{
+          backgroundColor: "primary.main",
+          border: 2,
+          borderColor: "background.paper",
+          borderRadius: "50%",
+          height: DOT_SIZE,
+          position: "absolute",
+          right: 0,
+          top: 0,
+          width: DOT_SIZE,
+        }}
+      />
+    );
+  }
+
+  return null;
+};
+
+/** A rotating conic gradient, masked to a ring along the pill's outline. */
+const WorkingOutline = ({ dataTestId }: { dataTestId: string }) => (
+  <Box
+    aria-hidden
+    data-testid={`${dataTestId}Working`}
+    sx={{
+      "@keyframes aiAssistantFabOutline": {
+        from: { transform: "rotate(0deg)" },
+        to: { transform: "rotate(360deg)" },
+      },
+      "@media (prefers-reduced-motion: reduce)": {
+        "& > *": { animation: "none" },
+      },
+      borderRadius: PILL_HEIGHT / 2,
+      inset: -1,
+      mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+      maskComposite: "exclude",
+      overflow: "hidden",
+      padding: "1.5px",
+      pointerEvents: "none",
+      position: "absolute",
+      WebkitMaskComposite: "xor",
+    }}
+  >
+    <Box
+      sx={{
+        animation: "aiAssistantFabOutline 2.8s linear infinite",
+        aspectRatio: "1",
+        background: assistantGlowTrail,
+        left: "50%",
+        marginLeft: "-60%",
+        marginTop: "-60%",
+        position: "absolute",
+        top: "50%",
+        width: "120%",
+      }}
+    />
+  </Box>
+);
+
+const AiAssistantFabPill = ({
+  open,
+  onClick,
+  label,
+  badge,
+  isWorking = false,
+  dataTestId = "assistantFab",
+  ...dataAttributes
+}: Omit<AiAssistantFabProps, "tooltip">) => (
+  <Fab
+    {...dataAttributes}
+    variant="extended"
+    onClick={onClick}
+    aria-label={label}
+    data-testid={dataTestId}
+    sx={{
+      "@media (prefers-reduced-motion: reduce)": {
+        "&&, && *": { transition: "none" },
+      },
+      "& .aiAssistantFabIcon": {
+        display: "flex",
+        gridArea: "1 / 1",
+        transition: `transform 280ms ${PILL_EASING}, opacity 180ms ease`,
+      },
+      "& .aiAssistantFabIconClose": {
+        opacity: open ? 1 : 0,
+        transform: open ? "rotate(0deg) scale(1)" : "rotate(-90deg) scale(0.4)",
+      },
+      "& .aiAssistantFabIconMark": {
+        opacity: open ? 0 : 1,
+        transform: open ? "rotate(90deg) scale(0.4)" : "rotate(0deg) scale(1)",
+      },
+      "&:hover": { backgroundColor: "background.paper", boxShadow: "0 6px 24px rgba(0, 0, 0, 0.14)" },
+      backgroundColor: "background.paper",
+      border: 1,
+      borderColor: "divider",
+      borderRadius: PILL_HEIGHT / 2,
+      bottom: 24,
+      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+      color: "text.primary",
+      height: PILL_HEIGHT,
+      minWidth: PILL_HEIGHT,
+      paddingLeft: `${PILL_INSET - 1}px`,
+      paddingRight: open ? `${PILL_INSET - 1}px` : 2.25,
+      position: "fixed",
+      right: 24,
+      textTransform: "none",
+      transition: `padding 280ms ${PILL_EASING}, box-shadow 200ms ease`,
+      zIndex: (theme) => theme.zIndex.snackbar,
+    }}
+  >
+    <Box sx={{ display: "grid", placeItems: "center" }}>
+      <Box className="aiAssistantFabIcon aiAssistantFabIconMark">
+        <AiAssistantAvatar size={PILL_AVATAR_SIZE} isBusy={isWorking && !open} isBreathing={!open} restShape="circle" />
+      </Box>
+      <Box className="aiAssistantFabIcon aiAssistantFabIconClose">
+        <CloseIcon />
+      </Box>
+    </Box>
+    <Box
+      sx={{
+        marginLeft: open ? 0 : 1.25,
+        maxWidth: open ? 0 : 240,
+        opacity: open ? 0 : 1,
+        overflow: "hidden",
+        transition: `max-width 280ms ${PILL_EASING}, margin 280ms ${PILL_EASING}, opacity 180ms ease`,
+        whiteSpace: "nowrap",
+      }}
+    >
+      <Typography variant="body2" fontWeight={500} component="span">
+        {label}
+      </Typography>
+    </Box>
+    {!open && isWorking && <WorkingOutline dataTestId={dataTestId} />}
+    {!open && <FabBadge badge={badge} dataTestId={dataTestId} />}
+  </Fab>
+);
+
+const AiAssistantFab = ({ label, isWorking, tooltip, ...props }: AiAssistantFabProps) =>
+  label ? <AiAssistantFabPill label={label} isWorking={isWorking} {...props} /> : <AiAssistantFabOrb tooltip={tooltip} {...props} />;
 
 /**
  * The assistant's floating action button — a liquid orb: brand gradient flow (Soren orange
@@ -13,7 +183,7 @@ import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
  * the panel is open. The animations live on a ::before layer so the hit-box never
  * moves (reliable clicks, stable e2e).
  */
-const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab", ...dataAttributes }: AiAssistantFabProps) => (
+const AiAssistantFabOrb = ({ open, onClick, tooltip, badge, dataTestId = "assistantFab", ...dataAttributes }: AiAssistantFabProps) => (
   <Tooltip title={tooltip} placement="left">
     <Fab
       {...dataAttributes}
@@ -56,12 +226,6 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab", .
           "78%": { backgroundPosition: "40% 0%" },
           "100%": { backgroundPosition: "0% 40%" },
         },
-        "@keyframes aiAssistantSpark": {
-          "0%, 100%": { opacity: 1, transform: "scale(1) rotate(0deg)" },
-          "34%": { opacity: 0.9, transform: "scale(1.12) rotate(8deg)" },
-          "55%": { opacity: 1, transform: "scale(0.98) rotate(-2deg)" },
-          "76%": { opacity: 0.95, transform: "scale(1.06) rotate(4deg)" },
-        },
         // Gentle breath with a barely asymmetric squash — organic, but no visible roll
         "@keyframes aiAssistantWobble": {
           "0%, 100%": { transform: "scale(1)" },
@@ -73,17 +237,12 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab", .
         // Doubled selector (&&) so this a11y override beats the base rules regardless of emission order
         "@media (prefers-reduced-motion: reduce)": {
           "&& .aiAssistantFabIcon": { transition: "none" },
-          "&& svg": { animation: "none" },
           "&&::after": { animation: "none" },
           "&&::before": { animation: "none" },
         },
         /**
-         * Spark <-> close morph: both icons are stacked in one grid cell and rotate 90°
-         * clockwise together during the cross-fade. Both glyphs have 4-fold symmetry, so
-         * the outgoing spark passes through the X orientation while the incoming cross
-         * departs from a "+" pose that mirrors the spark — one continuous transformation
-         * to the eye. The twinkle animation stays scoped to the spark's own svg (its
-         * transform layer), so it never fights the wrapper's morph transform.
+         * Mark <-> close morph: both icons are stacked in one grid cell and rotate 90°
+         * clockwise together during the cross-fade.
          */
         "& .aiAssistantFabIcon": {
           display: "flex",
@@ -94,10 +253,7 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab", .
           opacity: open ? 1 : 0,
           transform: open ? "rotate(0deg) scale(1)" : "rotate(-90deg) scale(0.4)",
         },
-        "& .aiAssistantFabIconSpark": {
-          "& svg": {
-            animation: open ? "none" : "aiAssistantSpark 3.7s ease-in-out infinite",
-          },
+        "& .aiAssistantFabIconMark": {
           opacity: open ? 0 : 1,
           transform: open ? "rotate(90deg) scale(0.4)" : "rotate(0deg) scale(1)",
         },
@@ -148,9 +304,10 @@ const AiAssistantFab = ({ open, onClick, tooltip, dataTestId = "assistantFab", .
         zIndex: (theme) => theme.zIndex.snackbar,
       }}
     >
+      {!open && <FabBadge badge={badge} dataTestId={dataTestId} />}
       <Box sx={{ display: "grid", placeItems: "center" }}>
-        <Box className="aiAssistantFabIcon aiAssistantFabIconSpark">
-          <AiSparkIcon />
+        <Box className="aiAssistantFabIcon aiAssistantFabIconMark">
+          <AiAssistantMark size={22} color="common.white" />
         </Box>
         <Box className="aiAssistantFabIcon aiAssistantFabIconClose">
           <CloseIcon />

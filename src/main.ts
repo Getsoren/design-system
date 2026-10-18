@@ -11,6 +11,7 @@ export * from "@mui/material/transitions";
 
 // Data display
 export { default as AiAssistant } from "@/components/DataDisplay/AiAssistant/AiAssistant";
+export * from "@/components/DataDisplay/AiAssistant/constants";
 export * from "@/components/DataDisplay/AiAssistant/types";
 export * from "@/components/DataDisplay/ArticleImage/ArticleImage";
 export { default as ArticleImage } from "@/components/DataDisplay/ArticleImage/ArticleImage";
@@ -36,7 +37,6 @@ export * from "@/components/DataDisplay/EventFlag/EventFlag";
 export { default as EventFlag } from "@/components/DataDisplay/EventFlag/EventFlag";
 export * from "@/components/DataDisplay/FileViewer/FileViewer";
 export { default as FileViewer } from "@/components/DataDisplay/FileViewer/FileViewer";
-export { default as AiSparkIcon } from "@/components/DataDisplay/Icons/AiSparkIcon";
 export * from "@/components/DataDisplay/Kanban/Kanban";
 export { default as Kanban } from "@/components/DataDisplay/Kanban/Kanban";
 export * from "@/components/DataDisplay/ListAvatar/ListAvatar";

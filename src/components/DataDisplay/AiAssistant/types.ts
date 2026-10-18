@@ -9,8 +9,34 @@ export interface AiAssistantFabProps extends DataAttributes {
   onClick: () => void;
   /** Tooltip content (e.g. the assistant's name) */
   tooltip?: string;
+  /** Turns the orb into a pill showing the avatar and this label */
+  label?: string;
+  /** Pill only: a light runs along the outline while the assistant works in the background */
+  isWorking?: boolean;
+  /** A count, or `true` for a dot; hidden while the panel is open */
+  badge?: number | boolean;
   /** Test hook on the FAB button (defaults to "assistantFab") */
   dataTestId?: string;
+}
+
+export interface AiAssistantMarkProps {
+  /** Side of the square, in px (defaults to 32) */
+  size?: number;
+  /** Theme path or CSS colour of the ellipse (defaults to text.primary) */
+  color?: string;
+  /** The ellipse turns, then settles back into its pose once false */
+  isWorking?: boolean;
+  /** Background work: only the glow's colours move */
+  isBusy?: boolean;
+  /** Idle motion at rest, ignored while working */
+  isBreathing?: boolean;
+  /** Pose at rest (defaults to "ellipse") */
+  restShape?: "ellipse" | "circle";
+}
+
+export interface AiAssistantAvatarProps extends Omit<AiAssistantMarkProps, "size" | "color"> {
+  /** Diameter in px (defaults to 28) */
+  size?: number;
 }
 
 export interface AiAssistantNudgeProps {
@@ -52,6 +78,12 @@ export interface AiAssistantPanelProps {
   isBusy?: boolean;
   /** Panel content — typically Header + a Chat.* composition owned by the host app */
   children: ReactNode;
+  /** Full-height column on the right; the host layout leaves room for it (AI_ASSISTANT_DOCKED_SPACE) */
+  docked?: boolean;
+  /** Top offset of the docked panel, e.g. APP_BAR_HEIGHT (defaults to 0) */
+  dockedTop?: number;
+  /** False when the host hides the Fab while the panel is open: the panel then takes the corner (defaults to true) */
+  withFab?: boolean;
   /** Test hook on the panel container (defaults to "assistantPanel") */
   dataTestId?: string;
 }
@@ -61,17 +93,42 @@ export interface AiAssistantHeaderProps {
   title: string;
   /** Secondary caption next to the title (e.g. "Assistant IA") */
   subtitle?: string;
+  /** Small uppercase tag after the title (e.g. "Beta") */
+  tag?: string;
   /** Close action of the panel — rendered as the trailing icon button */
   onClose: () => void;
-  /** Defaults to the gradient AI spark */
+  /** Rendered before the header buttons */
+  actions?: ReactNode;
+  /** Rendered before the title */
   icon?: ReactNode;
+  /** Line under the header (defaults to true) */
+  divider?: boolean;
+  /** Picks the glyph of the dock toggle */
+  docked?: boolean;
+  /** Shows a button to dock or float the panel */
+  onToggleDocked?: () => void;
+  /** Shows a "new conversation" button */
+  onNewConversation?: () => void;
+  /** Accessible names of the header buttons */
+  labels?: { close?: string; dock?: string; newConversation?: string; undock?: string };
 }
 
 export interface AiAssistantEmptyStateProps {
   /** Invitation shown while the thread is empty (e.g. "I'm Atlas, ask me anything…") */
-  message: string;
-  /** Rendered centered under the invitation — quick actions, suggestion pills… */
+  message?: string;
+  /** Question to the user (e.g. "What do you want to do today?"); switches to a left-aligned layout above the composer */
+  title?: string;
+  /** With a `title` only: shown above it, on the logo's silhouette */
+  icon?: ReactNode;
+  /** Rendered under the invitation — quick actions, suggestion pills… */
   children?: ReactNode;
+}
+
+export interface AiAssistantSuggestionProps extends DataAttributes {
+  /** What the user could ask */
+  children: ReactNode;
+  onClick: () => void;
+  dataTestId?: string;
 }
 
 export interface AiAssistantThinkingOrbProps {
@@ -92,17 +149,14 @@ export interface AiAssistantConfirmationCardProps {
   onAccept: () => void;
   /** Called when the user declines the action */
   onDecline: () => void;
-  /** Button wording (host-app i18n) */
-  labels: { accept: string; decline: string };
+  /** Button wording (host-app i18n); once decided, `accepted` / `declined` replace the heading (default to the button labels) */
+  labels: { accept: string; decline: string; accepted?: string; declined?: string };
+  /** Rendered left of the summary */
+  icon?: ReactNode;
+  /** Once decided, makes the card clickable (e.g. to open what the action created) */
+  onOpen?: () => void;
+  /** Once decided, rendered under the summary */
+  links?: ReactNode;
   /** Test hook on the card (defaults to "assistantConfirmationCard") */
   dataTestId?: string;
-}
-
-export interface AiSparkIconProps {
-  /** Icon box in px */
-  size?: number;
-  /** Solid fill — ignored with variant="gradient" */
-  color?: string;
-  /** "solid" (currentColor/color) or "gradient" (brand gradient) */
-  variant?: "gradient" | "solid";
 }

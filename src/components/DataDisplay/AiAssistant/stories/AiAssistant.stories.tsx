@@ -1,4 +1,4 @@
-import { Alert, Chip, Stack, Typography } from "@mui/material";
+import { Alert, Button, Chip, Stack, Typography } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { ReactNode, useState } from "react";
 import AiAssistant from "@/components/DataDisplay/AiAssistant/AiAssistant";
@@ -142,6 +142,83 @@ export const WithVoiceInput: StoryFn = () => {
       </AiAssistant.Panel>
     </>
   );
+};
+
+export const HeaderWithActions: StoryFn = () => (
+  <Stack width={400} border={1} borderColor="divider" borderRadius={3} marginX="auto">
+    <AiAssistant.Header
+      title="Nova"
+      onClose={() => undefined}
+      actions={
+        <Button variant="outlined" color="inherit" size="small">
+          3 running
+        </Button>
+      }
+    />
+  </Stack>
+);
+
+/** With a `label`, the Fab is a pill that folds into a round close button once open. */
+export const WithLabel: StoryFn = () => {
+  const [open, setOpen] = useState(false);
+
+  return <AiAssistant.Fab open={open} onClick={() => setOpen((prev) => !prev)} label="Demander à Soren" badge={2} />;
+};
+
+/** With `isWorking`, a light runs along the pill's outline. */
+export const WithLabelWorking: StoryFn = () => {
+  const [open, setOpen] = useState(false);
+
+  return <AiAssistant.Fab open={open} onClick={() => setOpen((prev) => !prev)} label="Demander à Soren" isWorking />;
+};
+
+/** At rest, working at 24, 48 and 96px, busy, breathing, and breathing with `restShape="circle"`. */
+export const Mark: StoryFn = () => (
+  <Stack direction="row" spacing={4} alignItems="center">
+    <AiAssistant.Mark size={48} />
+    <AiAssistant.Mark size={24} isWorking />
+    <AiAssistant.Mark size={48} isWorking />
+    <AiAssistant.Mark size={96} isWorking />
+    <AiAssistant.Mark size={48} isBusy />
+    <AiAssistant.Mark size={48} isBreathing />
+    <AiAssistant.Mark size={48} isBreathing restShape="circle" />
+  </Stack>
+);
+
+/** Hover or focus a button: an orange sweep crosses its label once. */
+export const ActionButton: StoryFn = () => (
+  <Stack direction="row" spacing={2} alignItems="center">
+    <AiAssistant.Button size="small">Lancer</AiAssistant.Button>
+    <AiAssistant.Button variant="outlined" color="contrast" startIcon={<AiAssistant.Mark size={18} isBreathing restShape="circle" />}>
+      Laisser Soren chercher
+    </AiAssistant.Button>
+  </Stack>
+);
+
+/** The mark in a grey round; the button toggles `isWorking`. */
+export const Avatar: StoryFn = () => {
+  const [isWorking, setIsWorking] = useState(false);
+
+  return (
+    <Stack spacing={2} alignItems="flex-start">
+      <Stack direction="row" spacing={2} alignItems="center">
+        <AiAssistant.Avatar isWorking={isWorking} />
+        <Typography variant="body2" color="text.secondary">
+          {isWorking ? "Soren réfléchit…" : "Voici les 3 commandes à comparer."}
+        </Typography>
+      </Stack>
+      <Button size="small" variant="outlined" onClick={() => setIsWorking((prev) => !prev)}>
+        {isWorking ? "Répondre" : "Réfléchir"}
+      </Button>
+    </Stack>
+  );
+};
+
+/** A count on the orb's corner; `badge={true}` shows a dot instead. */
+export const WithBadge: StoryFn = () => {
+  const [open, setOpen] = useState(false);
+
+  return <AiAssistant.Fab open={open} onClick={() => setOpen((prev) => !prev)} tooltip="Nova - Assistant IA" badge={2} />;
 };
 
 /**

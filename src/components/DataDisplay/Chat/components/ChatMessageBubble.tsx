@@ -1,5 +1,6 @@
 import { getInitials } from "@getsoren/react-utils";
 import { Theme } from "@mui/material";
+import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
@@ -63,6 +64,19 @@ interface BubbleProps {
   isOwn?: boolean;
 }
 
+const PlainOwnBubble = ({ children }: { children: ReactNode }) => (
+  <Box
+    sx={{
+      backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.800" : "grey.100"),
+      borderRadius: ({ shape }: Theme) => `${shape.borderRadiusL}px`,
+      px: 2,
+      py: 1.25,
+    }}
+  >
+    {children}
+  </Box>
+);
+
 const Bubble = ({ children, isOwn }: BubbleProps) => (
   <Paper
     sx={{
@@ -89,9 +103,34 @@ const ChatMessageBubble = ({
   renderAfterBubble,
   formatTime,
   hideAvatar,
+  variant = "bubble",
+  avatar,
 }: ChatMessageBubbleProps) => {
   const formattedTime = (formatTime ?? defaultFormatTime)(message.createdAt);
   const urls = extractUrls(message.body);
+
+  if (variant === "plain") {
+    const body = (
+      <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+        {renderMessageBody(message.body)}
+      </Typography>
+    );
+
+    return isOwn ? (
+      <Stack alignItems="flex-end" spacing={0.5} sx={{ maxWidth: "85%" }} alignSelf="flex-end" data-testid="chatMessagePlainOwn">
+        <PlainOwnBubble>{body}</PlainOwnBubble>
+        {renderAfterBubble?.(urls)}
+      </Stack>
+    ) : (
+      <Stack direction="row" spacing={1.5} alignItems="flex-start" data-testid="chatMessagePlain">
+        {avatar && <Box sx={{ flexShrink: 0 }}>{avatar}</Box>}
+        <Stack spacing={0.5} minWidth={0} flex={1}>
+          {body}
+          {renderAfterBubble?.(urls)}
+        </Stack>
+      </Stack>
+    );
+  }
 
   if (isOwn) {
     return (

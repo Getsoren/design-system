@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
+import InputBase from "@mui/material/InputBase";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -8,6 +9,7 @@ import type { ChatMessageInputProps } from "@/components/DataDisplay/Chat/types"
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
 
 const RADIUS = 15;
+const FILLED_RADIUS = 16;
 const COUNTER_VISIBLE_FROM = 40;
 
 const ChatMessageInput = ({
@@ -19,6 +21,9 @@ const ChatMessageInput = ({
   startActions,
   slotProps,
   maxLength = 10000,
+  divider = true,
+  footnote,
+  variant = "outlined",
 }: ChatMessageInputProps) => {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,7 +36,7 @@ const ChatMessageInput = ({
     setMessage("");
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -47,12 +52,83 @@ const ChatMessageInput = ({
     }
   }, [defaultMessage]);
 
+  const sendLabel = labels?.send ?? "Send";
+  const counter = message.length > maxLength - COUNTER_VISIBLE_FROM && (
+    <Typography variant="caption" color={message.length >= maxLength ? "error.main" : "text.secondary"}>
+      {message.length}/{maxLength}
+    </Typography>
+  );
+
+  if (variant === "filled") {
+    return (
+      <Box sx={{ p: 2, pt: 1 }}>
+        <Box
+          sx={{
+            "&:focus-within": { borderColor: "text.primary" },
+            backgroundColor: ({ palette }) => (palette.mode === "dark" ? "grey.800" : "grey.100"),
+            border: 1,
+            borderColor: "transparent",
+            borderRadius: `${FILLED_RADIUS}px`,
+            transition: "border-color 150ms ease",
+          }}
+        >
+          <InputBase
+            fullWidth
+            multiline
+            autoFocus
+            key={autoFocusKey}
+            inputRef={inputRef}
+            maxRows={6}
+            placeholder={labels?.writeAMessage ?? "Write a message..."}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            slotProps={{ input: { maxLength } }}
+            // The theme gives inputs a white background.
+            sx={{ backgroundColor: "transparent", fontSize: ({ typography }) => typography.body2.fontSize, pt: 1.75, px: 2 }}
+          />
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: 1, pl: 1.25 }}>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              {startActions}
+            </Stack>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              {counter}
+              <IconButton
+                {...slotProps?.sendButton}
+                aria-label={sendLabel}
+                title={sendLabel}
+                onClick={handleSend}
+                disabled={!message.trim() || isSending}
+                sx={{
+                  "&:hover": { backgroundColor: "primary.dark" },
+                  "&.Mui-disabled": { backgroundColor: "action.disabledBackground", color: "action.disabled" },
+                  backgroundColor: "primary.main",
+                  borderRadius: "50%",
+                  color: "primary.contrastText",
+                  height: 32,
+                  width: 32,
+                }}
+              >
+                <ArrowUpwardRoundedIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Stack>
+          </Stack>
+        </Box>
+        {footnote && (
+          <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={1}>
+            {footnote}
+          </Typography>
+        )}
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{
         backgroundColor: "grey.A100",
         // The composer surface is as light as the message list: without this line the two merge.
-        borderTop: ({ palette }) => `1px solid ${palette.divider}`,
+        ...(divider && { borderTop: ({ palette }) => `1px solid ${palette.divider}` }),
         p: 2,
       }}
     >
@@ -138,8 +214,13 @@ const ChatMessageInput = ({
           </IconButton>
         </Stack>
       </Stack>
+      {footnote && (
+        <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={1}>
+          {footnote}
+        </Typography>
+      )}
       {/* Pass an empty string to hide the hint entirely (undefined keeps the default) */}
-      {labels?.enterToSend !== "" && (
+      {!footnote && labels?.enterToSend !== "" && (
         <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={0.5}>
           {labels?.enterToSend ?? "Enter to Send"}
         </Typography>

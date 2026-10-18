@@ -130,6 +130,10 @@ export interface ChatMessageBubbleProps {
   renderAfterBubble?: (urls: string[]) => ReactNode;
   formatTime?: (date: string) => string;
   hideAvatar?: boolean;
+  /** "plain": replies as plain text and own messages on a grey surface, e.g. for an AI assistant */
+  variant?: "bubble" | "plain";
+  /** Plain variant only: shown left of the reply */
+  avatar?: ReactNode;
 }
 
 /** `data-*` attributes forwarded to the message input's inner controls */
@@ -147,6 +151,12 @@ export interface ChatMessageInputProps {
   /** Rendered on the left of the bottom bar, facing the send button (e.g. ChatVoiceRecorder) */
   startActions?: ReactNode;
   slotProps?: ChatMessageInputSlotProps;
+  /** Border above the composer (defaults to true) */
+  divider?: boolean;
+  /** Small print under the composer, in place of the Enter hint */
+  footnote?: ReactNode;
+  /** "filled": a grey surface outlined on focus, with a round send button */
+  variant?: "outlined" | "filled";
 }
 
 export interface ChatVoiceRecorderLabels {

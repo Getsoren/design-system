@@ -55,6 +55,12 @@ Preview.args = {
   onOpenFullPage: () => {},
 };
 
+export const PreviewDense = Template.bind({});
+PreviewDense.args = {
+  ...Preview.args,
+  dense: true,
+};
+
 export const FullPage = Template.bind({});
 FullPage.args = {
   actions,

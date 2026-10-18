@@ -30,6 +30,8 @@ export interface CollapsingHeaderProps {
   onClose?: () => void;
   /** Preview only: open the entity full page. */
   onOpenFullPage?: () => void;
+  /** Preview only: 8px instead of 24px above the first line, e.g. docked beside the AI assistant panel. */
+  dense?: boolean;
   /** Full page only: back link label. */
   backLabel?: string;
   /** Full page only: back link handler. */

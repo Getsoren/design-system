@@ -143,6 +143,7 @@ export { default as HasPermission } from "@/components/Utils/HasPermission/HasPe
 
 // Theme
 export { default as theme } from "@/config/theme";
+export * from "@/constants/appBar";
 
 // Context providers
 export * from "@/context/Permission/PermissionProvider";

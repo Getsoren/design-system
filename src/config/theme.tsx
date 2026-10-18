@@ -11,6 +11,7 @@ import {
 import type { Interpolation } from "@mui/system";
 import { Children, CSSProperties, isValidElement } from "react";
 import CheckboxIcon from "@/components/Inputs/Checkbox/CheckboxIcon";
+import { APP_BAR_HEIGHT } from "@/constants/appBar";
 
 // Local type definition since OverridesStyleRules is not exported from @mui/material/styles
 type OverridesStyleRules<
@@ -305,7 +306,7 @@ const commonThemeOptions: MuiThemeOptions = {
       styleOverrides: {
         root: ({ theme }) => ({
           backgroundColor: theme.palette.background.dark,
-          height: 60,
+          height: APP_BAR_HEIGHT,
         }),
       },
     },

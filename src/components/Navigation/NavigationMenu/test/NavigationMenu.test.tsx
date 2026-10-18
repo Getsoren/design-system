@@ -43,4 +43,20 @@ describe("<NavigationMenu /> collapse toggle", () => {
 
     expect(queryByTestId("feedback-icon")).toBeInTheDocument();
   });
+
+  it("folds to the rail while something needs the room, leaving the saved choice untouched", () => {
+    const { container, queryByTestId, rerender } = renderMenu();
+
+    rerender(<NavigationMenu items={[]} bottomLink={FEEDBACK} storageKey={STORAGE_KEY} makeRoom />);
+    expect(queryByTestId("feedback-icon")).toBeInTheDocument();
+    expect(localStorage.getItem(STORAGE_KEY)).toBe("false");
+
+    // A manual unfold is not saved either.
+    fireEvent.click(collapseToggle(container));
+    expect(queryByTestId("feedback-icon")).not.toBeInTheDocument();
+    expect(localStorage.getItem(STORAGE_KEY)).toBe("false");
+
+    rerender(<NavigationMenu items={[]} bottomLink={FEEDBACK} storageKey={STORAGE_KEY} />);
+    expect(queryByTestId("feedback-icon")).not.toBeInTheDocument();
+  });
 });

@@ -7,16 +7,25 @@ import { SOREN_MARK_VIEWBOX } from "@/constants/sorenLogo";
 
 const ELLIPSE = { cx: 154.5, cy: 156.5, rx: 170, ry: 95, tilt: -44 } as const;
 const REST = `rotate(${ELLIPSE.tilt}deg) scale(1, 1)`;
-// Same area as the ellipse.
-const CIRCLE = `rotate(${ELLIPSE.tilt}deg) scale(0.75, 1.34)`;
 const CYCLE_MS = 2800;
 const TURN_EASE = "cubic-bezier(0.37, 0, 0.63, 1)";
 const SETTLE_MS = 640;
 const SETTLE_EASE = "cubic-bezier(0.2, 0, 0, 1)";
 const HANDOVER_MS = 120;
-const BREATH_MS = 9000;
-const BREATH_EASE = "cubic-bezier(0.45, 0, 0.55, 1)";
-const STRETCH_MS = 10000;
+
+// Each satellite has its own orbit and pace, so the two never move in step.
+const SATELLITES = [
+  { a: 232, b: 72, radius: 28, roundMs: 2100, tilt: -22 },
+  { a: 275, b: 104, radius: 20, roundMs: 3300, tilt: 16 },
+] as const;
+
+// An orbit is two swings, across and up and down, a quarter of a round apart.
+const ORBIT_KEYFRAMES = Object.fromEntries(
+  SATELLITES.flatMap(({ a, b }, index) => [
+    [`@keyframes aiAssistantMarkAcross${index}`, { from: { transform: `translateX(${-a}px)` }, to: { transform: `translateX(${a}px)` } }],
+    [`@keyframes aiAssistantMarkUpDown${index}`, { from: { transform: `translateY(${-b}px)` }, to: { transform: `translateY(${b}px)` } }],
+  ]),
+);
 
 const GLOW_TURN_S = 4.2;
 const GLOW_SMALL = { blur: 20, size: 16, width: 70 } as const;
@@ -24,6 +33,9 @@ const GLOW_LARGE = { blur: 9, size: 96, width: 22 } as const;
 
 // Shared by all marks: a resting mark mounted right after a working one stops or unmounts takes over its turn.
 let workingMarkLeftAt = Number.NEGATIVE_INFINITY;
+
+/** Negative delay that puts an animation of this period in phase with every other mark. */
+const phaseOf = (periodMs: number, shiftMs = 0) => `-${Math.round((performance.now() + shiftMs) % periodMs)}ms`;
 
 const glowFor = (size: number) => {
   const progress = Math.min(1, Math.max(0, (size - GLOW_SMALL.size) / (GLOW_LARGE.size - GLOW_SMALL.size)));
@@ -34,49 +46,58 @@ const glowFor = (size: number) => {
   };
 };
 
-/** The Soren logo's ellipse in a glow, turning while the assistant works. */
-const AiAssistantMark = ({
-  size = 32,
-  color = "text.primary",
-  isWorking = false,
-  isBusy = false,
-  isBreathing = false,
-  restShape = "ellipse",
-}: AiAssistantMarkProps) => {
+interface SatelliteProps {
+  index: number;
+  radius: number;
+  roundMs: number;
+  tilt: number;
+  delays: { across: string; upDown: string };
+}
+
+const Satellite = ({ index, radius, roundMs, tilt, delays }: SatelliteProps) => (
+  <g transform={`rotate(${tilt} ${ELLIPSE.cx} ${ELLIPSE.cy})`}>
+    <Box
+      component="g"
+      sx={{ animation: `aiAssistantMarkAcross${index} ${roundMs / 2}ms ${TURN_EASE} ${delays.across} infinite alternate` }}
+    >
+      <Box
+        component="circle"
+        cx={ELLIPSE.cx}
+        cy={ELLIPSE.cy}
+        r={radius}
+        fill="currentColor"
+        sx={{ animation: `aiAssistantMarkUpDown${index} ${roundMs / 2}ms ${TURN_EASE} ${delays.upDown} infinite alternate` }}
+      />
+    </Box>
+  </g>
+);
+
+/** The Soren logo's ellipse in a glow, turning with two satellites while the assistant works. */
+const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false, isBusy = false }: AiAssistantMarkProps) => {
   const id = useId();
   const isReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const svgRef = useRef<SVGSVGElement>(null);
   const moverRef = useRef<SVGGElement>(null);
-  // Negative delay: every working mark turns in phase with the others.
-  const [phaseDelay] = useState(() => `-${Math.round(performance.now() % CYCLE_MS)}ms`);
+  const satellitesBehindRef = useRef<SVGGElement>(null);
+  const satellitesInFrontRef = useRef<SVGGElement>(null);
+  const [phaseDelay] = useState(() => phaseOf(CYCLE_MS));
+  const [orbitDelays] = useState(() =>
+    SATELLITES.map(({ roundMs }) => ({ across: phaseOf(roundMs), upDown: phaseOf(roundMs, roundMs / 4) })),
+  );
   const [isSettling, setIsSettling] = useState(false);
-  const [settlingFrom, setSettlingFrom] = useState<"breath" | "turn">("turn");
   // Started working while mounted: the turn starts from the rest pose, not mid-phase.
   const [isEntering, setIsEntering] = useState(false);
   const [wasWorking, setWasWorking] = useState(isWorking);
-  const [wasBreathing, setWasBreathing] = useState(isBreathing);
 
   // Set during render, not in an effect, so the turn is still running when the settle reads its pose.
   if (wasWorking !== isWorking) {
     setWasWorking(isWorking);
     setIsEntering(isWorking);
     setIsSettling(!(isWorking || isReducedMotion));
-    setSettlingFrom("turn");
   }
 
-  if (wasBreathing !== isBreathing) {
-    setWasBreathing(isBreathing);
-
-    if (!(isBreathing || isWorking || isReducedMotion)) {
-      setIsSettling(true);
-      setSettlingFrom("breath");
-    }
-  }
-
-  const isTurning = (isWorking || (isSettling && settlingFrom === "turn")) && !isReducedMotion;
-  const isBreathingNow = !(isWorking || isReducedMotion) && (isSettling ? settlingFrom === "breath" : isBreathing);
+  const isTurning = (isWorking || isSettling) && !isReducedMotion;
   const isGliding = (isTurning || isBusy) && !isReducedMotion;
-  const restPose = restShape === "circle" ? CIRCLE : REST;
 
   // Layout effect, so this cleanup runs before the next mark's mount effect in the same commit.
   useLayoutEffect(() => {
@@ -93,7 +114,6 @@ const AiAssistantMark = ({
   useLayoutEffect(() => {
     if (!(isWorking || isReducedMotion) && performance.now() - workingMarkLeftAt < HANDOVER_MS) {
       setIsSettling(true);
-      setSettlingFrom("turn");
     }
   }, []);
 
@@ -126,19 +146,26 @@ const AiAssistantMark = ({
     const turnPose = getComputedStyle(mover).transform;
     mover.style.animation = "none";
 
-    const home = mover.animate([{ transform: turnPose }, { transform: restPose }], {
+    const home = mover.animate([{ transform: turnPose }, { transform: REST }], {
       duration: SETTLE_MS,
       easing: SETTLE_EASE,
       fill: "forwards",
     });
+    // The satellites slip away first, as the ellipse heads home.
+    const leaving = [satellitesBehindRef.current, satellitesInFrontRef.current].map((satellites) =>
+      satellites?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: SETTLE_MS / 2, easing: SETTLE_EASE, fill: "forwards" }),
+    );
 
     home.onfinish = () => setIsSettling(false);
 
     return () => {
       home.cancel();
+      for (const animation of leaving) {
+        animation?.cancel();
+      }
       mover.style.animation = "";
     };
-  }, [isSettling, restPose]);
+  }, [isSettling]);
 
   const glow = glowFor(size);
 
@@ -149,19 +176,6 @@ const AiAssistantMark = ({
       aria-hidden
       viewBox={`0 0 ${SOREN_MARK_VIEWBOX.width} ${SOREN_MARK_VIEWBOX.height}`}
       sx={{
-        "@keyframes aiAssistantMarkBreath": {
-          "0%, 100%": { transform: REST },
-          "25%": { transform: `rotate(${ELLIPSE.tilt + 8}deg) scale(0.8, 1.25)` },
-          "38%": { transform: `rotate(${ELLIPSE.tilt + 6}deg) scale(0.75, 1.34)` },
-          "62%": { transform: `rotate(${ELLIPSE.tilt - 7}deg) scale(0.95, 1.05)` },
-          "80%": { transform: REST },
-        },
-        "@keyframes aiAssistantMarkStretch": {
-          "0%, 48%, 100%": { transform: CIRCLE },
-          "60%": { transform: `rotate(${ELLIPSE.tilt - 4}deg) scale(1.04, 0.96)` },
-          "66%, 70%": { transform: REST },
-          "84%": { transform: CIRCLE },
-        },
         "@keyframes aiAssistantMarkTurn": {
           "0%": { transform: REST },
           "25%": { transform: `rotate(${ELLIPSE.tilt + 90}deg) scale(0.72, 1.05)` },
@@ -169,6 +183,7 @@ const AiAssistantMark = ({
           "75%": { transform: `rotate(${ELLIPSE.tilt + 270}deg) scale(0.7, 0.95)` },
           "100%": { transform: `rotate(${ELLIPSE.tilt + 360}deg) scale(1, 1)` },
         },
+        ...ORBIT_KEYFRAMES,
         color,
         display: "block",
         flexShrink: 0,
@@ -195,19 +210,26 @@ const AiAssistantMark = ({
             />
           )}
         </linearGradient>
+        {/* The front half of each orbit, below its tilted axis: where a satellite passes over the ellipse. */}
+        {SATELLITES.map(({ tilt }, index) => (
+          <mask key={tilt} id={`${id}front${index}`} maskUnits="userSpaceOnUse" x={-300} y={-300} width={912} height={913}>
+            <rect x={-300} y={ELLIPSE.cy} width={912} height={500} fill="white" transform={`rotate(${tilt} ${ELLIPSE.cx} ${ELLIPSE.cy})`} />
+          </mask>
+        ))}
       </defs>
+      {isTurning && (
+        <g ref={satellitesBehindRef}>
+          {SATELLITES.map(({ tilt, radius, roundMs }, index) => (
+            <Satellite key={tilt} index={index} radius={radius} roundMs={roundMs} tilt={tilt} delays={orbitDelays[index]} />
+          ))}
+        </g>
+      )}
       <Box
         component="g"
         ref={moverRef}
         sx={{
-          animation: isTurning
-            ? `aiAssistantMarkTurn ${CYCLE_MS}ms ${TURN_EASE} ${isEntering ? "0ms" : phaseDelay} infinite`
-            : isBreathingNow
-              ? restShape === "circle"
-                ? `aiAssistantMarkStretch ${STRETCH_MS}ms ${BREATH_EASE} infinite`
-                : `aiAssistantMarkBreath ${BREATH_MS}ms ${BREATH_EASE} infinite`
-              : "none",
-          transform: restPose,
+          animation: isTurning ? `aiAssistantMarkTurn ${CYCLE_MS}ms ${TURN_EASE} ${isEntering ? "0ms" : phaseDelay} infinite` : "none",
+          transform: REST,
           transformBox: "fill-box",
           transformOrigin: "center",
         }}
@@ -225,6 +247,16 @@ const AiAssistantMark = ({
         />
         <ellipse cx={ELLIPSE.cx} cy={ELLIPSE.cy} rx={ELLIPSE.rx} ry={ELLIPSE.ry} fill="currentColor" />
       </Box>
+      {/* The same satellites again, seen only on the front half of their orbit: they pass behind, then in front. */}
+      {isTurning && (
+        <g ref={satellitesInFrontRef}>
+          {SATELLITES.map(({ tilt, radius, roundMs }, index) => (
+            <g key={tilt} mask={`url(#${id}front${index})`}>
+              <Satellite index={index} radius={radius} roundMs={roundMs} tilt={tilt} delays={orbitDelays[index]} />
+            </g>
+          ))}
+        </g>
+      )}
     </Box>
   );
 };

@@ -24,14 +24,10 @@ export interface AiAssistantMarkProps {
   size?: number;
   /** Theme path or CSS colour of the ellipse (defaults to text.primary) */
   color?: string;
-  /** The ellipse turns, then settles back into its pose once false */
+  /** The ellipse turns with two satellites, then settles back into its pose once false */
   isWorking?: boolean;
   /** Background work: only the glow's colours move */
   isBusy?: boolean;
-  /** Idle motion at rest, ignored while working */
-  isBreathing?: boolean;
-  /** Pose at rest (defaults to "ellipse") */
-  restShape?: "ellipse" | "circle";
 }
 
 export interface AiAssistantAvatarProps extends Omit<AiAssistantMarkProps, "size" | "color"> {

@@ -11,6 +11,30 @@ describe("<AiAssistantMark />", () => {
     expect(shapes).toHaveLength(2);
     expect(shapes[0].getAttribute("stroke")).toMatch(/^url\(#/);
     expect(shapes[1]).toHaveAttribute("fill", "currentColor");
+    expect(container.querySelector("circle")).not.toBeInTheDocument();
+  });
+
+  it("sends two satellites round the ellipse while working", () => {
+    const { container } = render(<AiAssistantMark isWorking />);
+
+    // Each one drawn behind the ellipse, then again over the front half of its orbit.
+    expect(container.querySelectorAll("circle")).toHaveLength(4);
+  });
+
+  it("leaves the satellites out when motion is reduced", () => {
+    const original = window.matchMedia;
+    window.matchMedia = vi.fn((query: string) => ({
+      addEventListener: vi.fn(),
+      addListener: vi.fn(),
+      matches: query.includes("reduce"),
+      media: query,
+      removeEventListener: vi.fn(),
+      removeListener: vi.fn(),
+    })) as unknown as typeof window.matchMedia;
+    const { container } = render(<AiAssistantMark isWorking />);
+
+    expect(container.querySelector("circle")).not.toBeInTheDocument();
+    window.matchMedia = original;
   });
 
   it("keeps its glow while working and once the work stops", () => {
@@ -39,15 +63,6 @@ describe("<AiAssistantMark />", () => {
     Reflect.deleteProperty(SVGSVGElement.prototype, "unpauseAnimations");
   });
 
-  it("keeps the same ellipse in its glow while breathing at rest", () => {
-    const { container, rerender } = render(<AiAssistantMark isBreathing />);
-
-    expect(container.querySelectorAll("ellipse")).toHaveLength(2);
-
-    rerender(<AiAssistantMark />);
-    expect(container.querySelectorAll("ellipse")).toHaveLength(2);
-  });
-
   describe("with the Web Animations API", () => {
     const original = Element.prototype.animate;
 
@@ -64,17 +79,13 @@ describe("<AiAssistantMark />", () => {
       expect(Element.prototype.animate).toHaveBeenCalled();
     });
 
-    it("eases the pose home once it stops breathing, rather than snapping", () => {
+    it("fades the satellites out as the ellipse settles home", () => {
       Element.prototype.animate = vi.fn(() => ({ cancel: vi.fn(), onfinish: null })) as unknown as typeof Element.prototype.animate;
-      // Far from the previous test's working mark, so no hand-over.
-      const now = vi.spyOn(performance, "now").mockReturnValue(1e12);
-      const { rerender } = render(<AiAssistantMark isBreathing />);
+      const { rerender } = render(<AiAssistantMark isWorking />);
 
-      expect(Element.prototype.animate).not.toHaveBeenCalled();
+      rerender(<AiAssistantMark isWorking={false} />);
 
-      rerender(<AiAssistantMark />);
-      expect(Element.prototype.animate).toHaveBeenCalled();
-      now.mockRestore();
+      expect(Element.prototype.animate).toHaveBeenCalledWith([{ opacity: 1 }, { opacity: 0 }], expect.anything());
     });
   });
 });

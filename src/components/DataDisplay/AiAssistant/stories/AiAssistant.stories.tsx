@@ -172,7 +172,7 @@ export const WithLabelWorking: StoryFn = () => {
   return <AiAssistant.Fab open={open} onClick={() => setOpen((prev) => !prev)} label="Demander à Soren" isWorking />;
 };
 
-/** At rest, working at 24, 48 and 96px, busy, breathing, and breathing with `restShape="circle"`. */
+/** At rest, working with its satellites at 24, 48 and 96px, and busy. */
 export const Mark: StoryFn = () => (
   <Stack direction="row" spacing={4} alignItems="center">
     <AiAssistant.Mark size={48} />
@@ -180,8 +180,6 @@ export const Mark: StoryFn = () => (
     <AiAssistant.Mark size={48} isWorking />
     <AiAssistant.Mark size={96} isWorking />
     <AiAssistant.Mark size={48} isBusy />
-    <AiAssistant.Mark size={48} isBreathing />
-    <AiAssistant.Mark size={48} isBreathing restShape="circle" />
   </Stack>
 );
 
@@ -189,7 +187,7 @@ export const Mark: StoryFn = () => (
 export const ActionButton: StoryFn = () => (
   <Stack direction="row" spacing={2} alignItems="center">
     <AiAssistant.Button size="small">Lancer</AiAssistant.Button>
-    <AiAssistant.Button variant="outlined" color="contrast" startIcon={<AiAssistant.Mark size={18} isBreathing restShape="circle" />}>
+    <AiAssistant.Button variant="outlined" color="contrast" startIcon={<AiAssistant.Mark size={18} />}>
       Laisser Soren chercher
     </AiAssistant.Button>
   </Stack>

@@ -6,7 +6,7 @@ import type { AiAssistantAvatarProps } from "@/components/DataDisplay/AiAssistan
 const MARK_RATIO = 15 / 28;
 
 /** The assistant's mark in a grey round. */
-const AiAssistantAvatar = ({ size = 28, isWorking, isBusy, isBreathing, restShape }: AiAssistantAvatarProps) => (
+const AiAssistantAvatar = ({ size = 28, isWorking, isBusy }: AiAssistantAvatarProps) => (
   <Box
     sx={{
       alignItems: "center",
@@ -19,13 +19,7 @@ const AiAssistantAvatar = ({ size = 28, isWorking, isBusy, isBreathing, restShap
       width: size,
     }}
   >
-    <AiAssistantMark
-      size={Math.round(size * MARK_RATIO)}
-      isWorking={isWorking}
-      isBusy={isBusy}
-      isBreathing={isBreathing}
-      restShape={restShape}
-    />
+    <AiAssistantMark size={Math.round(size * MARK_RATIO)} isWorking={isWorking} isBusy={isBusy} />
   </Box>
 );
 

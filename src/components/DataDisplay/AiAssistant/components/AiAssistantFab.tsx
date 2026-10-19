@@ -148,7 +148,7 @@ const AiAssistantFabPill = ({
   >
     <Box sx={{ display: "grid", placeItems: "center" }}>
       <Box className="aiAssistantFabIcon aiAssistantFabIconMark">
-        <AiAssistantAvatar size={PILL_AVATAR_SIZE} isBusy={isWorking && !open} isBreathing={!open} restShape="circle" />
+        <AiAssistantAvatar size={PILL_AVATAR_SIZE} isBusy={isWorking && !open} />
       </Box>
       <Box className="aiAssistantFabIcon aiAssistantFabIconClose">
         <CloseIcon />

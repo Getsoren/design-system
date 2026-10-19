@@ -10,7 +10,6 @@ import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRo
 import getSubtleSurfaceColor from "@/utils/getSubtleSurfaceColor";
 
 const RADIUS = 15;
-const FILLED_RADIUS = 16;
 const COUNTER_VISIBLE_FROM = 40;
 
 const ChatMessageInput = ({
@@ -68,7 +67,8 @@ const ChatMessageInput = ({
             backgroundColor: ({ palette }) => getSubtleSurfaceColor(palette),
             border: 1,
             borderColor: "transparent",
-            borderRadius: `${FILLED_RADIUS}px`,
+            // Twice the theme's radius (16px)
+            borderRadius: 2,
             transition: "border-color 150ms ease",
           }}
         >

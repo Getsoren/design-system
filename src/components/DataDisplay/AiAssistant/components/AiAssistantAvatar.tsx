@@ -31,7 +31,7 @@ const AiAssistantAvatar = ({ variant = "subtle", isWorking }: AiAssistantAvatarP
               },
               "@media (prefers-reduced-motion: reduce)": { "&&": { animation: "none" } },
               animation: "aiAssistantAvatarFlow 11.3s ease infinite",
-              background: ({ palette }) => assistantOrbGradient(palette.mode),
+              background: ({ palette }) => assistantOrbGradient(palette),
               backgroundSize: "320% 320%",
             }
           : { backgroundColor: ({ palette }) => getSubtleSurfaceColor(palette) }),

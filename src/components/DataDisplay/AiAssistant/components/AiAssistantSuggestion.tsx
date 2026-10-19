@@ -12,7 +12,7 @@ const AiAssistantSuggestion = ({ children, onClick, dataTestId, ...dataAttribute
       "&:hover, &:focus-visible": { backgroundColor: "action.hover" },
       border: 1,
       borderColor: "divider",
-      borderRadius: "12px",
+      borderRadius: ({ shape }) => `${shape.borderRadiusL}px`,
       font: "inherit",
       justifyContent: "flex-start",
       paddingX: 1.75,

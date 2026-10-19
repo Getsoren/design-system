@@ -1,12 +1,17 @@
 import Fab from "@mui/material/Fab";
 import Typography from "@mui/material/Typography";
 import AiAssistantAvatar from "@/components/DataDisplay/AiAssistant/components/AiAssistantAvatar";
-import { AI_ASSISTANT_AVATAR_SIZE } from "@/components/DataDisplay/AiAssistant/constants";
+import {
+  AI_ASSISTANT_AVATAR_SIZE,
+  AI_ASSISTANT_FAB_HEIGHT,
+  AI_ASSISTANT_FAB_HOVER_SHADOW,
+  AI_ASSISTANT_FAB_SHADOW,
+  AI_ASSISTANT_FLOATING_INSET,
+} from "@/components/DataDisplay/AiAssistant/constants";
 import type { AiAssistantFabProps } from "@/components/DataDisplay/AiAssistant/types";
 
-const PILL_HEIGHT = 44;
 // Even padding around the avatar.
-const PILL_INSET = (PILL_HEIGHT - AI_ASSISTANT_AVATAR_SIZE) / 2;
+const PILL_INSET = (AI_ASSISTANT_FAB_HEIGHT - AI_ASSISTANT_AVATAR_SIZE) / 2;
 
 /**
  * The assistant's entry point, a pill in the bottom-right corner: its avatar and a call to ask it.
@@ -20,20 +25,20 @@ const AiAssistantFab = ({ onClick, label, dataTestId = "assistantFab", ...dataAt
     data-testid={dataTestId}
     sx={{
       "@media (prefers-reduced-motion: reduce)": { "&&": { transition: "none" } },
-      "&:hover": { backgroundColor: "background.paper", boxShadow: "0 6px 24px rgba(0, 0, 0, 0.14)" },
+      "&:hover": { backgroundColor: "background.paper", boxShadow: AI_ASSISTANT_FAB_HOVER_SHADOW },
       backgroundColor: "background.paper",
       border: 1,
       borderColor: "divider",
-      borderRadius: PILL_HEIGHT / 2,
-      bottom: 24,
-      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+      borderRadius: AI_ASSISTANT_FAB_HEIGHT / 2,
+      bottom: AI_ASSISTANT_FLOATING_INSET,
+      boxShadow: AI_ASSISTANT_FAB_SHADOW,
       color: "text.primary",
       gap: 1.25,
-      height: PILL_HEIGHT,
+      height: AI_ASSISTANT_FAB_HEIGHT,
       paddingLeft: `${PILL_INSET - 1}px`,
       paddingRight: 2.25,
       position: "fixed",
-      right: 24,
+      right: AI_ASSISTANT_FLOATING_INSET,
       textTransform: "none",
       transition: "box-shadow 200ms ease",
       zIndex: (theme) => theme.zIndex.snackbar,

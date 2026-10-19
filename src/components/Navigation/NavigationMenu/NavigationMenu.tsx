@@ -333,12 +333,12 @@ const NavigationMenu = ({
   density = "standard",
   makeRoom = false,
 }: NavigationMenuProps) => {
-  const { breakpoints } = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(DEFAULT_CONTEXT_VALUE.isDrawerOpen);
   // The user's choice, persisted; `isCollapsed` below is what the menu actually shows.
   const [isCollapsedPreference, setIsCollapsedPreference] = useState(() => getStoredCollapsed(storageKey));
   // Manual unfold while `makeRoom` is set: never persisted, reset once `makeRoom` is off.
   const [isUnfoldedForNow, setIsUnfoldedForNow] = useState(false);
+  const { breakpoints } = useTheme();
   const isMobile = useMediaQuery(breakpoints.down("sm"));
   const isTablet = useMediaQuery(breakpoints.between("sm", "md"));
   const isInDrawer = (isMobile || isTablet) && !disableResponsive;
@@ -361,6 +361,9 @@ const NavigationMenu = ({
     setIsCollapsedPreference((prev) => !prev);
   }, [makeRoom]);
 
+  /**
+   * Forget a manual unfold once the room is no longer needed, so the next `makeRoom` folds the menu again
+   */
   useEffect(() => {
     if (!makeRoom) {
       setIsUnfoldedForNow(false);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AI_ASSISTANT_DOCKED_INSET, AI_ASSISTANT_DOCKED_SPACE } from "@/components/DataDisplay/AiAssistant/constants";
+import { AI_ASSISTANT_DOCKED_INSET, AI_ASSISTANT_DOCKED_WIDTH } from "@/components/DataDisplay/AiAssistant/constants";
 import { getAiAssistantNeighbourSx } from "@/components/DataDisplay/AiAssistant/utils/docked";
 
 describe("getAiAssistantNeighbourSx", () => {
@@ -8,7 +8,7 @@ describe("getAiAssistantNeighbourSx", () => {
       border: 1,
       bottom: AI_ASSISTANT_DOCKED_INSET,
       overflow: "hidden",
-      right: AI_ASSISTANT_DOCKED_SPACE,
+      right: AI_ASSISTANT_DOCKED_WIDTH + 2 * AI_ASSISTANT_DOCKED_INSET,
       top: 60 + AI_ASSISTANT_DOCKED_INSET,
     });
   });

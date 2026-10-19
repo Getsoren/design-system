@@ -26,25 +26,14 @@ const VOTE_BUTTONS: VoteButton[] = [
 /** Copy and vote buttons under an assistant reply; the vote is controlled by the host app. */
 const AiAssistantReplyActions = ({
   content,
-  vote = null,
   onVote,
   labels,
   slotProps,
+  vote = null,
   dataTestId = "assistantReplyActions",
 }: AiAssistantReplyActionsProps) => {
   const [isCopied, setIsCopied] = useState(false);
   const copyLabel = labels?.copy ?? "Copy";
-
-  // The check stays a moment, then the copy glyph comes back.
-  useEffect(() => {
-    if (!isCopied) {
-      return;
-    }
-
-    const timeout = setTimeout(() => setIsCopied(false), COPIED_FEEDBACK_MS);
-
-    return () => clearTimeout(timeout);
-  }, [isCopied]);
 
   const copy = async () => {
     try {
@@ -54,6 +43,19 @@ const AiAssistantReplyActions = ({
       // Clipboard unavailable (permission, insecure context): nothing to confirm.
     }
   };
+
+  /**
+   * The check stays a moment, then the copy glyph comes back.
+   */
+  useEffect(() => {
+    if (!isCopied) {
+      return;
+    }
+
+    const timeout = setTimeout(() => setIsCopied(false), COPIED_FEEDBACK_MS);
+
+    return () => clearTimeout(timeout);
+  }, [isCopied]);
 
   return (
     // The negative margin lines the first glyph up with the reply's text.

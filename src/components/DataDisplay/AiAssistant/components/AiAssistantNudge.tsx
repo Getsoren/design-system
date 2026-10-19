@@ -4,8 +4,16 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import {
+  AI_ASSISTANT_FAB_HEIGHT,
+  AI_ASSISTANT_FLOATING_INSET,
+  AI_ASSISTANT_FLOATING_INSET_XS,
+} from "@/components/DataDisplay/AiAssistant/constants";
 import type { AiAssistantNudgeProps } from "@/components/DataDisplay/AiAssistant/types";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
+
+// Gap between the bubble and the Fab under it, in px
+const GAP_ABOVE_FAB = 12;
 
 /**
  * Contextual nudge anchored where the assistant lives — a compact bubble growing out of
@@ -48,14 +56,13 @@ const AiAssistantNudge = ({
         role="status"
         sx={{
           borderRadius: 3,
-          // 12px above the Fab (24px inset, 44px high)
-          bottom: 80,
+          bottom: AI_ASSISTANT_FLOATING_INSET + AI_ASSISTANT_FAB_HEIGHT + GAP_ABOVE_FAB,
           padding: 2,
           position: "fixed",
-          right: { sm: 24, xs: 16 },
-          // The grow starts from the Fab's rounded end, under the bubble's corner
-          transformOrigin: "calc(100% - 22px) calc(100% + 34px)",
-          width: { sm: 340, xs: "calc(100vw - 32px)" },
+          right: { sm: AI_ASSISTANT_FLOATING_INSET, xs: AI_ASSISTANT_FLOATING_INSET_XS },
+          // The grow starts from the centre of the Fab's rounded end, under the bubble's corner
+          transformOrigin: `calc(100% - ${AI_ASSISTANT_FAB_HEIGHT / 2}px) calc(100% + ${GAP_ABOVE_FAB + AI_ASSISTANT_FAB_HEIGHT / 2}px)`,
+          width: { sm: 340, xs: `calc(100vw - ${2 * AI_ASSISTANT_FLOATING_INSET_XS}px)` },
           // Snackbar level (above modal backdrops): nudges fire on screens that may live
           // inside a modal, and the bubble must stay readable and dismissable there
           zIndex: (theme) => theme.zIndex.snackbar,

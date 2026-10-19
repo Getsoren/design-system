@@ -10,6 +10,23 @@ const SPOTLIGHT_PADDING = 6;
 /** The anchor can move without firing resize/scroll (animations, layout) — light poll */
 const TRACK_INTERVAL_MS = 200;
 
+/** Two soft layers of the aura: [blur, spread, opacity] each, at rest then swollen */
+type AuraLayers = readonly [readonly [number, number, number], readonly [number, number, number]];
+const AURA_CALM: AuraLayers = [
+  [22, 5, 0.3],
+  [60, 22, 0.14],
+];
+const AURA_PEAK: AuraLayers = [
+  [38, 12, 0.44],
+  [95, 36, 0.22],
+];
+
+/** Pale glint at the comet's head, lighter than any tint of the palette */
+const COMET_HEAD = "#FFC9A8";
+
+const auraShadow = (color: string, layers: AuraLayers) =>
+  layers.map(([blur, spread, opacity]) => `0 0 ${blur}px ${spread}px ${alpha(color, opacity)}`).join(", ");
+
 /**
  * The assistant's visual language for POINTING at things (host apps use it for
  * contextual nudges and guided tours): dims the whole screen except a window around
@@ -82,17 +99,17 @@ const AiAssistantSpotlight = ({
         sx={(theme) => ({
           "@keyframes aiAssistantSpotlightAura": {
             "0%, 100%": {
-              boxShadow: "0 0 22px 5px rgba(255, 79, 18, 0.3), 0 0 60px 22px rgba(255, 79, 18, 0.14)",
+              boxShadow: auraShadow(theme.palette.secondary.main, AURA_CALM),
             },
             "50%": {
-              boxShadow: "0 0 38px 12px rgba(255, 79, 18, 0.44), 0 0 95px 36px rgba(255, 79, 18, 0.22)",
+              boxShadow: auraShadow(theme.palette.secondary.main, AURA_PEAK),
             },
           },
           // Doubled selector so this a11y override beats the base rule regardless of emission order
           "@media (prefers-reduced-motion: reduce)": { "&&": { animation: "none" } },
           animation: "aiAssistantSpotlightAura 3.4s ease-in-out infinite",
           borderRadius: 2.5,
-          boxShadow: "0 0 22px 5px rgba(255, 79, 18, 0.3), 0 0 60px 22px rgba(255, 79, 18, 0.14)",
+          boxShadow: auraShadow(theme.palette.secondary.main, AURA_CALM),
           height: rect.height + SPOTLIGHT_PADDING * 2,
           left: rect.left - SPOTLIGHT_PADDING,
           pointerEvents: "none",
@@ -115,41 +132,44 @@ const AiAssistantSpotlight = ({
         <Box
           key={layer.ringWidth}
           aria-hidden
-          sx={(theme) => ({
-            "@keyframes aiAssistantSpotlightShine": { to: { transform: "rotate(1turn)" } },
-            // Doubled selector so this a11y override beats the base rule regardless of emission order
-            "@media (prefers-reduced-motion: reduce)": { "&&::before": { animation: "none" } },
-            "&::before": {
-              animation: "aiAssistantSpotlightShine 4.2s linear infinite",
-              // A comet with a LONG progressive tail and a soft head — abrupt ends read
-              // as the ring being cut while it orbits
-              background:
-                "conic-gradient(transparent 0deg, rgba(255, 79, 18, 0.05) 70deg, rgba(255, 79, 18, 0.16) 150deg, rgba(255, 79, 18, 0.42) 215deg, #FF4F12 252deg, #FFC9A8 270deg, rgba(255, 201, 168, 0.4) 285deg, transparent 310deg, transparent 360deg)",
-              content: '""',
-              inset: "-75%",
-              position: "absolute",
-            },
-            // Faint CONSTANT ring under the comet
-            backgroundColor: "rgba(255, 79, 18, 0.16)",
-            borderRadius: 2.5,
-            filter: layer.blur ? `blur(${layer.blur}px)` : undefined,
-            height: rect.height + SPOTLIGHT_PADDING * 2,
-            left: rect.left - SPOTLIGHT_PADDING,
-            // Ring mask (the `mask` SHORTHAND — content-box is invalid inside mask-image):
-            // only `padding` px of the spinning gradient stays visible
-            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            maskComposite: "exclude",
-            opacity: layer.ringOpacity,
-            overflow: "hidden",
-            padding: `${layer.ringWidth}px`,
-            pointerEvents: "none",
-            position: "fixed",
-            top: rect.top - SPOTLIGHT_PADDING,
-            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            WebkitMaskComposite: "xor",
-            width: rect.width + SPOTLIGHT_PADDING * 2,
-            zIndex: theme.zIndex.snackbar - 1,
-          })}
+          sx={(theme) => {
+            const orange = theme.palette.secondary.main;
+
+            return {
+              "@keyframes aiAssistantSpotlightShine": { to: { transform: "rotate(1turn)" } },
+              // Doubled selector so this a11y override beats the base rule regardless of emission order
+              "@media (prefers-reduced-motion: reduce)": { "&&::before": { animation: "none" } },
+              "&::before": {
+                animation: "aiAssistantSpotlightShine 4.2s linear infinite",
+                // A comet with a LONG progressive tail and a soft head — abrupt ends read
+                // as the ring being cut while it orbits
+                background: `conic-gradient(transparent 0deg, ${alpha(orange, 0.05)} 70deg, ${alpha(orange, 0.16)} 150deg, ${alpha(orange, 0.42)} 215deg, ${orange} 252deg, ${COMET_HEAD} 270deg, ${alpha(COMET_HEAD, 0.4)} 285deg, transparent 310deg, transparent 360deg)`,
+                content: '""',
+                inset: "-75%",
+                position: "absolute",
+              },
+              // Faint CONSTANT ring under the comet
+              backgroundColor: alpha(orange, 0.16),
+              borderRadius: 2.5,
+              filter: layer.blur ? `blur(${layer.blur}px)` : undefined,
+              height: rect.height + SPOTLIGHT_PADDING * 2,
+              left: rect.left - SPOTLIGHT_PADDING,
+              // Ring mask (the `mask` SHORTHAND — content-box is invalid inside mask-image):
+              // only `padding` px of the spinning gradient stays visible
+              mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+              maskComposite: "exclude",
+              opacity: layer.ringOpacity,
+              overflow: "hidden",
+              padding: `${layer.ringWidth}px`,
+              pointerEvents: "none",
+              position: "fixed",
+              top: rect.top - SPOTLIGHT_PADDING,
+              WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+              WebkitMaskComposite: "xor",
+              width: rect.width + SPOTLIGHT_PADDING * 2,
+              zIndex: theme.zIndex.snackbar - 1,
+            };
+          }}
         />
       ))}
     </Portal>

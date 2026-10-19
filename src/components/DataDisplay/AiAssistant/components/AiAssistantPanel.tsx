@@ -1,6 +1,11 @@
 import Grow from "@mui/material/Grow";
 import Paper from "@mui/material/Paper";
-import { AI_ASSISTANT_DOCKED_INSET, AI_ASSISTANT_DOCKED_WIDTH } from "@/components/DataDisplay/AiAssistant/constants";
+import {
+  AI_ASSISTANT_DOCKED_INSET,
+  AI_ASSISTANT_DOCKED_WIDTH,
+  AI_ASSISTANT_FLOATING_INSET,
+  AI_ASSISTANT_FLOATING_INSET_XS,
+} from "@/components/DataDisplay/AiAssistant/constants";
 import type { AiAssistantPanelProps } from "@/components/DataDisplay/AiAssistant/types";
 import { dockedSurfaceSx } from "@/components/DataDisplay/AiAssistant/utils/docked";
 import { APP_BAR_HEIGHT } from "@/constants/appBar";
@@ -33,16 +38,16 @@ const AiAssistantPanel = ({ open, docked = false, children, dataTestId = "assist
       elevation={docked ? 0 : 8}
       sx={{
         borderRadius: 2,
-        bottom: { sm: 24, xs: 16 },
+        bottom: { sm: AI_ASSISTANT_FLOATING_INSET, xs: AI_ASSISTANT_FLOATING_INSET_XS },
         display: "flex",
         flexDirection: "column",
-        height: { sm: 640, xs: "calc(100dvh - 32px)" },
-        maxHeight: "calc(100dvh - 48px)",
+        height: { sm: 640, xs: `calc(100dvh - ${2 * AI_ASSISTANT_FLOATING_INSET_XS}px)` },
+        maxHeight: `calc(100dvh - ${2 * AI_ASSISTANT_FLOATING_INSET}px)`,
         overflow: "hidden",
         position: "fixed",
-        right: { sm: 24, xs: 16 },
+        right: { sm: AI_ASSISTANT_FLOATING_INSET, xs: AI_ASSISTANT_FLOATING_INSET_XS },
         transformOrigin: "100% 100%",
-        width: { sm: 400, xs: "calc(100vw - 32px)" },
+        width: { sm: 400, xs: `calc(100vw - ${2 * AI_ASSISTANT_FLOATING_INSET_XS}px)` },
         // Snackbar level, like the Fab: opened above a modal backdrop, the panel must not be buried under it
         zIndex: (theme) => theme.zIndex.snackbar,
         ...(docked && DOCKED_SX),

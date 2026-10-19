@@ -14,6 +14,9 @@ export interface TextFieldGroupProps extends PropsWithChildren {
   variant?: "outlined" | "segmented";
   /** Between two fields of the `segmented` variant, such as an arrow from a start to an end */
   separator?: ReactNode;
+  /**
+   * Additional styling for the group
+   */
   sx?: SxProps<Theme>;
 }
 
@@ -27,12 +30,12 @@ const SEGMENT_GAP = 4;
  */
 const TextFieldGroup = ({
   children,
-  direction = "column",
   error,
   errorColor,
-  variant = "outlined",
   separator,
   sx,
+  direction = "column",
+  variant = "outlined",
 }: TextFieldGroupProps) => {
   const isRow = direction === "row";
 

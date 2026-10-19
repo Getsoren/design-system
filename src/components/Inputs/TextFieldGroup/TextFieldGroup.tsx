@@ -1,5 +1,5 @@
 import { Box, Stack, type SxProps, type Theme } from "@mui/material";
-import { Children, Fragment, type PropsWithChildren, type ReactNode } from "react";
+import { Children, Fragment, isValidElement, type PropsWithChildren, type ReactNode } from "react";
 import getInvalidColor, { type InvalidColor } from "@/utils/getInvalidColor";
 import getOutlineColor from "@/utils/getOutlineColor";
 
@@ -10,7 +10,10 @@ export interface TextFieldGroupProps extends PropsWithChildren {
   error?: boolean;
   /** Palette of the invalid frame */
   errorColor?: InvalidColor;
-  /** `segmented`: the fields sit on a grey track, the focused one lifted in white (a period picked end by end) */
+  /**
+   * `segmented`: the fields sit on a grey track, the focused one lifted in white (a period picked end by end).
+   * Give each field `slotProps.inputLabel.shrink`: an empty field's label otherwise drops to the middle of the track.
+   */
   variant?: "outlined" | "segmented";
   /** Between two fields of the `segmented` variant, such as an arrow from a start to an end */
   separator?: ReactNode;
@@ -58,7 +61,8 @@ const TextFieldGroup = ({
             },
             "& .MuiTextField-root .MuiFilledInput-root.Mui-focused, & .MuiTextField-root .MuiFilledInput-root.Mui-error.Mui-focused": {
               backgroundColor: theme.palette.background.paper,
-              boxShadow: theme.shadows[2],
+              // The hairline keeps the white field apart from the light track, the shadow alone barely did
+              boxShadow: `${theme.shadows[2]}, 0 0 0 1px ${getOutlineColor(theme)}`,
             },
             "& > :not([aria-hidden])": { flex: 1, minWidth: 0 },
             backgroundColor: theme.palette.background.default,
@@ -70,7 +74,7 @@ const TextFieldGroup = ({
         ]}
       >
         {Children.toArray(children).map((field, index) => (
-          <Fragment key={index}>
+          <Fragment key={isValidElement(field) ? field.key : index}>
             {index > 0 && separator && (
               <Box aria-hidden sx={{ color: "text.secondary", display: "flex", flexShrink: 0, marginX: 1 }}>
                 {separator}

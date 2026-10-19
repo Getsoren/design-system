@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.87.0](https://github.com/getsoren/design-system/compare/4.86.0...4.87.0) (2026-10-19)
+
+
+### Features
+
+* **TextFieldGroup:** improve segmented variant with enhanced label handling and box shadow ([f9defb0](https://github.com/getsoren/design-system/commit/f9defb00a3162b26e7964d17508670e02dabbe42))
+
 ## [4.86.0](https://github.com/getsoren/design-system/compare/4.85.1...4.86.0) (2026-10-19)
 
 

@@ -1,5 +1,5 @@
 import { Button, Chip, Stack, Typography } from "@mui/material";
-import type { Meta, StoryFn } from "@storybook/react-vite";
+import type { Decorator, Meta, StoryFn } from "@storybook/react-vite";
 import { useRef, useState } from "react";
 import AiAssistant from "@/components/DataDisplay/AiAssistant/AiAssistant";
 import type { AiAssistantVote } from "@/components/DataDisplay/AiAssistant/types";
@@ -12,6 +12,13 @@ const meta: Meta = {
 };
 
 export default meta;
+
+/** Centres an in-flow example on the canvas, like the other stories; the fixed ones (Fab, Panel, Nudge) keep their corner. */
+const Centered: Decorator = (Story) => (
+  <Stack height="100%" alignItems="center" justifyContent="center">
+    <Story />
+  </Stack>
+);
 
 const PARTICIPANTS = [{ avatar: null, firstName: "Soren", lastName: "", userId: "assistant" }];
 const SUGGESTIONS = ["Où en sont mes demandes de devis ?", "Quelles locations se terminent cette semaine ?"];
@@ -272,10 +279,9 @@ export const Spotlight: StoryFn = () => {
   );
 };
 
-// In-flow examples sit in the middle of the canvas; the fixed ones (Fab, Panel, Nudge) keep their corner.
-Mark.parameters = { layout: "centered" };
-Avatar.parameters = { layout: "centered" };
-Thinking.parameters = { layout: "centered" };
-ReplyActions.parameters = { layout: "centered" };
-ConfirmationCard.parameters = { layout: "centered" };
-Spotlight.parameters = { layout: "centered" };
+Mark.decorators = [Centered];
+Avatar.decorators = [Centered];
+Thinking.decorators = [Centered];
+ReplyActions.decorators = [Centered];
+ConfirmationCard.decorators = [Centered];
+Spotlight.decorators = [Centered];

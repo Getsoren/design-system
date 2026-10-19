@@ -547,17 +547,24 @@ const commonThemeOptions: MuiThemeOptions = {
             };
           },
         },
-        // Soft variant: a quiet grey fill, e.g. suggestions or a "see more" under a card
+        // Soft variant: a quiet fill in the button's colour, e.g. suggestions or a "see more" under a card
         {
           props: { variant: "soft" },
-          style: ({ theme }) => ({
-            "&:hover": { backgroundColor: theme.palette.action.selected },
-            "&.Mui-disabled": { backgroundColor: theme.palette.action.disabledBackground, color: theme.palette.action.disabled },
-            backgroundColor: theme.palette.action.hover,
-            color: theme.palette.text.primary,
-            paddingLeft: theme.spacing(1.5),
-            paddingRight: theme.spacing(1.5),
-          }),
+          style: ({ theme, ownerState }: { theme: MuiTheme; ownerState?: ButtonProps } & ComponentsPropsList["MuiButton"]) => {
+            const color =
+              ownerState?.color === "inherit" || ownerState?.color === "contrast"
+                ? theme.palette.text.primary
+                : theme.palette[ownerState?.color || "primary"].main;
+
+            return {
+              "&:hover": { backgroundColor: alpha(color, theme.palette.action.selectedOpacity) },
+              "&.Mui-disabled": { backgroundColor: theme.palette.action.disabledBackground, color: theme.palette.action.disabled },
+              backgroundColor: alpha(color, theme.palette.action.hoverOpacity),
+              color,
+              paddingLeft: theme.spacing(1.5),
+              paddingRight: theme.spacing(1.5),
+            };
+          },
         },
         // Dashed variant (borderRadius: 4px)
         {

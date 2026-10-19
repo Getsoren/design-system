@@ -1,0 +1,179 @@
+import{i as e,s as t}from"./preload-helper-xPQekRTU.js";import{F as n,Kr as r,L as i,N as a,Pi as o,V as s,Vr as c,_ as l,ct as u,do as d,ea as f,g as p,h as m,k as h,m as g,na as _,p as v,z as y}from"./iframe-Ck_dG9Ja.js";var b,x=e((()=>{l(),g(),b=e=>m(s,{...e});try{b.displayName=`Table`,b.__docgenInfo={description:``,displayName:`Table`,filePath:`/home/runner/work/design-system/design-system/src/components/DataDisplay/Table/stories/Table.tsx`,methods:[],props:{component:{defaultValue:null,declarations:[{fileName:`design-system/node_modules/@mui/material/esm/Table/Table.d.ts`,name:`TypeLiteral`}],description:``,name:`component`,required:!1,tags:{},type:{name:`ElementType<any, keyof IntrinsicElements>`}}},tags:{}}}catch{}})),S,C,w,T,E,D,O,k,A,j,M,N,P,F;e((()=>{l(),S=t(d(),1),x(),g(),C=(e,t,n,r,i,a)=>({calories:t,carbs:r,fat:n,history:[{amount:3,customerId:`11091700`,date:`2020-01-05`},{amount:1,customerId:`Anonymous`,date:`2020-01-02`}],name:e,price:a,protein:i}),w=[C(`Frozen yoghurt`,159,6,24,4,3.99),C(`Ice cream sandwich`,237,9,37,4.3,4.99),C(`Eclair`,262,16,24,6,3.79),C(`Cupcake`,305,3.7,67,4.3,2.5),C(`Gingerbread`,356,16,49,3.9,1.5)],T=e=>{let{row:t}=e,[n,s]=(0,S.useState)(!1);return p(v,{children:[p(h,{sx:{"& > *":{borderBottom:`unset`}},children:[m(i,{children:m(c,{"aria-label":`expand row`,size:`small`,onClick:()=>s(!n),children:n?`-`:`+`})}),m(i,{component:`th`,scope:`row`,children:t.name}),m(i,{align:`right`,children:t.calories}),m(i,{align:`right`,children:t.fat}),m(i,{align:`right`,children:t.carbs}),m(i,{align:`right`,children:t.protein})]}),m(h,{children:m(i,{style:{paddingBottom:0,paddingTop:0},colSpan:6,children:m(_,{in:n,timeout:`auto`,unmountOnExit:!0,children:p(r,{sx:{margin:1},children:[m(o,{variant:`h6`,gutterBottom:!0,component:`div`,children:`History`}),p(b,{size:`small`,"aria-label":`purchases`,children:[m(a,{children:p(h,{children:[m(i,{children:`Date`}),m(i,{children:`Customer`}),m(i,{align:`right`,children:`Amount`}),m(i,{align:`right`,children:`Total price ($)`})]})}),m(y,{children:t.history.map(e=>p(h,{children:[m(i,{component:`th`,scope:`row`,children:e.date}),m(i,{children:e.customerId}),m(i,{align:`right`,children:e.amount}),m(i,{align:`right`,children:Math.round(e.amount*t.price*100)/100})]},e.date))})]})]})})})})]})},E=e=>{let{stickyHeader:t}=e;return m(u,{spacing:2,alignItems:`center`,justifyContent:`center`,height:`100%`,children:m(n,{sx:{maxHeight:t?250:`auto`},children:p(b,{sx:{minWidth:650},"aria-label":`simple table`,...e,children:[m(a,{children:p(h,{children:[m(i,{children:`Dessert (100g serving)`}),m(i,{align:`right`,children:`Calories`}),m(i,{align:`right`,children:`Fat\xA0(g)`}),m(i,{align:`right`,children:`Carbs\xA0(g)`}),m(i,{align:`right`,children:`Protein\xA0(g)`})]})}),m(y,{children:w.map(e=>p(h,{sx:{"&:last-child td, &:last-child th":{border:0}},children:[m(i,{component:`th`,scope:`row`,children:e.name}),m(i,{align:`right`,children:e.calories}),m(i,{align:`right`,children:e.fat}),m(i,{align:`right`,children:e.carbs}),m(i,{align:`right`,children:e.protein})]},e.name))})]})})})},D=e=>{let{stickyHeader:t}=e;return m(u,{spacing:2,alignItems:`center`,justifyContent:`center`,height:`100%`,children:m(n,{component:f,sx:{maxHeight:t?250:`auto`},children:p(b,{sx:{minWidth:650},"aria-label":`simple table`,...e,children:[p(a,{children:[p(h,{children:[m(i,{align:`center`,colSpan:2,children:`Name`}),m(i,{align:`center`,colSpan:3,children:`Details`})]}),p(h,{children:[m(i,{children:`Dessert (100g serving)`}),m(i,{align:`right`,children:`Calories`}),m(i,{align:`right`,children:`Fat\xA0(g)`}),m(i,{align:`right`,children:`Carbs\xA0(g)`}),m(i,{align:`right`,children:`Protein\xA0(g)`})]})]}),m(y,{children:w.map(e=>p(h,{sx:{"&:last-child td, &:last-child th":{border:0}},children:[m(i,{component:`th`,scope:`row`,children:e.name}),m(i,{align:`right`,children:e.calories}),m(i,{align:`right`,children:e.fat}),m(i,{align:`right`,children:e.carbs}),m(i,{align:`right`,children:e.protein})]},e.name))})]})})})},O=e=>m(u,{spacing:2,alignItems:`center`,justifyContent:`center`,height:`100%`,children:m(n,{component:f,children:p(b,{"aria-label":`collapsible table`,...e,children:[m(a,{children:p(h,{children:[m(i,{}),m(i,{children:`Dessert (100g serving)`}),m(i,{align:`right`,children:`Calories`}),m(i,{align:`right`,children:`Fat\xA0(g)`}),m(i,{align:`right`,children:`Carbs\xA0(g)`}),m(i,{align:`right`,children:`Protein\xA0(g)`})]})}),m(y,{children:w.map(e=>m(T,{row:e},e.name))})]})})}),k=E.bind({}),k.args={},A=E.bind({}),A.args={size:`small`},j=E.bind({}),j.args={stickyHeader:!0},M=D.bind({}),M.args={},N=O.bind({}),N.args={},P={component:b,title:`Components/Data Display/Table`},k.parameters={...k.parameters,docs:{...k.parameters?.docs,source:{originalSource:`args => {
+  const {
+    stickyHeader
+  } = args;
+  return <Stack spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <TableContainer sx={{
+      maxHeight: stickyHeader ? 250 : "auto"
+    }}>
+        <Table sx={{
+        minWidth: 650
+      }} aria-label="simple table" {...args}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Dessert (100g serving)</TableCell>
+              <TableCell align="right">Calories</TableCell>
+              <TableCell align="right">Fat&nbsp;(g)</TableCell>
+              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map(row => <TableRow key={row.name} sx={{
+            "&:last-child td, &:last-child th": {
+              border: 0
+            }
+          }}>
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell align="right">{row.calories}</TableCell>
+                <TableCell align="right">{row.fat}</TableCell>
+                <TableCell align="right">{row.carbs}</TableCell>
+                <TableCell align="right">{row.protein}</TableCell>
+              </TableRow>)}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Stack>;
+}`,...k.parameters?.docs?.source}}},A.parameters={...A.parameters,docs:{...A.parameters?.docs,source:{originalSource:`args => {
+  const {
+    stickyHeader
+  } = args;
+  return <Stack spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <TableContainer sx={{
+      maxHeight: stickyHeader ? 250 : "auto"
+    }}>
+        <Table sx={{
+        minWidth: 650
+      }} aria-label="simple table" {...args}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Dessert (100g serving)</TableCell>
+              <TableCell align="right">Calories</TableCell>
+              <TableCell align="right">Fat&nbsp;(g)</TableCell>
+              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map(row => <TableRow key={row.name} sx={{
+            "&:last-child td, &:last-child th": {
+              border: 0
+            }
+          }}>
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell align="right">{row.calories}</TableCell>
+                <TableCell align="right">{row.fat}</TableCell>
+                <TableCell align="right">{row.carbs}</TableCell>
+                <TableCell align="right">{row.protein}</TableCell>
+              </TableRow>)}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Stack>;
+}`,...A.parameters?.docs?.source}}},j.parameters={...j.parameters,docs:{...j.parameters?.docs,source:{originalSource:`args => {
+  const {
+    stickyHeader
+  } = args;
+  return <Stack spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <TableContainer sx={{
+      maxHeight: stickyHeader ? 250 : "auto"
+    }}>
+        <Table sx={{
+        minWidth: 650
+      }} aria-label="simple table" {...args}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Dessert (100g serving)</TableCell>
+              <TableCell align="right">Calories</TableCell>
+              <TableCell align="right">Fat&nbsp;(g)</TableCell>
+              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map(row => <TableRow key={row.name} sx={{
+            "&:last-child td, &:last-child th": {
+              border: 0
+            }
+          }}>
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell align="right">{row.calories}</TableCell>
+                <TableCell align="right">{row.fat}</TableCell>
+                <TableCell align="right">{row.carbs}</TableCell>
+                <TableCell align="right">{row.protein}</TableCell>
+              </TableRow>)}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Stack>;
+}`,...j.parameters?.docs?.source}}},M.parameters={...M.parameters,docs:{...M.parameters?.docs,source:{originalSource:`args => {
+  const {
+    stickyHeader
+  } = args;
+  return <Stack spacing={2} alignItems="center" justifyContent="center" height="100%">
+      <TableContainer component={Paper} sx={{
+      maxHeight: stickyHeader ? 250 : "auto"
+    }}>
+        <Table sx={{
+        minWidth: 650
+      }} aria-label="simple table" {...args}>
+          <TableHead>
+            <TableRow>
+              <TableCell align="center" colSpan={2}>
+                Name
+              </TableCell>
+              <TableCell align="center" colSpan={3}>
+                Details
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Dessert (100g serving)</TableCell>
+              <TableCell align="right">Calories</TableCell>
+              <TableCell align="right">Fat&nbsp;(g)</TableCell>
+              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map(row => <TableRow key={row.name} sx={{
+            "&:last-child td, &:last-child th": {
+              border: 0
+            }
+          }}>
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell align="right">{row.calories}</TableCell>
+                <TableCell align="right">{row.fat}</TableCell>
+                <TableCell align="right">{row.carbs}</TableCell>
+                <TableCell align="right">{row.protein}</TableCell>
+              </TableRow>)}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Stack>;
+}`,...M.parameters?.docs?.source}}},N.parameters={...N.parameters,docs:{...N.parameters?.docs,source:{originalSource:`args => <Stack spacing={2} alignItems="center" justifyContent="center" height="100%">
+    <TableContainer component={Paper}>
+      <Table aria-label="collapsible table" {...args}>
+        <TableHead>
+          <TableRow>
+            <TableCell />
+            <TableCell>Dessert (100g serving)</TableCell>
+            <TableCell align="right">Calories</TableCell>
+            <TableCell align="right">Fat&nbsp;(g)</TableCell>
+            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map(row => <Row key={row.name} row={row} />)}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Stack>`,...N.parameters?.docs?.source}}},F=[`Basic`,`Dense`,`StickyHeader`,`ColumnGrouping`,`CollapsibleTable`]}))();export{k as Basic,N as CollapsibleTable,M as ColumnGrouping,A as Dense,j as StickyHeader,F as __namedExportsOrder,P as default};

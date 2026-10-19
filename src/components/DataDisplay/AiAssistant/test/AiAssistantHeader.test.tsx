@@ -3,29 +3,19 @@ import { describe, expect, it, vi } from "vitest";
 import AiAssistantHeader from "@/components/DataDisplay/AiAssistant/components/AiAssistantHeader";
 
 describe("<AiAssistantHeader />", () => {
-  it("puts the host app's actions before the close button", () => {
+  it("names the assistant, with the close button last", () => {
     const onClose = vi.fn();
-    const { getAllByRole, getByRole } = render(
-      <AiAssistantHeader title="Nova" onClose={onClose} actions={<button type="button">3 running</button>} />,
-    );
-
-    const buttons = getAllByRole("button");
-    expect(buttons[0]).toHaveTextContent("3 running");
-
-    fireEvent.click(buttons[buttons.length - 1]);
-    expect(onClose).toHaveBeenCalled();
-    expect(getByRole("button", { name: "3 running" })).toBeInTheDocument();
-  });
-
-  it("shows the name alone when the icon is null", () => {
-    const { container, getByText } = render(<AiAssistantHeader title="Soren" onClose={vi.fn()} icon={null} />);
+    const { getAllByRole, getByText } = render(<AiAssistantHeader title="Soren" onClose={onClose} labels={{ close: "Close" }} />);
 
     expect(getByText("Soren")).toBeInTheDocument();
-    expect(container.querySelectorAll("svg")).toHaveLength(1);
+    const buttons = getAllByRole("button");
+    expect(buttons.at(-1)).toHaveAccessibleName("Close");
+    fireEvent.click(buttons.at(-1) as HTMLElement);
+    expect(onClose).toHaveBeenCalled();
   });
 
   it("tags the title, e.g. as a beta", () => {
-    const { getByTestId } = render(<AiAssistantHeader title="Soren" tag="Beta" onClose={vi.fn()} icon={null} />);
+    const { getByTestId } = render(<AiAssistantHeader title="Soren" tag="Beta" onClose={vi.fn()} />);
 
     expect(getByTestId("assistantHeaderTag")).toHaveTextContent("Beta");
   });

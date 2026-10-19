@@ -60,6 +60,7 @@ declare module "@mui/material/Button" {
     dashed: true;
     "dashed-rounded": true;
     link: true;
+    soft: true;
   }
 }
 
@@ -545,6 +546,18 @@ const commonThemeOptions: MuiThemeOptions = {
               textTransform: "none",
             };
           },
+        },
+        // Soft variant: a quiet grey fill, e.g. suggestions or a "see more" under a card
+        {
+          props: { variant: "soft" },
+          style: ({ theme }) => ({
+            "&:hover": { backgroundColor: theme.palette.action.selected },
+            "&.Mui-disabled": { backgroundColor: theme.palette.action.disabledBackground, color: theme.palette.action.disabled },
+            backgroundColor: theme.palette.action.hover,
+            color: theme.palette.text.primary,
+            paddingLeft: theme.spacing(1.5),
+            paddingRight: theme.spacing(1.5),
+          }),
         },
         // Dashed variant (borderRadius: 4px)
         {

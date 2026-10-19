@@ -11,8 +11,9 @@ export * from "@mui/material/transitions";
 
 // Data display
 export { default as AiAssistant } from "@/components/DataDisplay/AiAssistant/AiAssistant";
-export * from "@/components/DataDisplay/AiAssistant/constants";
+export { AI_ASSISTANT_DOCKED_SPACE } from "@/components/DataDisplay/AiAssistant/constants";
 export * from "@/components/DataDisplay/AiAssistant/types";
+export { getAiAssistantNeighbourSx } from "@/components/DataDisplay/AiAssistant/utils/docked";
 export * from "@/components/DataDisplay/ArticleImage/ArticleImage";
 export { default as ArticleImage } from "@/components/DataDisplay/ArticleImage/ArticleImage";
 export type { AvatarProps } from "@/components/DataDisplay/Avatar/Avatar";

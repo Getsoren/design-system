@@ -151,9 +151,7 @@ export interface ChatMessageInputProps {
   /** Rendered on the left of the bottom bar, facing the send button (e.g. ChatVoiceRecorder) */
   startActions?: ReactNode;
   slotProps?: ChatMessageInputSlotProps;
-  /** Border above the composer (defaults to true) */
-  divider?: boolean;
-  /** Small print under the composer, in place of the Enter hint */
+  /** Filled variant only: small print under the composer */
   footnote?: ReactNode;
   /** "filled": a grey surface outlined on focus, with a round send button */
   variant?: "outlined" | "filled";

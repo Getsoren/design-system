@@ -76,7 +76,7 @@ const AiAssistantSpotlight = ({
         })}
       />
       {/* Breathing aura emanating from the ring: layered soft shadows swelling and
-          settling — same visual language as the Panel's busy aura and the Fab's halo. */}
+          settling — in the assistant's brand orange. */}
       <Box
         aria-hidden
         sx={(theme) => ({

@@ -10,6 +10,7 @@ import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import type { ChatMessageBubbleProps } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import { extractUrls } from "@/components/DataDisplay/Chat/utils/extractUrls";
+import getSubtleSurfaceColor from "@/utils/getSubtleSurfaceColor";
 
 const URL_REGEX = /https?:\/\/\S+/g;
 
@@ -67,7 +68,7 @@ interface BubbleProps {
 const PlainOwnBubble = ({ children }: { children: ReactNode }) => (
   <Box
     sx={{
-      backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.800" : "grey.100"),
+      backgroundColor: ({ palette }: Theme) => getSubtleSurfaceColor(palette),
       borderRadius: ({ shape }: Theme) => `${shape.borderRadiusL}px`,
       px: 2,
       py: 1.25,

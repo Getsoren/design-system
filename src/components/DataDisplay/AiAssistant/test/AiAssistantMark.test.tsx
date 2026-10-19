@@ -48,7 +48,7 @@ describe("<AiAssistantMark />", () => {
     expect(container.querySelector("linearGradient")).toBeInTheDocument();
   });
 
-  it("lets the glow's colours glide only while the assistant works", () => {
+  it("lets the glow's colours glide only while the mark turns", () => {
     const pause = vi.fn();
     const unpause = vi.fn();
     // jsdom has no SMIL API.
@@ -57,7 +57,7 @@ describe("<AiAssistantMark />", () => {
 
     expect(pause).toHaveBeenCalled();
 
-    rerender(<AiAssistantMark isBusy />);
+    rerender(<AiAssistantMark isWorking />);
     expect(unpause).toHaveBeenCalled();
     Reflect.deleteProperty(SVGSVGElement.prototype, "pauseAnimations");
     Reflect.deleteProperty(SVGSVGElement.prototype, "unpauseAnimations");

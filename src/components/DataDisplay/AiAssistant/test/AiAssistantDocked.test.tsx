@@ -19,7 +19,7 @@ describe("docked assistant", () => {
   it("offers to dock or float the panel from the header, without the line under it", () => {
     const onToggleDocked = vi.fn();
     const { container, getByRole, rerender } = render(
-      <AiAssistantHeader title="Soren" onClose={vi.fn()} divider={false} onToggleDocked={onToggleDocked} labels={{ dock: "Dock" }} />,
+      <AiAssistantHeader title="Soren" onClose={vi.fn()} onToggleDocked={onToggleDocked} labels={{ dock: "Dock" }} />,
     );
 
     fireEvent.click(getByRole("button", { name: "Dock" }));

@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
+import getSubtleSurfaceColor from "@/utils/getSubtleSurfaceColor";
 
 const RADIUS = 15;
 const FILLED_RADIUS = 16;
@@ -21,7 +22,6 @@ const ChatMessageInput = ({
   startActions,
   slotProps,
   maxLength = 10000,
-  divider = true,
   footnote,
   variant = "outlined",
 }: ChatMessageInputProps) => {
@@ -65,7 +65,7 @@ const ChatMessageInput = ({
         <Box
           sx={{
             "&:focus-within": { borderColor: "text.primary" },
-            backgroundColor: ({ palette }) => (palette.mode === "dark" ? "grey.800" : "grey.100"),
+            backgroundColor: ({ palette }) => getSubtleSurfaceColor(palette),
             border: 1,
             borderColor: "transparent",
             borderRadius: `${FILLED_RADIUS}px`,
@@ -128,7 +128,7 @@ const ChatMessageInput = ({
       sx={{
         backgroundColor: "grey.A100",
         // The composer surface is as light as the message list: without this line the two merge.
-        ...(divider && { borderTop: ({ palette }) => `1px solid ${palette.divider}` }),
+        borderTop: ({ palette }) => `1px solid ${palette.divider}`,
         p: 2,
       }}
     >
@@ -214,13 +214,8 @@ const ChatMessageInput = ({
           </IconButton>
         </Stack>
       </Stack>
-      {footnote && (
-        <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={1}>
-          {footnote}
-        </Typography>
-      )}
       {/* Pass an empty string to hide the hint entirely (undefined keeps the default) */}
-      {!footnote && labels?.enterToSend !== "" && (
+      {labels?.enterToSend !== "" && (
         <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={0.5}>
           {labels?.enterToSend ?? "Enter to Send"}
         </Typography>

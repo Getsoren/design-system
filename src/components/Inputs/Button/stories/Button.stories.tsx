@@ -416,6 +416,12 @@ Text.args = {
   variant: "text",
 };
 
+/** A quiet grey fill: suggestions, or a "see more" under a card. */
+export const Soft = Template.bind({});
+Soft.args = {
+  variant: "soft",
+};
+
 export const Link = ButtonLinkTemplate.bind({});
 Link.args = {
   variant: "link",

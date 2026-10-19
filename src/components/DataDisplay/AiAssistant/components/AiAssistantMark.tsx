@@ -73,7 +73,7 @@ const Satellite = ({ index, radius, roundMs, tilt, delays }: SatelliteProps) => 
 );
 
 /** The Soren logo's ellipse in a glow, turning with two satellites while the assistant works. */
-const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false, isBusy = false }: AiAssistantMarkProps) => {
+const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false }: AiAssistantMarkProps) => {
   const id = useId();
   const isReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const svgRef = useRef<SVGSVGElement>(null);
@@ -88,6 +88,8 @@ const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false,
   // Started working while mounted: the turn starts from the rest pose, not mid-phase.
   const [isEntering, setIsEntering] = useState(false);
   const [wasWorking, setWasWorking] = useState(isWorking);
+  // Read by the mount effect only: whether this mark appeared at rest.
+  const isRestingAtMountRef = useRef(!(isWorking || isReducedMotion));
 
   // Set during render, not in an effect, so the turn is still running when the settle reads its pose.
   if (wasWorking !== isWorking) {
@@ -97,7 +99,6 @@ const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false,
   }
 
   const isTurning = (isWorking || isSettling) && !isReducedMotion;
-  const isGliding = (isTurning || isBusy) && !isReducedMotion;
 
   // Layout effect, so this cleanup runs before the next mark's mount effect in the same commit.
   useLayoutEffect(() => {
@@ -110,9 +111,9 @@ const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false,
     };
   }, [isWorking]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on mount only, when a hand-over can happen
+  // On mount only: a mark appearing at rest right after a working one left takes its turn over.
   useLayoutEffect(() => {
-    if (!(isWorking || isReducedMotion) && performance.now() - workingMarkLeftAt < HANDOVER_MS) {
+    if (isRestingAtMountRef.current && performance.now() - workingMarkLeftAt < HANDOVER_MS) {
       setIsSettling(true);
     }
   }, []);
@@ -124,12 +125,13 @@ const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false,
       return;
     }
 
-    if (isGliding) {
+    // The glow's colours glide only while the mark turns.
+    if (isTurning) {
       svg.unpauseAnimations();
     } else {
       svg.pauseAnimations();
     }
-  }, [isGliding]);
+  }, [isTurning]);
 
   useEffect(() => {
     const mover = moverRef.current;

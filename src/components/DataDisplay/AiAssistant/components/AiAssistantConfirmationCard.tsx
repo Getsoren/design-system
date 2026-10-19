@@ -1,12 +1,14 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import ButtonBase from "@mui/material/ButtonBase";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import type { KeyboardEvent } from "react";
 import type { AiAssistantConfirmationCardProps } from "@/components/DataDisplay/AiAssistant/types";
 import CheckIcon from "@/components/DataDisplay/Icons/CheckIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
+
+const OPEN_CLASS = "aiAssistantConfirmationCardOpen";
 
 /**
  * Human-in-the-loop gate for destructive assistant actions: shows what is about to be
@@ -27,27 +29,37 @@ const AiAssistantConfirmationCard = ({
   dataTestId = "assistantConfirmationCard",
 }: AiAssistantConfirmationCardProps) => {
   const isApproved = status === "approved";
-  const isOpenable = status !== "pending" && !!onOpen;
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) {
-      event.preventDefault();
-      onOpen?.();
-    }
-  };
+  const isPending = status === "pending";
+  const isOpenable = !isPending && !!onOpen;
+
+  const subject = (
+    <Stack direction="row" alignItems="flex-start" spacing={1.25}>
+      {icon && <Box sx={{ display: "flex", flexShrink: 0 }}>{icon}</Box>}
+      <Typography variant="subtitle2" sx={{ minWidth: 0 }}>
+        {summary}
+      </Typography>
+    </Stack>
+  );
 
   return (
     <Paper
       variant="outlined"
       data-testid={dataTestId}
-      {...(isOpenable && { onClick: onOpen, onKeyDown: handleKeyDown, role: "button", tabIndex: 0 })}
       sx={{
         alignSelf: "stretch",
         padding: 1.5,
-        ...(isOpenable && { "&:hover": { backgroundColor: "action.hover" }, cursor: "pointer" }),
+        ...(isOpenable && {
+          [`&:has(.${OPEN_CLASS}.Mui-focusVisible)`]: {
+            outline: ({ palette }) => `2px solid ${palette.primary.main}`,
+            outlineOffset: 2,
+          },
+          "&:hover": { backgroundColor: "action.hover" },
+          position: "relative",
+        }),
       }}
     >
       <Stack spacing={1}>
-        {status === "pending" ? (
+        {isPending ? (
           <Typography variant="caption" color="text.secondary">
             {heading}
           </Typography>
@@ -58,22 +70,36 @@ const AiAssistantConfirmationCard = ({
               {isApproved ? <CheckIcon /> : <CloseIcon />}
             </Box>
             <Typography variant="caption" color={isApproved ? "success.dark" : "text.secondary"}>
-              {isApproved ? (labels.accepted ?? labels.accept) : (labels.declined ?? labels.decline)}
+              {isApproved ? labels.accepted : labels.declined}
             </Typography>
           </Stack>
         )}
-        <Stack direction="row" alignItems="flex-start" spacing={1.25}>
-          {icon && <Box sx={{ display: "flex", flexShrink: 0 }}>{icon}</Box>}
-          <Typography variant="subtitle2" sx={{ minWidth: 0 }}>
-            {summary}
-          </Typography>
-        </Stack>
+        {isOpenable ? (
+          // Stretched over the whole card, so the card opens from anywhere, while the links stay outside the button.
+          <ButtonBase
+            disableRipple
+            className={OPEN_CLASS}
+            onClick={onOpen}
+            data-testid={`${dataTestId}Open`}
+            sx={{
+              "&::after": { content: '""', inset: 0, position: "absolute" },
+              font: "inherit",
+              justifyContent: "flex-start",
+              position: "static",
+              textAlign: "left",
+            }}
+          >
+            {subject}
+          </ButtonBase>
+        ) : (
+          subject
+        )}
         {details && (
           <Typography variant="caption" component="pre" sx={{ fontFamily: "monospace", margin: 0, whiteSpace: "pre-wrap" }}>
             {details}
           </Typography>
         )}
-        {status === "pending" ? (
+        {isPending ? (
           <Stack direction="row" spacing={1}>
             <Button size="small" variant="contained" data-testid={`${dataTestId}Accept`} onClick={onAccept}>
               {labels.accept}
@@ -84,10 +110,8 @@ const AiAssistantConfirmationCard = ({
           </Stack>
         ) : (
           links && (
-            // A click on a link must not open the card as well.
-            <Box onClick={(event) => event.stopPropagation()} sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
-              {links}
-            </Box>
+            // Above the stretched button's layer, so a link goes its own way.
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, position: "relative", zIndex: 1 }}>{links}</Box>
           )
         )}
       </Stack>

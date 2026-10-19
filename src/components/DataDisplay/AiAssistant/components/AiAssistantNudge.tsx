@@ -9,7 +9,7 @@ import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 
 /**
  * Contextual nudge anchored where the assistant lives — a compact bubble growing out of
- * the Fab, same spot and motion as the Panel but free-height and one-click dismissable.
+ * the Fab, right above it, free-height and one-click dismissable.
  * No backdrop, no focus trap: the ongoing interaction is never blocked. Host apps use it
  * for proactive one-shot messages (onboarding hints…) without opening the full panel.
  *
@@ -48,12 +48,13 @@ const AiAssistantNudge = ({
         role="status"
         sx={{
           borderRadius: 3,
-          bottom: 96,
+          // 12px above the Fab (24px inset, 44px high)
+          bottom: 80,
           padding: 2,
           position: "fixed",
           right: { sm: 24, xs: 16 },
-          // Same origin as the Panel: the grow visually starts from the Fab
-          transformOrigin: "calc(100% - 24px) calc(100% + 48px)",
+          // The grow starts from the Fab's rounded end, under the bubble's corner
+          transformOrigin: "calc(100% - 22px) calc(100% + 34px)",
           width: { sm: 340, xs: "calc(100vw - 32px)" },
           // Snackbar level (above modal backdrops): nudges fire on screens that may live
           // inside a modal, and the bubble must stay readable and dismissable there

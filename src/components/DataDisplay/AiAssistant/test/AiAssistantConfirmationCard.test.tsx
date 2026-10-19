@@ -44,4 +44,22 @@ describe("<AiAssistantConfirmationCard />", () => {
     fireEvent.click(getByText("Report a breakdown on order 37207"));
     expect(onOpen).toHaveBeenCalled();
   });
+
+  it("keeps its links outside the button that opens it", () => {
+    const { getByRole, getByTestId } = render(
+      <AiAssistantConfirmationCard {...props} status="approved" onOpen={vi.fn()} links={<a href="/orders/37207">Order 37207</a>} />,
+    );
+
+    const open = getByTestId("assistantConfirmationCardOpen");
+    expect(open.tagName).toBe("BUTTON");
+    expect(open).toHaveTextContent("Report a breakdown on order 37207");
+    expect(open).not.toContainElement(getByRole("link", { name: "Order 37207" }));
+    expect(getByTestId("assistantConfirmationCard")).not.toHaveAttribute("role");
+  });
+
+  it("opens nothing while the action waits for a decision", () => {
+    const { queryByTestId } = render(<AiAssistantConfirmationCard {...props} status="pending" onOpen={vi.fn()} />);
+
+    expect(queryByTestId("assistantConfirmationCardOpen")).not.toBeInTheDocument();
+  });
 });

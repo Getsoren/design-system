@@ -1,21 +1,13 @@
 import type { ReactNode } from "react";
 import type { DataAttributes } from "@/types/dataAttributes";
 
-/** Extra `data-*` props (e.g. an analytics feature id) land on the FAB button itself */
+/** Extra `data-*` props (e.g. an analytics feature id) land on the Fab button itself */
 export interface AiAssistantFabProps extends DataAttributes {
-  /** Panel visibility — the FAB shows a close glyph and calms down when open */
-  open: boolean;
-  /** Toggles the panel — the FAB never owns the open state, the host app does */
+  /** Opens the panel — the host app owns the open state, and hides the Fab while the panel is open */
   onClick: () => void;
-  /** Tooltip content (e.g. the assistant's name) */
-  tooltip?: string;
-  /** Turns the orb into a pill showing the avatar and this label */
-  label?: string;
-  /** Pill only: a light runs along the outline while the assistant works in the background */
-  isWorking?: boolean;
-  /** A count, or `true` for a dot; hidden while the panel is open */
-  badge?: number | boolean;
-  /** Test hook on the FAB button (defaults to "assistantFab") */
+  /** Call to ask the assistant, next to its avatar (e.g. "Ask Soren") */
+  label: string;
+  /** Test hook on the Fab button (defaults to "assistantFab") */
   dataTestId?: string;
 }
 
@@ -26,13 +18,11 @@ export interface AiAssistantMarkProps {
   color?: string;
   /** The ellipse turns with two satellites, then settles back into its pose once false */
   isWorking?: boolean;
-  /** Background work: only the glow's colours move */
-  isBusy?: boolean;
 }
 
-export interface AiAssistantAvatarProps extends Omit<AiAssistantMarkProps, "size" | "color"> {
-  /** Diameter in px (defaults to 28) */
-  size?: number;
+export interface AiAssistantAvatarProps extends Pick<AiAssistantMarkProps, "isWorking"> {
+  /** "subtle" (default): a grey round, e.g. beside a reply; "brand": the brand gradient with a white mark, e.g. on the Fab */
+  variant?: "subtle" | "brand";
 }
 
 export interface AiAssistantNudgeProps {
@@ -68,18 +58,12 @@ export interface AiAssistantSpotlightProps {
 }
 
 export interface AiAssistantPanelProps {
-  /** Panel visibility — grows out of the Fab when opening, unmounted when closed */
+  /** Panel visibility — grows from the corner when opening, unmounted when closed */
   open: boolean;
-  /** The assistant is working (streaming/tools): the panel breathes an iridescent aura */
-  isBusy?: boolean;
+  /** Full-height column under the app bar; the host layout leaves room for it (AI_ASSISTANT_DOCKED_SPACE) */
+  docked?: boolean;
   /** Panel content — typically Header + a Chat.* composition owned by the host app */
   children: ReactNode;
-  /** Full-height column on the right; the host layout leaves room for it (AI_ASSISTANT_DOCKED_SPACE) */
-  docked?: boolean;
-  /** Top offset of the docked panel, e.g. APP_BAR_HEIGHT (defaults to 0) */
-  dockedTop?: number;
-  /** False when the host hides the Fab while the panel is open: the panel then takes the corner (defaults to true) */
-  withFab?: boolean;
   /** Test hook on the panel container (defaults to "assistantPanel") */
   dataTestId?: string;
 }
@@ -87,18 +71,10 @@ export interface AiAssistantPanelProps {
 export interface AiAssistantHeaderProps {
   /** Product name of the assistant — a brand chosen by the host app */
   title: string;
-  /** Secondary caption next to the title (e.g. "Assistant IA") */
-  subtitle?: string;
   /** Small uppercase tag after the title (e.g. "Beta") */
   tag?: string;
   /** Close action of the panel — rendered as the trailing icon button */
   onClose: () => void;
-  /** Rendered before the header buttons */
-  actions?: ReactNode;
-  /** Rendered before the title */
-  icon?: ReactNode;
-  /** Line under the header (defaults to true) */
-  divider?: boolean;
   /** Picks the glyph of the dock toggle */
   docked?: boolean;
   /** Shows a button to dock or float the panel */
@@ -110,13 +86,11 @@ export interface AiAssistantHeaderProps {
 }
 
 export interface AiAssistantEmptyStateProps {
-  /** Invitation shown while the thread is empty (e.g. "I'm Atlas, ask me anything…") */
-  message?: string;
-  /** Question to the user (e.g. "What do you want to do today?"); switches to a left-aligned layout above the composer */
-  title?: string;
-  /** With a `title` only: shown above it, on the logo's silhouette */
+  /** Question to the user (e.g. "What do you want to do today?") */
+  title: string;
+  /** Shown above the title, on the logo's silhouette */
   icon?: ReactNode;
-  /** Rendered under the invitation — quick actions, suggestion pills… */
+  /** Rendered under the title — typically AiAssistant.Suggestion entries */
   children?: ReactNode;
 }
 
@@ -127,9 +101,43 @@ export interface AiAssistantSuggestionProps extends DataAttributes {
   dataTestId?: string;
 }
 
-export interface AiAssistantThinkingOrbProps {
-  /** Orb diameter in px */
-  size?: number;
+export interface AiAssistantThinkingStep {
+  /** Stable key of the step, e.g. its activity kind */
+  id: string;
+  label: string;
+  /** Pulses while true; a done step stays, greyed */
+  isInProgress: boolean;
+}
+
+export interface AiAssistantThinkingProps {
+  /** What the assistant is doing, next to the working avatar (e.g. "Thinking…") */
+  label: string;
+  /** One line per step of the turn, under the label */
+  steps?: AiAssistantThinkingStep[];
+  /** Shows a button to cut the turn short */
+  onStop?: () => void;
+  labels?: { stop?: string };
+  /** `data-*` attributes of the stop button, e.g. analytics ids or test hooks */
+  slotProps?: { stopButton?: DataAttributes };
+  /** Test hook on the row (defaults to "assistantThinking"); the steps append "Steps" */
+  dataTestId?: string;
+}
+
+export type AiAssistantVote = "up" | "down";
+
+export interface AiAssistantReplyActionsProps {
+  /** Text the copy button puts on the clipboard */
+  content: string;
+  /** Vote cast on the reply, null when none */
+  vote?: AiAssistantVote | null;
+  /** Called with the new vote, or null when the user takes theirs back; the vote buttons only show with it */
+  onVote?: (vote: AiAssistantVote | null) => void;
+  /** Accessible names and tooltips (host-app i18n) */
+  labels?: { copy?: string; copied?: string; helpful?: string; notHelpful?: string };
+  /** `data-*` attributes of each button, e.g. analytics ids */
+  slotProps?: { copyButton?: DataAttributes; upVoteButton?: DataAttributes; downVoteButton?: DataAttributes };
+  /** Test hook on the row (defaults to "assistantReplyActions") */
+  dataTestId?: string;
 }
 
 export interface AiAssistantConfirmationCardProps {
@@ -145,8 +153,8 @@ export interface AiAssistantConfirmationCardProps {
   onAccept: () => void;
   /** Called when the user declines the action */
   onDecline: () => void;
-  /** Button wording (host-app i18n); once decided, `accepted` / `declined` replace the heading (default to the button labels) */
-  labels: { accept: string; decline: string; accepted?: string; declined?: string };
+  /** Wording (host-app i18n): the buttons, then the decision that replaces the heading once made */
+  labels: { accept: string; decline: string; accepted: string; declined: string };
   /** Rendered left of the summary */
   icon?: ReactNode;
   /** Once decided, makes the card clickable (e.g. to open what the action created) */

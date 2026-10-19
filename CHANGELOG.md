@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.86.0](https://github.com/getsoren/design-system/compare/4.85.1...4.86.0) (2026-10-19)
+
+
+### Features
+
+* **inputs:** segmented variant of the TextFieldGroup ([4e39bcc](https://github.com/getsoren/design-system/commit/4e39bcc428eb5f2a4ef0bd93ed0b31129acd0486))
+* **TextFieldGroup:** add sx prop for additional styling options ([c972c8f](https://github.com/getsoren/design-system/commit/c972c8f84108437decb1e2158c94e15217d77563))
+
 ## [4.85.1](https://github.com/getsoren/design-system/compare/4.85.0...4.85.1) (2026-10-16)
 
 

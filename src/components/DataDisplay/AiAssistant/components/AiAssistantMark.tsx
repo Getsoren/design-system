@@ -90,6 +90,7 @@ const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false 
   const [wasWorking, setWasWorking] = useState(isWorking);
   // Read by the mount effect only: whether this mark appeared at rest.
   const isRestingAtMountRef = useRef(!(isWorking || isReducedMotion));
+  const glow = glowFor(size);
 
   // Set during render, not in an effect, so the turn is still running when the settle reads its pose.
   if (wasWorking !== isWorking) {
@@ -111,13 +112,18 @@ const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false 
     };
   }, [isWorking]);
 
-  // On mount only: a mark appearing at rest right after a working one left takes its turn over.
+  /**
+   * On mount only: a mark appearing at rest right after a working one left takes its turn over.
+   */
   useLayoutEffect(() => {
     if (isRestingAtMountRef.current && performance.now() - workingMarkLeftAt < HANDOVER_MS) {
       setIsSettling(true);
     }
   }, []);
 
+  /**
+   * The glow's colours glide only while the mark turns.
+   */
   useLayoutEffect(() => {
     const svg = svgRef.current;
 
@@ -125,7 +131,6 @@ const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false 
       return;
     }
 
-    // The glow's colours glide only while the mark turns.
     if (isTurning) {
       svg.unpauseAnimations();
     } else {
@@ -133,6 +138,9 @@ const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false 
     }
   }, [isTurning]);
 
+  /**
+   * Back to rest: the ellipse glides home from wherever the turn left it, instead of snapping back.
+   */
   useEffect(() => {
     const mover = moverRef.current;
 
@@ -168,8 +176,6 @@ const AiAssistantMark = ({ size = 32, color = "text.primary", isWorking = false 
       mover.style.animation = "";
     };
   }, [isSettling]);
-
-  const glow = glowFor(size);
 
   return (
     <Box

@@ -1,3 +1,4 @@
+import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
@@ -11,6 +12,9 @@ import MicIcon from "@/components/DataDisplay/Icons/MicIcon";
 
 // Normalized RMS (0..1) above which the mic input counts as speech rather than ambient/room noise
 const SPEECH_RMS_THRESHOLD = 0.02;
+const WAVE_BARS = 28;
+const WAVE_STEP_MS = 70;
+const WAVE_FULL_RMS = 0.18;
 
 /** First recording mime the browser supports (Safari records mp4, everyone else webm/opus) */
 const pickMimeType = (): string | undefined =>
@@ -39,12 +43,13 @@ export const ChatVoiceRecorder = ({
 }: ChatVoiceRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [levels, setLevels] = useState<number[]>(() => Array(WAVE_BARS).fill(0));
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   // Read by the recorder's onstop: cancel discards the take instead of emitting it
   const discardRef = useRef(false);
-  // Web Audio graph used only for silence detection (Siri-style auto-send)
+  // Web Audio graph used for the live wave and silence detection (Siri-style auto-send)
   const audioContextRef = useRef<AudioContext | null>(null);
   const silenceFrameRef = useRef<number | null>(null);
 
@@ -74,16 +79,18 @@ export const ChatVoiceRecorder = ({
   };
 
   /**
-   * Watches the mic level and auto-validates the take after `silenceTimeoutMs` of trailing silence —
+   * Feeds the live wave and, when enabled, auto-validates the take after `silenceTimeoutMs` of trailing silence —
    * but only once the user has actually started speaking, so a slow start is never cut off.
    */
-  const monitorSilence = (stream: MediaStream) => {
+  const monitorLevel = (stream: MediaStream) => {
     const AudioContextCtor =
       window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
 
-    if (!(autoSubmitOnSilence && silenceTimeoutMs && AudioContextCtor)) {
+    if (!AudioContextCtor) {
       return;
     }
+
+    const watchesSilence = autoSubmitOnSilence && !!silenceTimeoutMs;
 
     const audioContext = new AudioContextCtor();
     const analyser = audioContext.createAnalyser();
@@ -94,6 +101,7 @@ export const ChatVoiceRecorder = ({
     const samples = new Uint8Array(analyser.fftSize);
     let hasSpoken = false;
     let lastSoundAt = performance.now();
+    let lastBarAt = 0;
 
     const tick = () => {
       analyser.getByteTimeDomainData(samples);
@@ -106,7 +114,14 @@ export const ChatVoiceRecorder = ({
         lastSoundAt = now;
       }
 
-      if (hasSpoken && now - lastSoundAt >= silenceTimeoutMs) {
+      if (now - lastBarAt >= WAVE_STEP_MS) {
+        lastBarAt = now;
+        // Square root, so a quiet voice still moves the bars.
+        const level = Math.min(1, Math.sqrt(rms / WAVE_FULL_RMS));
+        setLevels((previous) => [...previous.slice(1), level]);
+      }
+
+      if (watchesSilence && hasSpoken && now - lastSoundAt >= silenceTimeoutMs) {
         stop(false);
         return;
       }
@@ -143,8 +158,9 @@ export const ChatVoiceRecorder = ({
       streamRef.current = stream;
       recorderRef.current = recorder;
       recorder.start();
-      monitorSilence(stream);
+      monitorLevel(stream);
       setElapsedSeconds(0);
+      setLevels(Array(WAVE_BARS).fill(0));
       setIsRecording(true);
     } catch (error) {
       // Typically a denied microphone permission
@@ -186,7 +202,7 @@ export const ChatVoiceRecorder = ({
       <Tooltip title={labels?.record ?? "Record a voice message"}>
         <span>
           <IconButton onClick={start} disabled={disabled || isProcessing} data-test="chatVoiceStart">
-            {isProcessing ? <CircularProgress size={20} /> : <MicIcon />}
+            {isProcessing ? <CircularProgress size={20} /> : <MicIcon sx={{ fontSize: 20 }} />}
           </IconButton>
         </span>
       </Tooltip>
@@ -206,15 +222,32 @@ export const ChatVoiceRecorder = ({
             "&&": { animation: "none" },
           },
           animation: "chatVoicePulse 1.2s ease-in-out infinite",
-          backgroundColor: "error.main",
+          // error.main reads pinkish on such a small dot.
+          backgroundColor: "error.dark",
           borderRadius: "50%",
-          height: 10,
-          width: 10,
+          flexShrink: 0,
+          height: 6,
+          width: 6,
         }}
       />
-      <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: "tabular-nums", minWidth: 40 }}>
+      <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: "tabular-nums", minWidth: 36 }}>
         {formatElapsed(elapsedSeconds)}
       </Typography>
+      <Stack direction="row" alignItems="center" spacing="2px" aria-hidden sx={{ height: 20, paddingX: 0.5 }} data-test="chatVoiceWave">
+        {levels.map((level, index) => (
+          <Box
+            key={index}
+            sx={{
+              backgroundColor: "text.secondary",
+              borderRadius: 1,
+              flexShrink: 0,
+              height: `${Math.max(2, Math.round(level * 18))}px`,
+              transition: "height 70ms linear",
+              width: 2,
+            }}
+          />
+        ))}
+      </Stack>
       <Tooltip title={labels?.cancel ?? "Cancel"}>
         <IconButton size="small" onClick={() => stop(true)} data-test="chatVoiceCancel">
           <CloseIcon />

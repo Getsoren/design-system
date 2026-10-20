@@ -54,6 +54,7 @@ const CollapsingHeader = ({
   variant = "preview",
   onClose,
   onOpenFullPage,
+  dense = false,
   backLabel,
   onBack,
   labels,
@@ -111,7 +112,7 @@ const CollapsingHeader = ({
             </Box>
           </Box>
         </Box>
-        <Box sx={{ px: 3, py: 3 }}>
+        <Box sx={{ pb: 3, pt: dense ? 1 : 3, px: 3 }}>
           <Stack spacing={2}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               {onOpenFullPage && (

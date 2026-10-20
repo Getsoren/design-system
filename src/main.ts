@@ -11,7 +11,9 @@ export * from "@mui/material/transitions";
 
 // Data display
 export { default as AiAssistant } from "@/components/DataDisplay/AiAssistant/AiAssistant";
+export { AI_ASSISTANT_DOCKED_SPACE } from "@/components/DataDisplay/AiAssistant/constants";
 export * from "@/components/DataDisplay/AiAssistant/types";
+export { getAiAssistantNeighbourSx } from "@/components/DataDisplay/AiAssistant/utils/docked";
 export * from "@/components/DataDisplay/ArticleImage/ArticleImage";
 export { default as ArticleImage } from "@/components/DataDisplay/ArticleImage/ArticleImage";
 export type { AvatarProps } from "@/components/DataDisplay/Avatar/Avatar";
@@ -32,9 +34,10 @@ export { default as ChatVoiceRecorder } from "@/components/DataDisplay/Chat/comp
 export * from "@/components/DataDisplay/Chat/types";
 export * from "@/components/DataDisplay/Chip/Chip";
 export { default as Chip } from "@/components/DataDisplay/Chip/Chip";
+export * from "@/components/DataDisplay/EventFlag/EventFlag";
+export { default as EventFlag } from "@/components/DataDisplay/EventFlag/EventFlag";
 export * from "@/components/DataDisplay/FileViewer/FileViewer";
 export { default as FileViewer } from "@/components/DataDisplay/FileViewer/FileViewer";
-export { default as AiSparkIcon } from "@/components/DataDisplay/Icons/AiSparkIcon";
 export * from "@/components/DataDisplay/Kanban/Kanban";
 export { default as Kanban } from "@/components/DataDisplay/Kanban/Kanban";
 export * from "@/components/DataDisplay/ListAvatar/ListAvatar";
@@ -141,6 +144,7 @@ export { default as HasPermission } from "@/components/Utils/HasPermission/HasPe
 
 // Theme
 export { default as theme } from "@/config/theme";
+export * from "@/constants/appBar";
 
 // Context providers
 export * from "@/context/Permission/PermissionProvider";

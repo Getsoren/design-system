@@ -1,7 +1,8 @@
-import { Alert, Chip, Stack, Typography } from "@mui/material";
-import type { Meta, StoryFn } from "@storybook/react-vite";
-import { ReactNode, useState } from "react";
+import { Button, Chip, Stack, Typography } from "@mui/material";
+import type { Decorator, Meta, StoryFn } from "@storybook/react-vite";
+import { useRef, useState } from "react";
 import AiAssistant from "@/components/DataDisplay/AiAssistant/AiAssistant";
+import type { AiAssistantVote } from "@/components/DataDisplay/AiAssistant/types";
 import Chat from "@/components/DataDisplay/Chat/Chat";
 import type { ChatMessage } from "@/components/DataDisplay/Chat/types";
 
@@ -12,48 +13,103 @@ const meta: Meta = {
 
 export default meta;
 
-/**
- * The full block, composed the way a host app would: FAB orb toggling the floating
- * panel, header with a host-chosen name, thinking orb, confirmation card. The host
- * app plugs its own thread (Chat.MessageBubble), input (Chat.MessageInput /
- * Chat.VoiceRecorder) and agentic logic.
- */
-const PARTICIPANTS = [{ avatar: null, firstName: "Nova", lastName: "", userId: "assistant" }];
+/** Centres an in-flow example on the canvas, like the other stories; the fixed ones (Fab, Panel, Nudge) keep their corner. */
+const Centered: Decorator = (Story) => (
+  <Stack height="100%" alignItems="center" justifyContent="center">
+    <Story />
+  </Stack>
+);
 
+const PARTICIPANTS = [{ avatar: null, firstName: "Soren", lastName: "", userId: "assistant" }];
+const SUGGESTIONS = ["Où en sont mes demandes de devis ?", "Quelles locations se terminent cette semaine ?"];
+const REPLY_DELAY_MS = 2500;
+
+/**
+ * The whole block, composed the way a host app does it: the Fab opens the panel and steps aside, the
+ * header docks it or starts over, the empty state suggests what to ask, then the thread shows the
+ * assistant at work and its replies. The host app owns the thread, the input and the agentic logic.
+ */
 export const Default: StoryFn = () => {
   const [open, setOpen] = useState(true);
-  const [status, setStatus] = useState<"approved" | "declined" | "pending">("pending");
+  const [isDocked, setIsDocked] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isThinking, setIsThinking] = useState(false);
+  const replyRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const append = (authorId: string, body: string) =>
+    setMessages((previous) => [...previous, { authorId, body, createdAt: new Date().toISOString(), id: `${previous.length}` }]);
+
+  const send = (body: string) => {
+    append("me", body);
+    setIsThinking(true);
+    replyRef.current = setTimeout(() => {
+      append("assistant", `Voici ce que j'ai trouvé pour « ${body} » : deux devis sont arrivés, le moins cher à 180 € HT par jour.`);
+      setIsThinking(false);
+    }, REPLY_DELAY_MS);
+  };
+
+  const stop = () => {
+    clearTimeout(replyRef.current);
+    setIsThinking(false);
+  };
 
   return (
     <>
-      <AiAssistant.Fab open={open} onClick={() => setOpen((prev) => !prev)} tooltip="Nova - Assistant IA" />
-      <AiAssistant.Panel open={open} isBusy={status === "pending"}>
-        <AiAssistant.Header title="Nova" subtitle="Assistant IA" onClose={() => setOpen(false)} />
+      {!open && <AiAssistant.Fab onClick={() => setOpen(true)} label="Demander à Soren" />}
+      <AiAssistant.Panel open={open} docked={isDocked}>
+        <AiAssistant.Header
+          title="Soren Assistant"
+          tag="Beta"
+          docked={isDocked}
+          onToggleDocked={() => setIsDocked((previous) => !previous)}
+          onNewConversation={messages.length > 0 ? () => setMessages([]) : undefined}
+          onClose={() => setOpen(false)}
+          labels={{ close: "Fermer", dock: "Ancrer", newConversation: "Nouvelle conversation", undock: "Détacher" }}
+        />
         <Stack flex={1} minHeight={0}>
           <Chat height="100%">
-            <Stack flex={1} minHeight={0} padding={2} spacing={1} sx={{ overflowY: "auto" }}>
-              <Alert severity="info" icon={false}>
-                Le fil (bulles, saisie, vocal) vient des composants Chat.* — ici on montre les blocs propres à l&apos;assistant.
-              </Alert>
-              <AiAssistant.ConfirmationCard
-                heading="Action à confirmer"
-                summary="Créer une conversation avec Xavier Bove"
-                status={status}
-                onAccept={() => setStatus("approved")}
-                onDecline={() => setStatus("declined")}
-                labels={{ accept: "Accepter", decline: "Annuler" }}
-              />
-              <Stack direction="row" alignItems="center" spacing={1} paddingY={1}>
-                <AiAssistant.ThinkingOrb />
-                <Chip size="small" variant="outlined" label="Recherche dans l'application…" />
-              </Stack>
-              <Typography variant="caption" color="text.secondary">
-                L&apos;aura du panneau pulse tant que status=pending (isBusy). Un envoi réarme la carte de confirmation.
-              </Typography>
+            <Stack flex={1} minHeight={0} padding={2} spacing={3} sx={{ overflowY: "auto" }}>
+              {!messages.length && (
+                <AiAssistant.EmptyState title="Que voulez-vous faire aujourd'hui ?" icon={<AiAssistant.Mark size={26} />}>
+                  {SUGGESTIONS.map((suggestion) => (
+                    <AiAssistant.Suggestion key={suggestion} onClick={() => send(suggestion)}>
+                      {suggestion}
+                    </AiAssistant.Suggestion>
+                  ))}
+                </AiAssistant.EmptyState>
+              )}
+              {messages.map((message) => {
+                const isOwn = message.authorId === "me";
+
+                return (
+                  <Chat.MessageBubble
+                    key={message.id}
+                    isOwn={isOwn}
+                    hideAvatar
+                    variant="plain"
+                    avatar={isOwn ? undefined : <AiAssistant.Avatar />}
+                    renderAfterBubble={isOwn ? undefined : () => <AiAssistant.ReplyActions content={message.body} />}
+                    message={message}
+                    participants={PARTICIPANTS}
+                  />
+                );
+              })}
+              {isThinking && (
+                <AiAssistant.Thinking
+                  label="Soren réfléchit…"
+                  steps={[{ id: "search", isInProgress: true, label: "Recherche dans l'application…" }]}
+                  onStop={stop}
+                  labels={{ stop: "Arrêter" }}
+                />
+              )}
             </Stack>
             <Chat.MessageInput
-              onSend={() => setStatus("pending")}
-              labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message..." }}
+              variant="filled"
+              onSend={send}
+              isSending={isThinking}
+              footnote="Soren est une IA et peut se tromper. Vérifiez ses réponses."
+              labels={{ send: "Envoyer", writeAMessage: "Écrire un message..." }}
+              startActions={<Chat.VoiceRecorder onRecorded={() => send("(message vocal)")} disabled={isThinking} />}
             />
           </Chat>
         </Stack>
@@ -62,85 +118,91 @@ export const Default: StoryFn = () => {
   );
 };
 
-/**
- * The whole thing wired the way a host app does it — including VOICE input:
- * ChatVoiceRecorder sits in the composer via Chat.MessageInput's `startActions` slot,
- * hands its Blob to the app, which transcribes it (simulated here) and sends the text
- * like a typed message. The assistant "thinks" (orb + busy aura) then replies.
- */
-export const WithVoiceInput: StoryFn = () => {
-  const [open, setOpen] = useState(true);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isTranscribing, setIsTranscribing] = useState(false);
-  const [isThinking, setIsThinking] = useState(false);
+/** The entry point in the bottom-right corner; the host app hides it while the panel is open. */
+export const Fab: StoryFn = () => <AiAssistant.Fab onClick={() => undefined} label="Demander à Soren" />;
 
-  const append = (authorId: string, body: string) =>
-    setMessages((prev) => [...prev, { authorId, body, createdAt: new Date().toISOString(), id: `${prev.length}` }]);
+/** At rest, then working with its satellites at 24, 48 and 96px. */
+export const Mark: StoryFn = () => (
+  <Stack direction="row" spacing={4} alignItems="center">
+    <AiAssistant.Mark size={48} />
+    <AiAssistant.Mark size={24} isWorking />
+    <AiAssistant.Mark size={48} isWorking />
+    <AiAssistant.Mark size={96} isWorking />
+  </Stack>
+);
 
-  const sendMessage = (body: string) => {
-    append("me", body);
-    setIsThinking(true);
-    setTimeout(() => {
-      append("assistant", `Bien reçu : « ${body} » — je m'en occupe !`);
-      setIsThinking(false);
-    }, 2000);
-  };
-
-  const handleRecorded = (audio: Blob) => {
-    // Real app: POST the blob to its transcription endpoint, then send the returned text
-    setIsTranscribing(true);
-    setTimeout(() => {
-      setIsTranscribing(false);
-      sendMessage(`(vocal transcrit — ${(audio.size / 1024).toFixed(0)} kB) Il me faut une mini-pelle demain`);
-    }, 1500);
-  };
+/** The mark in a grey round, or on the brand gradient with `variant="brand"`; the button toggles `isWorking`. */
+export const Avatar: StoryFn = () => {
+  const [isWorking, setIsWorking] = useState(false);
 
   return (
-    <>
-      <AiAssistant.Fab open={open} onClick={() => setOpen((prev) => !prev)} tooltip="Nova - Assistant IA" />
-      <AiAssistant.Panel open={open} isBusy={isThinking || isTranscribing}>
-        <AiAssistant.Header title="Nova" subtitle="Assistant IA" onClose={() => setOpen(false)} />
-        {/* Same composition as a real host app: the Chat container owns the column,
-            the MessageInput sits flush at the bottom (it brings its own background,
-            top border and padding — no wrapper needed) */}
-        <Stack flex={1} minHeight={0}>
-          <Chat height="100%">
-            <Stack flex={1} minHeight={0} padding={2} spacing={1} sx={{ overflowY: "auto" }}>
-              {!messages.length && (
-                <AiAssistant.EmptyState message="Écrivez un message ou enregistrez un vocal avec le micro du composer." />
-              )}
-              {messages.map((message) => (
-                <Chat.MessageBubble
-                  key={message.id}
-                  isOwn={message.authorId === "me"}
-                  hideAvatar
-                  message={message}
-                  participants={PARTICIPANTS}
-                />
-              ))}
-              {isThinking && (
-                <Stack direction="row" alignItems="center" spacing={1} paddingY={1}>
-                  <AiAssistant.ThinkingOrb />
-                </Stack>
-              )}
-            </Stack>
-            <Chat.MessageInput
-              onSend={sendMessage}
-              isSending={isThinking}
-              labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message..." }}
-              startActions={
-                <Chat.VoiceRecorder
-                  onRecorded={handleRecorded}
-                  isProcessing={isTranscribing}
-                  disabled={isThinking}
-                  labels={{ cancel: "Annuler", record: "Enregistrer un vocal", send: "Utiliser cet enregistrement" }}
-                />
-              }
-            />
-          </Chat>
-        </Stack>
-      </AiAssistant.Panel>
-    </>
+    <Stack spacing={2} alignItems="flex-start">
+      <Stack direction="row" spacing={2} alignItems="center">
+        <AiAssistant.Avatar isWorking={isWorking} />
+        <AiAssistant.Avatar variant="brand" isWorking={isWorking} />
+        <Typography variant="body2" color="text.secondary">
+          {isWorking ? "Soren réfléchit…" : "Voici les 3 commandes à comparer."}
+        </Typography>
+      </Stack>
+      <Button size="small" variant="outlined" onClick={() => setIsWorking((previous) => !previous)}>
+        {isWorking ? "Répondre" : "Réfléchir"}
+      </Button>
+    </Stack>
+  );
+};
+
+/** In place of the next reply: the working avatar, then one line per step, the one in progress pulsing. */
+export const Thinking: StoryFn = () => (
+  <Stack width={400}>
+    <AiAssistant.Thinking
+      label="Soren réfléchit…"
+      steps={[
+        { id: "read", isInProgress: false, label: "Consultation des données…" },
+        { id: "search", isInProgress: true, label: "Recherche dans l'application…" },
+      ]}
+      onStop={() => undefined}
+      labels={{ stop: "Arrêter" }}
+    />
+  </Stack>
+);
+
+/** Under a reply: copy it, and vote on it once the host app listens to votes. */
+export const ReplyActions: StoryFn = () => {
+  const [vote, setVote] = useState<AiAssistantVote | null>(null);
+
+  return (
+    <Stack spacing={0.5} width={400}>
+      <Typography variant="body2">Deux devis sont arrivés pour la mini-pelle, le moins cher à 180 € HT par jour.</Typography>
+      <AiAssistant.ReplyActions
+        content="Deux devis sont arrivés pour la mini-pelle, le moins cher à 180 € HT par jour."
+        vote={vote}
+        onVote={setVote}
+        labels={{ copied: "Copié", copy: "Copier", helpful: "Utile", notHelpful: "Pas utile" }}
+      />
+    </Stack>
+  );
+};
+
+/** The gate before a mutating action; once decided, it opens what the action produced, its links going their own way. */
+export const ConfirmationCard: StoryFn = () => {
+  const [status, setStatus] = useState<"approved" | "declined" | "pending">("pending");
+
+  return (
+    <Stack width={400} spacing={1}>
+      <AiAssistant.ConfirmationCard
+        heading="Action à confirmer"
+        summary="Déclarer une panne sur la commande 37207"
+        status={status}
+        onAccept={() => setStatus("approved")}
+        onDecline={() => setStatus("declined")}
+        onOpen={() => undefined}
+        links={<Typography variant="body2">Commande 37207</Typography>}
+        labels={{ accept: "Accepter", accepted: "Action acceptée", decline: "Annuler", declined: "Action annulée" }}
+      />
+      <Button size="small" onClick={() => setStatus("pending")} disabled={status === "pending"} sx={{ alignSelf: "flex-start" }}>
+        Recommencer
+      </Button>
+    </Stack>
   );
 };
 
@@ -154,7 +216,7 @@ export const Nudge: StoryFn = () => {
 
   return (
     <>
-      <AiAssistant.Fab open={false} onClick={() => setOpen(true)} tooltip="Nova - Assistant IA" />
+      <AiAssistant.Fab onClick={() => setOpen(true)} label="Demander à Soren" />
       <AiAssistant.Nudge
         open={open}
         title="Choisissez votre matériel principal"
@@ -177,12 +239,11 @@ export const NudgeWithSteps: StoryFn = () => {
   return (
     <>
       <AiAssistant.Fab
-        open={false}
         onClick={() => {
           setStep(0);
           setOpen(true);
         }}
-        tooltip="Nova - Assistant IA"
+        label="Demander à Soren"
       />
       <AiAssistant.Nudge
         open={open}
@@ -211,66 +272,16 @@ export const Spotlight: StoryFn = () => {
   const [clicks, setClicks] = useState(0);
 
   return (
-    <Stack alignItems="center" justifyContent="center" minHeight={320}>
+    <>
       <Chip ref={setAnchor} label={`Élément mis en lumière — ${clicks} clic(s)`} onClick={() => setClicks((count) => count + 1)} />
       {anchor && <AiAssistant.Spotlight anchor={anchor} />}
-    </Stack>
-  );
-};
-
-/** Panel scaffolding shared by the EmptyState stories — the thread area is the only thing they vary */
-const EmptyStatePanel = ({ children }: { children: ReactNode }) => {
-  const [open, setOpen] = useState(true);
-
-  return (
-    <>
-      <AiAssistant.Fab open={open} onClick={() => setOpen((prev) => !prev)} tooltip="Nova - Assistant IA" />
-      <AiAssistant.Panel open={open}>
-        <AiAssistant.Header title="Nova" subtitle="Assistant IA" onClose={() => setOpen(false)} />
-        <Stack flex={1} minHeight={0}>
-          <Chat height="100%">
-            <Stack flex={1} minHeight={0} padding={2} spacing={1} sx={{ overflowY: "auto" }}>
-              {children}
-            </Stack>
-            <Chat.MessageInput
-              onSend={() => undefined}
-              labels={{ enterToSend: "", send: "Envoyer", writeAMessage: "Écrire un message..." }}
-            />
-          </Chat>
-        </Stack>
-      </AiAssistant.Panel>
     </>
   );
 };
 
-/** The empty-thread invitation in its real context — rendered in place of the message list content. */
-export const EmptyState: StoryFn = () => (
-  <EmptyStatePanel>
-    <AiAssistant.EmptyState message="Je suis Nova, votre assistant. Commandes, planning, chantiers, messagerie… demandez-moi !" />
-  </EmptyStatePanel>
-);
-
-/**
- * The `children` slot hosting quick-action pills — how a host app offers entry points
- * (guided tour, canned prompts) before the first message. Anything centered fits.
- */
-export const EmptyStateWithQuickActions: StoryFn = () => {
-  const [picked, setPicked] = useState<string | null>(null);
-
-  return (
-    <EmptyStatePanel>
-      <AiAssistant.EmptyState message="Je suis Nova, votre assistant. Commandes, planning, chantiers, messagerie… demandez-moi !">
-        <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1} justifyContent="center">
-          {["Découvrir l'application", "Mes commandes en cours", "Mes events ouverts"].map((label) => (
-            <Chip key={label} size="small" variant="outlined" label={label} onClick={() => setPicked(label)} />
-          ))}
-        </Stack>
-        {picked && (
-          <Typography variant="caption" color="text.secondary">
-            Pin cliqué : {picked}
-          </Typography>
-        )}
-      </AiAssistant.EmptyState>
-    </EmptyStatePanel>
-  );
-};
+Mark.decorators = [Centered];
+Avatar.decorators = [Centered];
+Thinking.decorators = [Centered];
+ReplyActions.decorators = [Centered];
+ConfirmationCard.decorators = [Centered];
+Spotlight.decorators = [Centered];

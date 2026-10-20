@@ -255,6 +255,10 @@ export interface NavigationMenuProps {
    */
   storageKey?: string;
   /**
+   * Folds the menu to its icon rail without changing the saved preference, e.g. while the AI assistant is docked
+   */
+  makeRoom?: boolean;
+  /**
    * Vertical density of the navigation. A closed set owned by the design system: "compact" only
    * tightens the vertical rhythm (row height, paddings, gaps between blocks). Font size, horizontal
    * gutters, icon gutter and collapsed rail are identical in both densities.
@@ -327,15 +331,18 @@ const NavigationMenu = ({
   sideBarWidth = 260,
   storageKey = DEFAULT_COLLAPSED_STORAGE_KEY,
   density = "standard",
+  makeRoom = false,
 }: NavigationMenuProps) => {
-  const { breakpoints } = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(DEFAULT_CONTEXT_VALUE.isDrawerOpen);
   // The user's choice, persisted; `isCollapsed` below is what the menu actually shows.
   const [isCollapsedPreference, setIsCollapsedPreference] = useState(() => getStoredCollapsed(storageKey));
+  // Manual unfold while `makeRoom` is set: never persisted, reset once `makeRoom` is off.
+  const [isUnfoldedForNow, setIsUnfoldedForNow] = useState(false);
+  const { breakpoints } = useTheme();
   const isMobile = useMediaQuery(breakpoints.down("sm"));
   const isTablet = useMediaQuery(breakpoints.between("sm", "md"));
   const isInDrawer = (isMobile || isTablet) && !disableResponsive;
-  const isCollapsed = isCollapsedPreference && !isInDrawer;
+  const isCollapsed = !isInDrawer && (makeRoom ? !isUnfoldedForNow : isCollapsedPreference);
 
   const closeDrawerMenu = useCallback(() => {
     setIsDrawerOpen(false);
@@ -346,8 +353,22 @@ const NavigationMenu = ({
   }, []);
 
   const toggleCollapse = useCallback(() => {
+    if (makeRoom) {
+      setIsUnfoldedForNow((prev) => !prev);
+      return;
+    }
+
     setIsCollapsedPreference((prev) => !prev);
-  }, []);
+  }, [makeRoom]);
+
+  /**
+   * Forget a manual unfold once the room is no longer needed, so the next `makeRoom` folds the menu again
+   */
+  useEffect(() => {
+    if (!makeRoom) {
+      setIsUnfoldedForNow(false);
+    }
+  }, [makeRoom]);
 
   /**
    * Persist the sidebar collapsed state so it survives page reloads

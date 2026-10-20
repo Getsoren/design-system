@@ -1,19 +1,35 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import AiAssistantFab from "@/components/DataDisplay/AiAssistant/components/AiAssistantFab";
 
 describe("<AiAssistantFab />", () => {
-  it("forwards data-* props to the button so analytics tags land on the DOM node", () => {
-    const { getByTestId } = render(<AiAssistantFab open={false} onClick={vi.fn()} data-amp-track-feature="assistant.open" />);
+  it("is a button named by its call, opening the panel", () => {
+    const onClick = vi.fn();
+    const { getByRole } = render(<AiAssistantFab onClick={onClick} label="Ask Soren" />);
 
-    const fab = getByTestId("assistantFab");
-    expect(fab.tagName).toBe("BUTTON");
-    expect(fab).toHaveAttribute("data-amp-track-feature", "assistant.open");
+    const fab = getByRole("button", { name: "Ask Soren" });
+    expect(fab).toHaveAttribute("data-testid", "assistantFab");
+    fireEvent.click(fab);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("forwards data-* props to the button so analytics tags land on the DOM node", () => {
+    const { getByTestId } = render(<AiAssistantFab onClick={vi.fn()} label="Ask Soren" data-amp-track-feature="assistant.open" />);
+
+    expect(getByTestId("assistantFab")).toHaveAttribute("data-amp-track-feature", "assistant.open");
   });
 
   it("keeps the test id in control even when a data-testid is passed as a data prop", () => {
-    const { getByTestId } = render(<AiAssistantFab open={false} onClick={vi.fn()} dataTestId="customFab" />);
+    const { getByTestId } = render(<AiAssistantFab onClick={vi.fn()} label="Ask Soren" dataTestId="customFab" />);
 
     expect(getByTestId("customFab")).toBeInTheDocument();
+  });
+
+  it("wears the brand avatar, the mark resting in its glow", () => {
+    const { container } = render(<AiAssistantFab onClick={vi.fn()} label="Ask Soren" />);
+
+    expect(container.querySelector("[data-variant]")).toHaveAttribute("data-variant", "brand");
+    expect(container.querySelectorAll("ellipse")).toHaveLength(2);
+    expect(container.querySelector("circle")).not.toBeInTheDocument();
   });
 });

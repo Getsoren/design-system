@@ -11,6 +11,7 @@ import {
 import type { Interpolation } from "@mui/system";
 import { Children, CSSProperties, isValidElement } from "react";
 import CheckboxIcon from "@/components/Inputs/Checkbox/CheckboxIcon";
+import { APP_BAR_HEIGHT } from "@/constants/appBar";
 
 // Local type definition since OverridesStyleRules is not exported from @mui/material/styles
 type OverridesStyleRules<
@@ -59,6 +60,7 @@ declare module "@mui/material/Button" {
     dashed: true;
     "dashed-rounded": true;
     link: true;
+    soft: true;
   }
 }
 
@@ -305,7 +307,7 @@ const commonThemeOptions: MuiThemeOptions = {
       styleOverrides: {
         root: ({ theme }) => ({
           backgroundColor: theme.palette.background.dark,
-          height: 60,
+          height: APP_BAR_HEIGHT,
         }),
       },
     },
@@ -542,6 +544,25 @@ const commonThemeOptions: MuiThemeOptions = {
               padding: 0,
               textDecoration: "underline",
               textTransform: "none",
+            };
+          },
+        },
+        // Soft variant: a quiet fill in the button's colour, e.g. suggestions or a "see more" under a card
+        {
+          props: { variant: "soft" },
+          style: ({ theme, ownerState }: { theme: MuiTheme; ownerState?: ButtonProps } & ComponentsPropsList["MuiButton"]) => {
+            const color =
+              ownerState?.color === "inherit" || ownerState?.color === "contrast"
+                ? theme.palette.text.primary
+                : theme.palette[ownerState?.color || "primary"].main;
+
+            return {
+              "&:hover": { backgroundColor: alpha(color, theme.palette.action.selectedOpacity) },
+              "&.Mui-disabled": { backgroundColor: theme.palette.action.disabledBackground, color: theme.palette.action.disabled },
+              backgroundColor: alpha(color, theme.palette.action.hoverOpacity),
+              color,
+              paddingLeft: theme.spacing(1.5),
+              paddingRight: theme.spacing(1.5),
             };
           },
         },

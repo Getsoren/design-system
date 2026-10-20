@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.90.0](https://github.com/getsoren/design-system/compare/4.89.0...4.90.0) (2026-10-20)
+
+
+### Features
+
+* **TextFieldPhone:** add phone input component with formatting and caret management ([4e14a48](https://github.com/getsoren/design-system/commit/4e14a484ab0597a814989ab201aa4442b3cceede))
+
 ## [4.89.0](https://github.com/getsoren/design-system/compare/4.88.0...4.89.0) (2026-10-20)
 
 

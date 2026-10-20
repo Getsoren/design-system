@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.88.0](https://github.com/getsoren/design-system/compare/4.87.0...4.88.0) (2026-10-20)
+
+
+### Features
+
+* **AiAssistant:** add glow effect and improve comments for clarity ([5d754f4](https://github.com/getsoren/design-system/commit/5d754f41784e50080ef799cf53bb32b11818460f))
+* **AiAssistant:** add soft button variant and subtle surface color utility ([15106a3](https://github.com/getsoren/design-system/commit/15106a3cc6b7ea9c56c9082d1fb3f08e04d795cb))
+* **AiAssistant:** center story examples and enhance soft button styling ([70fb0f2](https://github.com/getsoren/design-system/commit/70fb0f24b0ff864a15b8df8864726aea76e6fd3a))
+* **AiAssistant:** introduce brand flow duration constant for improved animation control ([bbfe2bf](https://github.com/getsoren/design-system/commit/bbfe2bf5f2281957fc2b91fa21111841fc9bf1d6))
+* **AiAssistant:** refactor constants for floating elements and improve styling ([44a13b1](https://github.com/getsoren/design-system/commit/44a13b19336125697176150cb4ef2e3ed8027a55))
+* **AiAssistant:** soren's animated mark, docked panel, button, suggestions and avatar ([313258c](https://github.com/getsoren/design-system/commit/313258c78a7d2481c8ba5c649b2d4dc3a87a9341))
+* **AiAssistant:** the mark rests as an ellipse and thinks with two satellites ([931a546](https://github.com/getsoren/design-system/commit/931a54640eea5557247bd817703463c0c2453adb))
+* **Backoffice:** room for a docked side panel, with the menu folded to its rail ([228c990](https://github.com/getsoren/design-system/commit/228c9905c323d85ad3c25685a6788cd387b66491))
+* **Chat:** plain message variant, filled composer with a footnote and a live voice wave ([9182c2e](https://github.com/getsoren/design-system/commit/9182c2eb0558c079550d6561f6c3404512f1ac1f))
+* **EventFlag:** event status flag shared by the booking timeline and the assistant ([d35c8ee](https://github.com/getsoren/design-system/commit/d35c8ee468551f528dfa5ac03b28abdf0dde1d42))
+
 ## [4.87.0](https://github.com/getsoren/design-system/compare/4.86.0...4.87.0) (2026-10-19)
 
 

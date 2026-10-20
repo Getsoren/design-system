@@ -7,6 +7,8 @@ import getSubtleSurfaceColor from "@/utils/getSubtleSurfaceColor";
 
 // Small enough for the mark's glow to fit inside the round.
 const MARK_SIZE = 15;
+// Slow enough for the brand gradient to read as a drift, not a scroll.
+const BRAND_FLOW_S = 12;
 
 /** The assistant's mark in a round: grey in the thread, or the flowing brand gradient where it stands for the brand. */
 const AiAssistantAvatar = ({ variant = "subtle", isWorking }: AiAssistantAvatarProps) => {
@@ -30,7 +32,7 @@ const AiAssistantAvatar = ({ variant = "subtle", isWorking }: AiAssistantAvatarP
                 "50%": { backgroundPosition: "100% 60%" },
               },
               "@media (prefers-reduced-motion: reduce)": { "&&": { animation: "none" } },
-              animation: "aiAssistantAvatarFlow 11.3s ease infinite",
+              animation: `aiAssistantAvatarFlow ${BRAND_FLOW_S}s ease infinite`,
               background: ({ palette }) => assistantOrbGradient(palette),
               backgroundSize: "320% 320%",
             }

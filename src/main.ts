@@ -113,6 +113,8 @@ export * from "@/components/Inputs/TextFieldGroup/TextFieldGroup";
 export { default as TextFieldGroup } from "@/components/Inputs/TextFieldGroup/TextFieldGroup";
 export * from "@/components/Inputs/TextFieldPassword/TextFieldPassword";
 export { default as TextFieldPassword } from "@/components/Inputs/TextFieldPassword/TextFieldPassword";
+export * from "@/components/Inputs/TextFieldPhone/TextFieldPhone";
+export { default as TextFieldPhone } from "@/components/Inputs/TextFieldPhone/TextFieldPhone";
 
 // Layout
 export * from "@/components/Layout/Backoffice/Backoffice";

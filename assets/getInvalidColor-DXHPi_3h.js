@@ -1,1 +1,0 @@
-import{i as e}from"./preload-helper-xPQekRTU.js";var t,n=e((()=>{t=(e,t=`error`)=>t===`warning`?e.palette.warning.dark:e.palette.error.main}));export{n,t};

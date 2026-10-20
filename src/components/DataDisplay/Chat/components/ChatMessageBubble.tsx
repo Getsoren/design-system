@@ -10,7 +10,7 @@ import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import type { ChatMessageBubbleProps } from "@/components/DataDisplay/Chat/types";
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import { extractUrls } from "@/components/DataDisplay/Chat/utils/extractUrls";
-import getSubtleSurfaceColor from "@/utils/getSubtleSurfaceColor";
+import { getSubtleSurfaceColor } from "@/utils/colors";
 
 const URL_REGEX = /https?:\/\/\S+/g;
 

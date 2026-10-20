@@ -1,7 +1,7 @@
 import { Box, ButtonBase, Skeleton, Stack, type SxProps, type Theme, Typography } from "@mui/material";
 import type { ReactNode } from "react";
 import CheckIcon from "@/components/DataDisplay/Icons/CheckIcon";
-import getOutlineColor from "@/utils/getOutlineColor";
+import { getSoftOutlineColor } from "@/utils/colors";
 
 export interface CheckboxCardProps {
   /** Main line — one line in a horizontal card, up to three in a vertical one */
@@ -198,7 +198,8 @@ const CheckboxCard = ({
         "&:hover": { borderColor: theme.palette.text.primary },
         alignItems: "stretch",
         backgroundColor: selected ? theme.palette.action.hover : theme.palette.background.paper,
-        border: `1px solid ${selected ? theme.palette.text.primary : getOutlineColor(theme)}`,
+        // At rest, a lighter grey than a field's outline: a grid of cards reads as content, not as a form
+        border: `1px solid ${selected ? theme.palette.text.primary : getSoftOutlineColor(theme.palette)}`,
         borderRadius: `${theme.shape.borderRadiusL}px`,
         // A second line inside the border reads as the 2px border of a selection, without moving the content
         boxShadow: selected ? `inset 0 0 0 1px ${theme.palette.text.primary}` : "none",

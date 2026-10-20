@@ -32,7 +32,7 @@ type OverridesStyleRules<
 import { ButtonProps } from "@/components/Inputs/Button/Button";
 import { dark, light } from "@/constants/colors";
 import { defaultFontFamily } from "@/constants/fonts";
-import getOutlineColor from "@/utils/getOutlineColor";
+import { getOutlineColor, getSoftOutlineColor } from "@/utils/colors";
 import pxToRem from "@/utils/pxToRem";
 
 // Components module augmentation
@@ -1085,7 +1085,7 @@ const commonThemeOptions: MuiThemeOptions = {
               zIndex: 1,
             },
             "& .MuiRadio-root": {
-              border: `solid 1px ${theme.palette.mode === "light" ? theme.palette.grey[200] : theme.palette.border.outline}`,
+              border: `solid 1px ${getSoftOutlineColor(theme.palette)}`,
               borderRadius: theme.shape.borderRadius,
               height: "100%",
               left: 0,

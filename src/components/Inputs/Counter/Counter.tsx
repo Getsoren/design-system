@@ -1,8 +1,7 @@
 import { FormHelperText, IconButton, Stack, SvgIcon, type Theme, Typography } from "@mui/material";
 import type { ReactNode } from "react";
 import useTranslation from "@/hooks/useTranslation/useTranslation";
-import getInvalidColor, { type InvalidColor } from "@/utils/getInvalidColor";
-import getOutlineColor from "@/utils/getOutlineColor";
+import { getInvalidColor, getOutlineColor, type InvalidColor } from "@/utils/colors";
 
 export interface CounterProps {
   label: ReactNode;

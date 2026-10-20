@@ -170,9 +170,9 @@ export { default as useTabs } from "@/hooks/useTabs/useTabs";
 export type { DataAttributes } from "@/types/dataAttributes";
 
 // Utility functions
+export * from "@/utils/colors";
 export * from "@/utils/getBackgroundImageElevation";
 export { default as getBackgroundImageElevation } from "@/utils/getBackgroundImageElevation";
-export type { InvalidColor } from "@/utils/getInvalidColor";
 export { default as isoToEmojiFlag } from "@/utils/isoToEmojiFlag";
 export { default as pickDataAttributes } from "@/utils/pickDataAttributes";
 export * from "@/utils/pxToRem";

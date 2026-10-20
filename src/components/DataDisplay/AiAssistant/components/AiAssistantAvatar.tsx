@@ -3,7 +3,7 @@ import AiAssistantMark from "@/components/DataDisplay/AiAssistant/components/AiA
 import { AI_ASSISTANT_AVATAR_SIZE } from "@/components/DataDisplay/AiAssistant/constants";
 import type { AiAssistantAvatarProps } from "@/components/DataDisplay/AiAssistant/types";
 import { assistantOrbGradient } from "@/components/DataDisplay/AiAssistant/utils/gradient";
-import getSubtleSurfaceColor from "@/utils/getSubtleSurfaceColor";
+import { getSubtleSurfaceColor } from "@/utils/colors";
 
 // Small enough for the mark's glow to fit inside the round.
 const MARK_SIZE = 15;

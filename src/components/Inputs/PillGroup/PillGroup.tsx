@@ -1,7 +1,6 @@
 import { ButtonBase, FormHelperText, Stack } from "@mui/material";
 import { type KeyboardEvent, type ReactNode, useId } from "react";
-import getInvalidColor, { type InvalidColor } from "@/utils/getInvalidColor";
-import getOutlineColor from "@/utils/getOutlineColor";
+import { getInvalidColor, getOutlineColor, type InvalidColor } from "@/utils/colors";
 
 export interface PillOption {
   value: string;

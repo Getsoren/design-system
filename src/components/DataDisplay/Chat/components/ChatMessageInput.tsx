@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
-import getSubtleSurfaceColor from "@/utils/getSubtleSurfaceColor";
+import { getSubtleSurfaceColor } from "@/utils/colors";
 
 const RADIUS = 15;
 const COUNTER_VISIBLE_FROM = 40;

@@ -1,7 +1,6 @@
 import { Box, Stack, type SxProps, type Theme } from "@mui/material";
 import { Children, Fragment, isValidElement, type PropsWithChildren, type ReactNode } from "react";
-import getInvalidColor, { type InvalidColor } from "@/utils/getInvalidColor";
-import getOutlineColor from "@/utils/getOutlineColor";
+import { getInvalidColor, getOutlineColor, type InvalidColor } from "@/utils/colors";
 
 export interface TextFieldGroupProps extends PropsWithChildren {
   /** `row` puts two short fields side by side */

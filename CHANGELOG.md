@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.89.0](https://github.com/getsoren/design-system/compare/4.88.0...4.89.0) (2026-10-20)
+
+
+### Features
+
+* **colors:** refactor color utility imports and consolidate color functions ([8cd4023](https://github.com/getsoren/design-system/commit/8cd4023405a110d07aaf0b68551c03cd14e3df74))
+
 ## [4.88.0](https://github.com/getsoren/design-system/compare/4.87.0...4.88.0) (2026-10-20)
 
 

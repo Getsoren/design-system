@@ -63,7 +63,7 @@ const ChatMessageInput = ({
       <Box sx={{ p: 2, pt: 1 }}>
         <Box
           sx={{
-            "&:focus-within": { borderColor: "text.primary" },
+            "&:focus-within": { borderColor: "border.outline" },
             backgroundColor: ({ palette }) => getSubtleSurfaceColor(palette),
             border: 1,
             borderColor: "transparent",

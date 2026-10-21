@@ -1,7 +1,9 @@
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
+import { alpha, type Theme } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
@@ -37,6 +39,8 @@ export const ChatVoiceRecorder = ({
   labels,
   isProcessing = false,
   disabled = false,
+  isHighlighted = false,
+  startLabel,
   autoSubmitOnSilence = false,
   maxDurationMs = 120_000,
   silenceTimeoutMs = 2_500,
@@ -198,10 +202,41 @@ export const ChatVoiceRecorder = ({
   );
 
   if (!isRecording) {
+    const callSx = isHighlighted
+      ? ({ palette }: Theme) => ({
+          // A slow halo that calls the eye, gone while the mic cannot be used.
+          "@keyframes chatVoiceCall": {
+            "0%": { boxShadow: `0 0 0 0 ${alpha(palette.primary.main, 0.3)}` },
+            "70%, 100%": { boxShadow: `0 0 0 10px ${alpha(palette.primary.main, 0)}` },
+          },
+          "@media (prefers-reduced-motion: reduce)": { "&&": { animation: "none" } },
+          "&:hover": { backgroundColor: "primary.dark" },
+          "&.Mui-disabled": { animation: "none" },
+          animation: "chatVoiceCall 1.8s ease-out infinite",
+          backgroundColor: "primary.main",
+          color: "primary.contrastText",
+        })
+      : undefined;
+
+    if (startLabel) {
+      return (
+        <Button
+          variant="contained"
+          onClick={start}
+          disabled={disabled || isProcessing}
+          data-test="chatVoiceStart"
+          startIcon={isProcessing ? <CircularProgress size={16} color="inherit" /> : <MicIcon sx={{ fontSize: 20 }} />}
+          sx={callSx}
+        >
+          {startLabel}
+        </Button>
+      );
+    }
+
     return (
       <Tooltip title={labels?.record ?? "Record a voice message"}>
         <span>
-          <IconButton onClick={start} disabled={disabled || isProcessing} data-test="chatVoiceStart">
+          <IconButton onClick={start} disabled={disabled || isProcessing} data-test="chatVoiceStart" sx={callSx}>
             {isProcessing ? <CircularProgress size={20} /> : <MicIcon sx={{ fontSize: 20 }} />}
           </IconButton>
         </span>

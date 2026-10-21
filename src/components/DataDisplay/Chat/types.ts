@@ -181,6 +181,14 @@ export interface ChatVoiceRecorderProps {
    */
   disabled?: boolean;
   /**
+   * Fills the mic like a ready send button, with a slow halo: the action to take, e.g. while a guide asks for a spoken message
+   */
+  isHighlighted?: boolean;
+  /**
+   * Written next to the mic, which then reads as a call to action (e.g. « Try your voice » in a guide)
+   */
+  startLabel?: string;
+  /**
    * Hard stop: past this duration the take is validated automatically (default 2 min)
    */
   maxDurationMs?: number;

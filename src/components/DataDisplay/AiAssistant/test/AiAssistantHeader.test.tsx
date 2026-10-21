@@ -1,6 +1,7 @@
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import AiAssistantHeader from "@/components/DataDisplay/AiAssistant/components/AiAssistantHeader";
+import ThemeProvider from "@/context/Theme/ThemeProvider";
 
 describe("<AiAssistantHeader />", () => {
   it("names the assistant, with the close button last", () => {
@@ -28,5 +29,17 @@ describe("<AiAssistantHeader />", () => {
 
     fireEvent.click(getByRole("button", { name: "New" }));
     expect(onNewConversation).toHaveBeenCalled();
+  });
+
+  it("falls back on the app's language for the labels it is not given", () => {
+    const { getByRole } = render(
+      <ThemeProvider language="fr">
+        <AiAssistantHeader title="Ren" onClose={vi.fn()} onNewConversation={vi.fn()} onToggleDocked={vi.fn()} />
+      </ThemeProvider>,
+    );
+
+    expect(getByRole("button", { name: "Nouvelle conversation" })).toBeInTheDocument();
+    expect(getByRole("button", { name: "Ancrer" })).toBeInTheDocument();
+    expect(getByRole("button", { name: "Fermer" })).toBeInTheDocument();
   });
 });

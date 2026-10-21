@@ -29,5 +29,5 @@ export const AI_ASSISTANT_DOCKED_SPACE = AI_ASSISTANT_DOCKED_WIDTH + AI_ASSISTAN
 /** Diameter of the avatar, in px: the Fab pill, the thread and the thinking row line up on it */
 export const AI_ASSISTANT_AVATAR_SIZE = 28;
 
-/** Glow colours of the mark and of the pill's working outline, from the head of the light to its tail */
+/** The assistant's light, from its head to its tail: its mark and its avatar, and what the host app paints with it (its name) */
 export const AI_ASSISTANT_GLOW_COLORS = ["#FF5A1F", "#FFB547", "#FFC4A3", "#FF7EB3"] as const;

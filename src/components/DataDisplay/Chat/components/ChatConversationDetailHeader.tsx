@@ -24,6 +24,7 @@ import KeyboardArrowLeftRoundedIcon from "@/components/DataDisplay/Icons/Keyboar
 import MoreHorizIcon from "@/components/DataDisplay/Icons/MoreHorizIcon";
 import PersonAddIcon from "@/components/DataDisplay/Icons/PersonAddIcon";
 import useMenu from "@/hooks/useMenu/useMenu";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 interface ChatConversationDetailHeaderProps {
   threadId: string;
@@ -58,6 +59,7 @@ const ChatConversationDetailHeader = ({
   slotProps,
   onBack,
 }: ChatConversationDetailHeaderProps) => {
+  const { t } = useTranslation();
   const { isMenuOpen, anchorMenu, closeMenu, openMenu } = useMenu();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const participantNames = formatParticipantNames(participants, formatParticipantName);
@@ -86,7 +88,7 @@ const ChatConversationDetailHeader = ({
           {onBack && (
             <IconButton
               size="small"
-              aria-label={labels?.back ?? "Back"}
+              aria-label={labels?.back ?? t("back")}
               onClick={onBack}
               sx={{ display: { sm: "none", xs: "inline-flex" } }}
             >
@@ -112,11 +114,11 @@ const ChatConversationDetailHeader = ({
             keeps what stays rare and destructive. */}
         {headerAction ?? (
           <Stack direction="row" alignItems="center" spacing={1}>
-            <Tooltip arrow title={labels?.addParticipant ?? "Add Participant"}>
+            <Tooltip arrow title={labels?.addParticipant ?? t("addParticipant")}>
               <IconButton
                 {...slotProps?.addParticipantsButton}
                 size="small"
-                aria-label={labels?.addParticipant ?? "Add Participant"}
+                aria-label={labels?.addParticipant ?? t("addParticipant")}
                 onClick={handleOpenAddDialog}
                 sx={{
                   "&:hover": { backgroundColor: ({ palette }: Theme) => (palette.mode === "dark" ? "grey.400" : "grey.200") },
@@ -141,7 +143,7 @@ const ChatConversationDetailHeader = ({
                 <ListItemIcon>
                   <DeleteIcon fontSize="small" color="error" />
                 </ListItemIcon>
-                <Typography color="error">{labels?.deleteConversation ?? "Delete Conversation"}</Typography>
+                <Typography color="error">{labels?.deleteConversation ?? t("deleteConversation")}</Typography>
               </MenuItem>
             </Menu>
           </Stack>
@@ -159,10 +161,10 @@ const ChatConversationDetailHeader = ({
         isSearchLoading={isSearchingParticipants}
         avatarSrcResolver={avatarSrcResolver}
         labels={{
-          confirm: labels?.add ?? "Add",
+          confirm: labels?.add ?? t("add"),
           participants: labels?.participants,
           searchContacts: labels?.searchContacts,
-          title: labels?.addParticipant ?? "Add Participant",
+          title: labels?.addParticipant ?? t("addParticipant"),
         }}
       />
     </>

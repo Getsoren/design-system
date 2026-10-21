@@ -1,7 +1,9 @@
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
+import { alpha, type Theme } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +11,7 @@ import type { ChatVoiceRecorderProps } from "@/components/DataDisplay/Chat/types
 import CheckIcon from "@/components/DataDisplay/Icons/CheckIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import MicIcon from "@/components/DataDisplay/Icons/MicIcon";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 // Normalized RMS (0..1) above which the mic input counts as speech rather than ambient/room noise
 const SPEECH_RMS_THRESHOLD = 0.02;
@@ -37,10 +40,13 @@ export const ChatVoiceRecorder = ({
   labels,
   isProcessing = false,
   disabled = false,
+  isHighlighted = false,
+  startLabel,
   autoSubmitOnSilence = false,
   maxDurationMs = 120_000,
   silenceTimeoutMs = 2_500,
 }: ChatVoiceRecorderProps) => {
+  const { t } = useTranslation();
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [levels, setLevels] = useState<number[]>(() => Array(WAVE_BARS).fill(0));
@@ -198,10 +204,41 @@ export const ChatVoiceRecorder = ({
   );
 
   if (!isRecording) {
+    const callSx = isHighlighted
+      ? ({ palette }: Theme) => ({
+          // A slow halo that calls the eye, gone while the mic cannot be used.
+          "@keyframes chatVoiceCall": {
+            "0%": { boxShadow: `0 0 0 0 ${alpha(palette.primary.main, 0.3)}` },
+            "70%, 100%": { boxShadow: `0 0 0 10px ${alpha(palette.primary.main, 0)}` },
+          },
+          "@media (prefers-reduced-motion: reduce)": { "&&": { animation: "none" } },
+          "&:hover": { backgroundColor: "primary.dark" },
+          "&.Mui-disabled": { animation: "none" },
+          animation: "chatVoiceCall 1.8s ease-out infinite",
+          backgroundColor: "primary.main",
+          color: "primary.contrastText",
+        })
+      : undefined;
+
+    if (startLabel) {
+      return (
+        <Button
+          variant="contained"
+          onClick={start}
+          disabled={disabled || isProcessing}
+          data-test="chatVoiceStart"
+          startIcon={isProcessing ? <CircularProgress size={16} color="inherit" /> : <MicIcon sx={{ fontSize: 20 }} />}
+          sx={callSx}
+        >
+          {startLabel}
+        </Button>
+      );
+    }
+
     return (
-      <Tooltip title={labels?.record ?? "Record a voice message"}>
+      <Tooltip title={labels?.record ?? t("recordVoiceMessage")}>
         <span>
-          <IconButton onClick={start} disabled={disabled || isProcessing} data-test="chatVoiceStart">
+          <IconButton onClick={start} disabled={disabled || isProcessing} data-test="chatVoiceStart" sx={callSx}>
             {isProcessing ? <CircularProgress size={20} /> : <MicIcon sx={{ fontSize: 20 }} />}
           </IconButton>
         </span>
@@ -248,12 +285,12 @@ export const ChatVoiceRecorder = ({
           />
         ))}
       </Stack>
-      <Tooltip title={labels?.cancel ?? "Cancel"}>
+      <Tooltip title={labels?.cancel ?? t("cancel")}>
         <IconButton size="small" onClick={() => stop(true)} data-test="chatVoiceCancel">
           <CloseIcon />
         </IconButton>
       </Tooltip>
-      <Tooltip title={labels?.send ?? "Use this recording"}>
+      <Tooltip title={labels?.send ?? t("useRecording")}>
         <IconButton size="small" color="primary" onClick={() => stop(false)} data-test="chatVoiceSend">
           <CheckIcon />
         </IconButton>

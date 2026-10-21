@@ -1,45 +1,75 @@
 import Box from "@mui/material/Box";
-import AiAssistantMark from "@/components/DataDisplay/AiAssistant/components/AiAssistantMark";
-import { AI_ASSISTANT_AVATAR_SIZE } from "@/components/DataDisplay/AiAssistant/constants";
+import portrait from "@/assets/img/soren-assistant.webp";
+import { AI_ASSISTANT_AVATAR_SIZE, AI_ASSISTANT_GLOW_COLORS } from "@/components/DataDisplay/AiAssistant/constants";
 import type { AiAssistantAvatarProps } from "@/components/DataDisplay/AiAssistant/types";
-import { assistantOrbGradient } from "@/components/DataDisplay/AiAssistant/utils/gradient";
 import { getSubtleSurfaceColor } from "@/utils/colors";
 
-// Small enough for the mark's glow to fit inside the round.
-const MARK_SIZE = 15;
-// Slow enough for the brand gradient to read as a drift, not a scroll.
-const BRAND_FLOW_S = 12;
+const [ORANGE, AMBER, , PINK] = AI_ASSISTANT_GLOW_COLORS;
+// A band of the brand's colours, parked off the avatar between two crossings.
+const BRAND_BAND = `linear-gradient(45deg, ${ORANGE}00 36%, ${ORANGE}99 44%, ${AMBER}cc 50%, ${PINK}99 56%, ${PINK}00 64%)`;
+// Back to the first colour, so the turning light has no seam.
+const WORKING_LIGHT = `conic-gradient(${[...AI_ASSISTANT_GLOW_COLORS, AI_ASSISTANT_GLOW_COLORS[0]].join(", ")})`;
 
-/** The assistant's mark in a round: grey in the thread, or the flowing brand gradient where it stands for the brand. */
-const AiAssistantAvatar = ({ variant = "subtle", isWorking }: AiAssistantAvatarProps) => {
-  const isBrand = variant === "brand";
+/** The assistant's portrait on a grey round; where it stands for the brand, the brand's colours cross it now and then. */
+const AiAssistantAvatar = ({
+  portrait: livePortrait,
+  variant = "subtle",
+  isWorking = false,
+  rounded = false,
+  size = AI_ASSISTANT_AVATAR_SIZE,
+}: AiAssistantAvatarProps) => {
+  const radius = rounded ? Math.round(size / 4) : size / 2;
+  const lightWidth = Math.max(2, Math.round(size / 24));
 
   return (
-    <Box
-      data-variant={variant}
-      sx={{
-        alignItems: "center",
-        borderRadius: "50%",
-        display: "flex",
-        flexShrink: 0,
-        height: AI_ASSISTANT_AVATAR_SIZE,
-        justifyContent: "center",
-        width: AI_ASSISTANT_AVATAR_SIZE,
-        ...(isBrand
-          ? {
-              "@keyframes aiAssistantAvatarFlow": {
-                "0%, 100%": { backgroundPosition: "0% 40%" },
-                "50%": { backgroundPosition: "100% 60%" },
-              },
+    <Box data-variant={variant} sx={{ flexShrink: 0, height: size, position: "relative", width: size }}>
+      {isWorking && (
+        // The light keeps the avatar's shape, a little larger: only its colours turn.
+        <Box
+          aria-hidden
+          data-testid="assistantAvatarLight"
+          sx={{ borderRadius: `${radius + lightWidth}px`, inset: -lightWidth, overflow: "hidden", position: "absolute" }}
+        >
+          <Box
+            sx={{
+              "@keyframes aiAssistantAvatarLight": { to: { transform: "rotate(1turn)" } },
               "@media (prefers-reduced-motion: reduce)": { "&&": { animation: "none" } },
-              animation: `aiAssistantAvatarFlow ${BRAND_FLOW_S}s ease infinite`,
-              background: ({ palette }) => assistantOrbGradient(palette),
-              backgroundSize: "320% 320%",
-            }
-          : { backgroundColor: ({ palette }) => getSubtleSurfaceColor(palette) }),
-      }}
-    >
-      <AiAssistantMark size={MARK_SIZE} color={isBrand ? "common.white" : undefined} isWorking={isWorking} />
+              animation: "aiAssistantAvatarLight 1600ms linear infinite",
+              background: WORKING_LIGHT,
+              // The square's diagonal, so the colours always cover its corners.
+              inset: "-21%",
+              position: "absolute",
+            }}
+          />
+        </Box>
+      )}
+      <Box
+        sx={{
+          ...(variant === "brand" && {
+            "@keyframes aiAssistantAvatarBand": {
+              "0%, 70%": { backgroundPosition: "120% -20%" },
+              "95%, 100%": { backgroundPosition: "-20% 120%" },
+            },
+            "@media (prefers-reduced-motion: reduce)": { "&&": { animation: "none" } },
+            // Every 10 s, from bottom left to top right: caught out of the corner of the eye.
+            animation: "aiAssistantAvatarBand 10s cubic-bezier(0.5, 0.05, 0.45, 0.95) infinite",
+            backgroundImage: BRAND_BAND,
+            backgroundPosition: "120% -20%",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "300% 300%",
+          }),
+          backgroundColor: ({ palette }) => getSubtleSurfaceColor(palette),
+          borderRadius: `${radius}px`,
+          height: size,
+          overflow: "hidden",
+          position: "relative",
+          width: size,
+        }}
+      >
+        {livePortrait ?? (
+          <Box component="img" src={portrait} alt="" draggable={false} sx={{ display: "block", height: 1, objectFit: "cover", width: 1 }} />
+        )}
+      </Box>
     </Box>
   );
 };

@@ -19,6 +19,7 @@ import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import formatParticipantNames from "@/components/DataDisplay/Chat/utils/formatParticipantNames";
 import PenLineIcon from "@/components/DataDisplay/Icons/PenLineIcon";
 import SearchIcon from "@/components/DataDisplay/Icons/SearchIcon";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 const defaultFormatDate = (date: string): string => {
   const d = new Date(ensureUtc(date));
@@ -49,6 +50,7 @@ const ChatConversationList = ({
   hasMore,
   slotProps,
 }: ChatConversationListProps) => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const getDate = formatDate ?? defaultFormatDate;
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -102,7 +104,7 @@ const ChatConversationList = ({
     >
       <Stack direction="row" alignItems="center" justifyContent="space-between" px={2} py={1.5}>
         <Typography variant="h3" fontWeight={600}>
-          {labels?.messages ?? "Messages"}
+          {labels?.messages ?? t("messages")}
         </Typography>
         <IconButton {...slotProps?.newConversationButton} size="small" onClick={onNewConversation}>
           <PenLineIcon />
@@ -112,7 +114,7 @@ const ChatConversationList = ({
         <TextField
           size="xSmall"
           fullWidth
-          placeholder={labels?.search ?? "Search"}
+          placeholder={labels?.search ?? t("search")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           slotProps={{

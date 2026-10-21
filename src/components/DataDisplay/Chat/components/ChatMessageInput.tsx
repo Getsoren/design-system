@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { ChatMessageInputProps } from "@/components/DataDisplay/Chat/types";
 import ArrowUpwardRoundedIcon from "@/components/DataDisplay/Icons/ArrowUpwardRoundedIcon";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 import { getSubtleSurfaceColor } from "@/utils/colors";
 
 const RADIUS = 15;
@@ -24,6 +25,7 @@ const ChatMessageInput = ({
   footnote,
   variant = "outlined",
 }: ChatMessageInputProps) => {
+  const { t } = useTranslation();
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -51,7 +53,7 @@ const ChatMessageInput = ({
     }
   }, [defaultMessage]);
 
-  const sendLabel = labels?.send ?? "Send";
+  const sendLabel = labels?.send ?? t("send");
   const counter = message.length > maxLength - COUNTER_VISIBLE_FROM && (
     <Typography variant="caption" color={message.length >= maxLength ? "error.main" : "text.secondary"}>
       {message.length}/{maxLength}
@@ -63,7 +65,7 @@ const ChatMessageInput = ({
       <Box sx={{ p: 2, pt: 1 }}>
         <Box
           sx={{
-            "&:focus-within": { borderColor: "text.primary" },
+            "&:focus-within": { borderColor: "border.outline" },
             backgroundColor: ({ palette }) => getSubtleSurfaceColor(palette),
             border: 1,
             borderColor: "transparent",
@@ -79,7 +81,7 @@ const ChatMessageInput = ({
             key={autoFocusKey}
             inputRef={inputRef}
             maxRows={6}
-            placeholder={labels?.writeAMessage ?? "Write a message..."}
+            placeholder={labels?.writeAMessage ?? t("writeAMessage")}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -139,7 +141,7 @@ const ChatMessageInput = ({
         key={autoFocusKey}
         inputRef={inputRef}
         maxRows={4}
-        placeholder={labels?.writeAMessage ?? "Write a message..."}
+        placeholder={labels?.writeAMessage ?? t("writeAMessage")}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -196,8 +198,8 @@ const ChatMessageInput = ({
           {/* Send: an upward arrow, like the note field of an order. */}
           <IconButton
             {...slotProps?.sendButton}
-            aria-label={labels?.send ?? "Send"}
-            title={labels?.send ?? "Send"}
+            aria-label={labels?.send ?? t("send")}
+            title={labels?.send ?? t("send")}
             onClick={handleSend}
             disabled={!message.trim() || isSending}
             sx={{
@@ -217,7 +219,7 @@ const ChatMessageInput = ({
       {/* Pass an empty string to hide the hint entirely (undefined keeps the default) */}
       {labels?.enterToSend !== "" && (
         <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={0.5}>
-          {labels?.enterToSend ?? "Enter to Send"}
+          {labels?.enterToSend ?? t("enterToSend")}
         </Typography>
       )}
     </Box>

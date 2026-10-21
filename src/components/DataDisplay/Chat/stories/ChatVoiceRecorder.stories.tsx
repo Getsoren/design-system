@@ -50,3 +50,18 @@ export const Default: StoryFn<typeof ChatVoiceRecorder> = () => {
     </Stack>
   );
 };
+
+/** Filled like a ready send button, when a guide asks the user to answer out loud. */
+export const Highlighted: StoryFn<typeof ChatVoiceRecorder> = () => (
+  <Paper variant="outlined" sx={{ alignItems: "center", display: "flex", gap: 1, paddingX: 2, paddingY: 1, width: 360 }}>
+    <Typography variant="body2" color="text.secondary" flex={1}>
+      Appuyez sur le micro et parlez
+    </Typography>
+    <ChatVoiceRecorder isHighlighted onRecorded={() => {}} labels={{ record: "Enregistrer un vocal" }} />
+  </Paper>
+);
+
+/** With its label, the mic reads as the call to action of a guide. */
+export const WithLabel: StoryFn<typeof ChatVoiceRecorder> = () => (
+  <ChatVoiceRecorder isHighlighted startLabel="Tester la voix" onRecorded={() => {}} />
+);

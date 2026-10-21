@@ -72,7 +72,7 @@ export const Default: StoryFn = () => {
               {!messages.length && (
                 <AiAssistant.EmptyState
                   title="Que voulez-vous faire aujourd'hui ?"
-                  icon={<AiAssistant.Avatar variant="brand" size={48} rounded />}
+                  icon={<AiAssistant.Avatar rounded variant="brand" size={48} />}
                 >
                   {SUGGESTIONS.map((suggestion) => (
                     <AiAssistant.Suggestion key={suggestion} onClick={() => send(suggestion)}>

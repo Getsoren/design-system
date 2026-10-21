@@ -12,11 +12,11 @@ const WORKING_LIGHT = `conic-gradient(${[...AI_ASSISTANT_GLOW_COLORS, AI_ASSISTA
 
 /** The assistant's portrait on a grey round; where it stands for the brand, the brand's colours cross it now and then. */
 const AiAssistantAvatar = ({
+  portrait: livePortrait,
   variant = "subtle",
   isWorking = false,
-  size = AI_ASSISTANT_AVATAR_SIZE,
   rounded = false,
-  portrait: livePortrait,
+  size = AI_ASSISTANT_AVATAR_SIZE,
 }: AiAssistantAvatarProps) => {
   const radius = rounded ? Math.round(size / 4) : size / 2;
   const lightWidth = Math.max(2, Math.round(size / 24));

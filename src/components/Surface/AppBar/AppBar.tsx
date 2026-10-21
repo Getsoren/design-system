@@ -168,6 +168,8 @@ const AppBar = ({
           anchorEl={anchorMenu}
           open={isMenuOpen}
           onClose={closeMenu}
+          // Above the assistant's floating panel (snackbar level), which stands right under the avatar
+          sx={{ zIndex: ({ zIndex }) => zIndex.snackbar + 1 }}
           anchorOrigin={{
             horizontal: "right",
             vertical: "bottom",

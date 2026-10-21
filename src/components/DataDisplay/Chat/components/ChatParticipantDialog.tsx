@@ -10,6 +10,7 @@ import ChatParticipantAutocomplete, {
 import type { ChatParticipantDialogProps, ChatSearchUser } from "@/components/DataDisplay/Chat/types";
 import DialogCloseIcon from "@/components/Feedback/Dialog/DialogCloseIcon/DialogCloseIcon";
 import Button from "@/components/Inputs/Button/Button";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 const ChatParticipantDialog = ({
   open,
@@ -23,6 +24,7 @@ const ChatParticipantDialog = ({
   labels,
   slotProps,
 }: ChatParticipantDialogProps) => {
+  const { t } = useTranslation();
   const [selectedParticipants, setSelectedParticipants] = useState<ChatSearchUser[]>([]);
   const [isConfirming, setIsConfirming] = useState(false);
   const autocompleteRef = useRef<ChatParticipantAutocompleteHandle>(null);
@@ -55,7 +57,7 @@ const ChatParticipantDialog = ({
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose} onAnimationEnd={() => autocompleteRef.current?.focus()}>
       <DialogCloseIcon onClick={onClose} />
       <DialogTitle variant="h3" paddingBottom={2}>
-        {labels?.title ?? "New Conversation"}
+        {labels?.title ?? t("newConversation")}
       </DialogTitle>
       <DialogContent sx={{ overflow: "visible" }}>
         <Stack spacing={2} marginTop={1}>
@@ -80,7 +82,7 @@ const ChatParticipantDialog = ({
           disabled={!selectedParticipants.length}
           loading={isConfirmLoading || isConfirming}
         >
-          {labels?.confirm ?? "Chat"}
+          {labels?.confirm ?? t("startConversation")}
         </Button>
       </DialogActions>
     </Dialog>

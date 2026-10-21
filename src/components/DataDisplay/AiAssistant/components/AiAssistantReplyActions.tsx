@@ -7,6 +7,7 @@ import CheckIcon from "@/components/DataDisplay/Icons/CheckIcon";
 import CopyIcon from "@/components/DataDisplay/Icons/CopyIcon";
 import ThumbDownIcon from "@/components/DataDisplay/Icons/ThumbDownIcon";
 import ThumbUpIcon from "@/components/DataDisplay/Icons/ThumbUpIcon";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 const COPIED_FEEDBACK_MS = 1500;
 
@@ -14,13 +15,12 @@ interface VoteButton {
   value: AiAssistantVote;
   Icon: typeof ThumbUpIcon;
   labelKey: keyof NonNullable<AiAssistantReplyActionsProps["labels"]>;
-  defaultLabel: string;
   slot: keyof NonNullable<AiAssistantReplyActionsProps["slotProps"]>;
 }
 
 const VOTE_BUTTONS: VoteButton[] = [
-  { defaultLabel: "Helpful", Icon: ThumbUpIcon, labelKey: "helpful", slot: "upVoteButton", value: "up" },
-  { defaultLabel: "Not helpful", Icon: ThumbDownIcon, labelKey: "notHelpful", slot: "downVoteButton", value: "down" },
+  { Icon: ThumbUpIcon, labelKey: "helpful", slot: "upVoteButton", value: "up" },
+  { Icon: ThumbDownIcon, labelKey: "notHelpful", slot: "downVoteButton", value: "down" },
 ];
 
 /** Copy and vote buttons under an assistant reply; the vote is controlled by the host app. */
@@ -32,8 +32,9 @@ const AiAssistantReplyActions = ({
   vote = null,
   dataTestId = "assistantReplyActions",
 }: AiAssistantReplyActionsProps) => {
+  const { t } = useTranslation();
   const [isCopied, setIsCopied] = useState(false);
-  const copyLabel = labels?.copy ?? "Copy";
+  const copyLabel = labels?.copy ?? t("copy");
 
   const copy = async () => {
     try {
@@ -65,15 +66,15 @@ const AiAssistantReplyActions = ({
       sx={{ "& svg": { fontSize: 16 }, color: "text.secondary", marginLeft: -0.75 }}
       data-testid={dataTestId}
     >
-      <Tooltip title={isCopied ? (labels?.copied ?? "Copied") : copyLabel}>
+      <Tooltip title={isCopied ? (labels?.copied ?? t("copied")) : copyLabel}>
         <IconButton {...slotProps?.copyButton} size="small" color="inherit" aria-label={copyLabel} onClick={copy}>
           {isCopied ? <CheckIcon /> : <CopyIcon />}
         </IconButton>
       </Tooltip>
       {onVote &&
-        VOTE_BUTTONS.map(({ defaultLabel, Icon, labelKey, slot, value }) => {
+        VOTE_BUTTONS.map(({ Icon, labelKey, slot, value }) => {
           const isPressed = vote === value;
-          const label = labels?.[labelKey] ?? defaultLabel;
+          const label = labels?.[labelKey] ?? t(labelKey);
 
           return (
             <Tooltip key={value} title={label}>

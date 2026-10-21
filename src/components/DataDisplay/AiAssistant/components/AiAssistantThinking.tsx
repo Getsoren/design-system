@@ -4,6 +4,7 @@ import AiAssistantAvatar from "@/components/DataDisplay/AiAssistant/components/A
 import { AI_ASSISTANT_AVATAR_SIZE } from "@/components/DataDisplay/AiAssistant/constants";
 import type { AiAssistantThinkingProps } from "@/components/DataDisplay/AiAssistant/types";
 import Button from "@/components/Inputs/Button/Button";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 const AVATAR_GAP = 1.5;
 
@@ -18,48 +19,52 @@ const AiAssistantThinking = ({
   labels,
   slotProps,
   dataTestId = "assistantThinking",
-}: AiAssistantThinkingProps) => (
-  <Stack spacing={1} role="status" data-testid={dataTestId}>
-    <Stack direction="row" alignItems="center" spacing={AVATAR_GAP}>
-      <AiAssistantAvatar isWorking />
-      <Typography variant="body2" color="text.secondary">
-        {label}
-      </Typography>
-      {onStop && (
-        <Button {...slotProps?.stopButton} variant="link" size="small" onClick={onStop}>
-          {labels?.stop ?? "Stop"}
-        </Button>
+}: AiAssistantThinkingProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <Stack spacing={1} role="status" data-testid={dataTestId}>
+      <Stack direction="row" alignItems="center" spacing={AVATAR_GAP}>
+        <AiAssistantAvatar isWorking />
+        <Typography variant="body2" color="text.secondary">
+          {label}
+        </Typography>
+        {onStop && (
+          <Button {...slotProps?.stopButton} variant="link" size="small" onClick={onStop}>
+            {labels?.stop ?? t("stop")}
+          </Button>
+        )}
+      </Stack>
+      {steps.length > 0 && (
+        <Stack
+          spacing={1}
+          data-testid={`${dataTestId}Steps`}
+          sx={{
+            "@keyframes aiAssistantThinkingStep": {
+              "0%, 100%": { opacity: 1 },
+              "50%": { opacity: 0.45 },
+            },
+            "@media (prefers-reduced-motion: reduce)": {
+              "&& > *": { animation: "none" },
+            },
+            // Steps line up with the label, past the avatar.
+            paddingLeft: ({ spacing }) => `calc(${AI_ASSISTANT_AVATAR_SIZE}px + ${spacing(AVATAR_GAP)})`,
+          }}
+        >
+          {steps.map(({ id, label: stepLabel, isInProgress }) => (
+            <Typography
+              key={id}
+              variant="caption"
+              color={isInProgress ? "text.secondary" : "text.disabled"}
+              sx={{ animation: isInProgress ? "aiAssistantThinkingStep 1.6s ease-in-out infinite" : "none" }}
+            >
+              {stepLabel}
+            </Typography>
+          ))}
+        </Stack>
       )}
     </Stack>
-    {steps.length > 0 && (
-      <Stack
-        spacing={1}
-        data-testid={`${dataTestId}Steps`}
-        sx={{
-          "@keyframes aiAssistantThinkingStep": {
-            "0%, 100%": { opacity: 1 },
-            "50%": { opacity: 0.45 },
-          },
-          "@media (prefers-reduced-motion: reduce)": {
-            "&& > *": { animation: "none" },
-          },
-          // Steps line up with the label, past the avatar.
-          paddingLeft: ({ spacing }) => `calc(${AI_ASSISTANT_AVATAR_SIZE}px + ${spacing(AVATAR_GAP)})`,
-        }}
-      >
-        {steps.map(({ id, label: stepLabel, isInProgress }) => (
-          <Typography
-            key={id}
-            variant="caption"
-            color={isInProgress ? "text.secondary" : "text.disabled"}
-            sx={{ animation: isInProgress ? "aiAssistantThinkingStep 1.6s ease-in-out infinite" : "none" }}
-          >
-            {stepLabel}
-          </Typography>
-        ))}
-      </Stack>
-    )}
-  </Stack>
-);
+  );
+};
 
 export default AiAssistantThinking;

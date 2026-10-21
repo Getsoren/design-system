@@ -11,6 +11,7 @@ import type { ChatConversationDetailProps } from "@/components/DataDisplay/Chat/
 import ensureUtc from "@/components/DataDisplay/Chat/utils/ensureUtc";
 import ChatBubbleIcon from "@/components/DataDisplay/Icons/ChatBubbleIcon";
 import Button from "@/components/Inputs/Button/Button";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 const defaultFormatDayLabel = (date: string): string => {
   const d = new Date(ensureUtc(date));
@@ -66,6 +67,7 @@ const ChatConversationDetail = ({
   slotProps,
   onBack,
 }: ChatConversationDetailProps) => {
+  const { t } = useTranslation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousThreadIdRef = useRef<string | undefined>(undefined);
 
@@ -100,10 +102,10 @@ const ChatConversationDetail = ({
       <Stack data-chat-pane="detail" data-selected={false} flex={1} alignItems="center" justifyContent="center" spacing={2}>
         <ChatBubbleIcon sx={{ color: "text.secondary", fontSize: 48 }} />
         <Typography variant="body1" color="text.secondary">
-          {labels?.createYourFirstConversation ?? "Create your first conversation"}
+          {labels?.createYourFirstConversation ?? t("createYourFirstConversation")}
         </Typography>
         <Button {...slotProps?.newConversationButton} variant="contained" onClick={onNewConversation}>
-          {labels?.newConversation ?? "New Conversation"}
+          {labels?.newConversation ?? t("newConversation")}
         </Button>
       </Stack>
     );

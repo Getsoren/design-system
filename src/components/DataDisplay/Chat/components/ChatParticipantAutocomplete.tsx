@@ -8,6 +8,7 @@ import { type Ref, useImperativeHandle, useRef } from "react";
 import Avatar from "@/components/DataDisplay/Avatar/Avatar";
 import type { ChatSearchUser } from "@/components/DataDisplay/Chat/types";
 import Chip from "@/components/DataDisplay/Chip/Chip";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 export interface ChatParticipantAutocompleteHandle {
   focus: () => void;
@@ -40,6 +41,7 @@ const ChatParticipantAutocomplete = ({
   avatarSrcResolver,
   labels,
 }: ChatParticipantAutocompleteProps) => {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useImperativeHandle(ref, () => ({
@@ -91,8 +93,8 @@ const ChatParticipantAutocomplete = ({
         <TextField
           {...params}
           inputRef={inputRef}
-          label={labels?.participants ?? "Participants"}
-          placeholder={labels?.searchContacts ?? "Search contacts..."}
+          label={labels?.participants ?? t("participants")}
+          placeholder={labels?.searchContacts ?? t("searchContacts")}
           slotProps={{
             input: {
               ...params.InputProps,

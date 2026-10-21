@@ -11,6 +11,7 @@ import type { ChatVoiceRecorderProps } from "@/components/DataDisplay/Chat/types
 import CheckIcon from "@/components/DataDisplay/Icons/CheckIcon";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import MicIcon from "@/components/DataDisplay/Icons/MicIcon";
+import useTranslation from "@/hooks/useTranslation/useTranslation";
 
 // Normalized RMS (0..1) above which the mic input counts as speech rather than ambient/room noise
 const SPEECH_RMS_THRESHOLD = 0.02;
@@ -45,6 +46,7 @@ export const ChatVoiceRecorder = ({
   maxDurationMs = 120_000,
   silenceTimeoutMs = 2_500,
 }: ChatVoiceRecorderProps) => {
+  const { t } = useTranslation();
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [levels, setLevels] = useState<number[]>(() => Array(WAVE_BARS).fill(0));
@@ -234,7 +236,7 @@ export const ChatVoiceRecorder = ({
     }
 
     return (
-      <Tooltip title={labels?.record ?? "Record a voice message"}>
+      <Tooltip title={labels?.record ?? t("recordVoiceMessage")}>
         <span>
           <IconButton onClick={start} disabled={disabled || isProcessing} data-test="chatVoiceStart" sx={callSx}>
             {isProcessing ? <CircularProgress size={20} /> : <MicIcon sx={{ fontSize: 20 }} />}
@@ -283,12 +285,12 @@ export const ChatVoiceRecorder = ({
           />
         ))}
       </Stack>
-      <Tooltip title={labels?.cancel ?? "Cancel"}>
+      <Tooltip title={labels?.cancel ?? t("cancel")}>
         <IconButton size="small" onClick={() => stop(true)} data-test="chatVoiceCancel">
           <CloseIcon />
         </IconButton>
       </Tooltip>
-      <Tooltip title={labels?.send ?? "Use this recording"}>
+      <Tooltip title={labels?.send ?? t("useRecording")}>
         <IconButton size="small" color="primary" onClick={() => stop(false)} data-test="chatVoiceSend">
           <CheckIcon />
         </IconButton>

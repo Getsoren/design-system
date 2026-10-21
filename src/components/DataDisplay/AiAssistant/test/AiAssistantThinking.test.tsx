@@ -4,11 +4,10 @@ import AiAssistantThinking from "@/components/DataDisplay/AiAssistant/components
 
 describe("<AiAssistantThinking />", () => {
   it("says what the assistant does beside its working avatar", () => {
-    const { container, getByRole, queryByTestId, queryByRole } = render(<AiAssistantThinking label="Thinking…" />);
+    const { getByRole, getByTestId, queryByTestId, queryByRole } = render(<AiAssistantThinking label="Thinking…" />);
 
     expect(getByRole("status")).toHaveTextContent("Thinking…");
-    // The working mark: two satellites, each drawn behind and in front of the ellipse.
-    expect(container.querySelectorAll("circle")).toHaveLength(4);
+    expect(getByTestId("assistantAvatarLight")).toBeInTheDocument();
     expect(queryByTestId("assistantThinkingSteps")).not.toBeInTheDocument();
     expect(queryByRole("button")).not.toBeInTheDocument();
   });

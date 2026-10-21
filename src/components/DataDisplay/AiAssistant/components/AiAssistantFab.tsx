@@ -17,7 +17,7 @@ const PILL_INSET = (AI_ASSISTANT_FAB_HEIGHT - AI_ASSISTANT_AVATAR_SIZE) / 2;
  * The assistant's entry point, a pill in the bottom-right corner: its avatar and a call to ask it.
  * The host app hides it while the panel is open, the panel taking its corner.
  */
-const AiAssistantFab = ({ onClick, label, dataTestId = "assistantFab", ...dataAttributes }: AiAssistantFabProps) => (
+const AiAssistantFab = ({ onClick, label, portrait, dataTestId = "assistantFab", ...dataAttributes }: AiAssistantFabProps) => (
   <Fab
     {...dataAttributes}
     variant="extended"
@@ -44,7 +44,7 @@ const AiAssistantFab = ({ onClick, label, dataTestId = "assistantFab", ...dataAt
       zIndex: (theme) => theme.zIndex.snackbar,
     }}
   >
-    <AiAssistantAvatar variant="brand" />
+    <AiAssistantAvatar variant="brand" portrait={portrait} />
     <Typography variant="body2" fontWeight={500} component="span" noWrap>
       {label}
     </Typography>

@@ -5,8 +5,10 @@ import type { DataAttributes } from "@/types/dataAttributes";
 export interface AiAssistantFabProps extends DataAttributes {
   /** Opens the panel — the host app owns the open state, and hides the Fab while the panel is open */
   onClick: () => void;
-  /** Call to ask the assistant, next to its avatar (e.g. "Ask Soren") */
-  label: string;
+  /** Call to ask the assistant, next to its avatar (e.g. "Ask Soren") — its text names the button */
+  label: ReactNode;
+  /** Replaces the avatar's still portrait, e.g. a video of it */
+  portrait?: ReactNode;
   /** Test hook on the Fab button (defaults to "assistantFab") */
   dataTestId?: string;
 }
@@ -20,9 +22,17 @@ export interface AiAssistantMarkProps {
   isWorking?: boolean;
 }
 
-export interface AiAssistantAvatarProps extends Pick<AiAssistantMarkProps, "isWorking"> {
-  /** "subtle" (default): a grey round, e.g. beside a reply; "brand": the brand gradient with a white mark, e.g. on the Fab */
+export interface AiAssistantAvatarProps {
+  /** "subtle" (default): a grey round, e.g. beside a reply; "brand": the brand's colours cross it now and then, e.g. on the Fab */
   variant?: "subtle" | "brand";
+  /** A light turns around it while the assistant works */
+  isWorking?: boolean;
+  /** Side in px (defaults to AI_ASSISTANT_AVATAR_SIZE) */
+  size?: number;
+  /** A square with soft corners instead of a round, e.g. above a welcome */
+  rounded?: boolean;
+  /** Replaces the still portrait, e.g. a video of it on a transparent background */
+  portrait?: ReactNode;
 }
 
 export interface AiAssistantNudgeProps {
@@ -70,7 +80,7 @@ export interface AiAssistantPanelProps {
 
 export interface AiAssistantHeaderProps {
   /** Product name of the assistant — a brand chosen by the host app */
-  title: string;
+  title: ReactNode;
   /** Small uppercase tag after the title (e.g. "Beta") */
   tag?: string;
   /** Close action of the panel — rendered as the trailing icon button */
@@ -88,7 +98,7 @@ export interface AiAssistantHeaderProps {
 export interface AiAssistantEmptyStateProps {
   /** Question to the user (e.g. "What do you want to do today?") */
   title: string;
-  /** Shown above the title, on the logo's silhouette */
+  /** Shown above the title, e.g. the assistant's avatar */
   icon?: ReactNode;
   /** Rendered under the title — typically AiAssistant.Suggestion entries */
   children?: ReactNode;

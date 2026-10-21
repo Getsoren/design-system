@@ -70,7 +70,10 @@ export const Default: StoryFn = () => {
           <Chat height="100%">
             <Stack flex={1} minHeight={0} padding={2} spacing={3} sx={{ overflowY: "auto" }}>
               {!messages.length && (
-                <AiAssistant.EmptyState title="Que voulez-vous faire aujourd'hui ?" icon={<AiAssistant.Mark size={26} />}>
+                <AiAssistant.EmptyState
+                  title="Que voulez-vous faire aujourd'hui ?"
+                  icon={<AiAssistant.Avatar variant="brand" size={48} rounded />}
+                >
                   {SUGGESTIONS.map((suggestion) => (
                     <AiAssistant.Suggestion key={suggestion} onClick={() => send(suggestion)}>
                       {suggestion}

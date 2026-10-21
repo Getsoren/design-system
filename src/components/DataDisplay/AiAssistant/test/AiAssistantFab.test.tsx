@@ -25,11 +25,29 @@ describe("<AiAssistantFab />", () => {
     expect(getByTestId("customFab")).toBeInTheDocument();
   });
 
-  it("wears the brand avatar, the mark resting in its glow", () => {
-    const { container } = render(<AiAssistantFab onClick={vi.fn()} label="Ask Soren" />);
+  it("wears the brand avatar, its portrait replaceable", () => {
+    const { container, getByTestId, rerender } = render(<AiAssistantFab onClick={vi.fn()} label="Ask Soren" />);
 
     expect(container.querySelector("[data-variant]")).toHaveAttribute("data-variant", "brand");
-    expect(container.querySelectorAll("ellipse")).toHaveLength(2);
-    expect(container.querySelector("circle")).not.toBeInTheDocument();
+    expect(container.querySelector("img")).toBeInTheDocument();
+
+    rerender(<AiAssistantFab onClick={vi.fn()} label="Ask Soren" portrait={<span data-testid="livePortrait" />} />);
+
+    expect(getByTestId("livePortrait")).toBeInTheDocument();
+  });
+
+  it("takes a label with markup, its text still naming the button", () => {
+    const { getByRole } = render(
+      <AiAssistantFab
+        onClick={vi.fn()}
+        label={
+          <span>
+            Ask <strong>Ren</strong>
+          </span>
+        }
+      />,
+    );
+
+    expect(getByRole("button", { name: "Ask Ren" })).toBeInTheDocument();
   });
 });

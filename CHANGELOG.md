@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.91.0](https://github.com/getsoren/design-system/compare/4.90.0...4.91.0) (2026-10-21)
+
+
+### Features
+
+* **AiAssistantAvatar:** reorder props for improved readability in avatar component ([9a7e8a1](https://github.com/getsoren/design-system/commit/9a7e8a1dca6d5aec2c8ec20aba9186d2d5aecb22))
+* **AiAssistant:** integrate translation hooks for dynamic label support in components ([190103e](https://github.com/getsoren/design-system/commit/190103effc6572910c669e23dd00d4ea480b6f88))
+* **AiAssistant:** ren's portrait in the avatar, crossed by the brand's colours on the fab ([649e174](https://github.com/getsoren/design-system/commit/649e1745d2915e225aa149c2e18f24277b4f4f7e))
+* **Chat:** highlighted mic with an optional label, grey outline on focus ([b69b82b](https://github.com/getsoren/design-system/commit/b69b82ba128dd41e8c81b20e4776cb5218f21d3b))
+
 ## [4.90.0](https://github.com/getsoren/design-system/compare/4.89.0...4.90.0) (2026-10-20)
 
 

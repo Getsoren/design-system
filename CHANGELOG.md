@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.91.1](https://github.com/getsoren/design-system/compare/4.91.0...4.91.1) (2026-10-21)
+
+
+### Bug Fixes
+
+* **AppBar:** adjust zIndex for menu positioning above the assistant's floating panel ([c5f0000](https://github.com/getsoren/design-system/commit/c5f000025f44f11038c2787afd4fe37c17f13160))
+
 ## [4.91.0](https://github.com/getsoren/design-system/compare/4.90.0...4.91.0) (2026-10-21)
 
 

@@ -278,6 +278,11 @@ const ApiAutocomplete = <Value extends Record<string | symbol, any>>({
 
   const handleOnChange = useCallback(
     (_: SyntheticEvent, newValue: Value | null, reason: AutocompleteChangeReason) => {
+      // MUI emits an undefined option on Enter when the highlighted index outlives an options refresh
+      if (reason === "selectOption" && !newValue) {
+        return;
+      }
+
       if (Array.isArray(newValue) && newValue.some((item) => item?.isActionOption)) {
         setInputValue("");
         (newValue.some((item) => item?.isActionStartOption) ? actionStartOption : actionEndOption)?.onClick?.();

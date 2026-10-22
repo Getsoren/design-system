@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.91.2](https://github.com/getsoren/design-system/compare/4.91.1...4.91.2) (2026-10-22)
+
+
+### Bug Fixes
+
+* **ApiAutocomplete:** handle undefined option on Enter key press to prevent errors ([563dcdd](https://github.com/getsoren/design-system/commit/563dcdd6cd1ebcce34dc42c6d8bf23741f0ea300))
+
 ## [4.91.1](https://github.com/getsoren/design-system/compare/4.91.0...4.91.1) (2026-10-21)
 
 

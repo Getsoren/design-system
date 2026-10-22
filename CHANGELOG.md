@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.91.3](https://github.com/getsoren/design-system/compare/4.91.2...4.91.3) (2026-10-22)
+
+
+### Bug Fixes
+
+* republish 4.91.2 (tag push failed in CI) ([11c171f](https://github.com/getsoren/design-system/commit/11c171f6b5497ff66d24cb4cf109972cf79a3a78))
+
 ## [4.91.2](https://github.com/getsoren/design-system/compare/4.91.1...4.91.2) (2026-10-22)
 
 

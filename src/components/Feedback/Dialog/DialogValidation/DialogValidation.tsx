@@ -82,10 +82,10 @@ const DialogValidation = ({
   subtitle,
   buttonPrimary,
   buttonSecondary,
+  onClose,
   color = "secondary",
   fullWidth = true,
   maxWidth = "xs",
-  onClose,
   ...props
 }: DialogValidationProps) => (
   <Dialog
@@ -152,6 +152,8 @@ const DialogValidation = ({
             size="small"
             isLoading={buttonPrimary?.loading}
             onClick={buttonPrimary?.onClick}
+            // Next to the secondary action, the primary one is the widest: the way the dialog leads on
+            sx={buttonSecondary ? { flex: 2 } : undefined}
             endIcon={
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7.27875 4.5L6.22125 5.5575L9.65625 9L6.22125 12.4425L7.27875 13.5L11.7788 9L7.27875 4.5Z" fill="currentColor" />

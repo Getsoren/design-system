@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { FormControl, ListItemIcon, MenuItem, Select, Stack, Typography } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import CloseIcon from "@/components/DataDisplay/Icons/CloseIcon";
 import AppBar from "../AppBar";
@@ -49,6 +49,31 @@ WithAvatarMenu.args = {
 
 export const Simple = SimpleTemplate.bind({});
 Simple.args = {};
+
+/** A select inside the avatar menu, as the apps' language switcher: its popover must open above the menu */
+const SelectMenuItem = () => (
+  <MenuItem>
+    <ListItemIcon>
+      <CloseIcon />
+    </ListItemIcon>
+    <Stack direction="row" alignItems="center" justifyContent="space-between" flex={1} spacing={3}>
+      <Typography>Language</Typography>
+      <FormControl sx={{ width: "100%" }}>
+        <Select variant="outlined" size="small" defaultValue="fr" inputProps={{ "data-testid": "story-language-select" }}>
+          <MenuItem value="fr">Français</MenuItem>
+          <MenuItem value="en">English</MenuItem>
+        </Select>
+      </FormControl>
+    </Stack>
+  </MenuItem>
+);
+
+export const WithSelectInAvatarMenu = Template.bind({});
+WithSelectInAvatarMenu.args = {
+  avatarProps: {
+    menuItems: [...menuItems, <SelectMenuItem key="select" />],
+  },
+};
 
 export default {
   component: AppBar,

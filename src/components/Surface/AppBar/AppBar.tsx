@@ -13,10 +13,11 @@ import {
   SxProps,
   TextFieldProps,
   Theme,
+  ThemeProvider,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { cloneElement, isValidElement, MouseEventHandler, PropsWithChildren, ReactNode } from "react";
+import { cloneElement, isValidElement, MouseEvent, MouseEventHandler, PropsWithChildren, ReactNode } from "react";
 import AvatarAppBar from "@/components/DataDisplay/AvatarAppBar/AvatarAppBar";
 import MenuIcon from "@/components/DataDisplay/Icons/MenuIcon";
 import Logo, { LogoProps } from "@/components/DataDisplay/Logo/Logo";
@@ -178,9 +179,14 @@ const AppBar = ({
             backdrop: {
               invisible: false,
             },
-            // Close the menu on any item click (covers custom element children, not just object items).
+            // Close the menu on any item click (covers custom element children, not just object items). A click in a
+            // popover opened from an item (an option of a select) bubbles through its portal: it is not an item click
             list: {
-              onClick: closeMenu,
+              onClick: (event: MouseEvent<HTMLUListElement>) => {
+                if (event.currentTarget.contains(event.target as Node)) {
+                  closeMenu();
+                }
+              },
             },
             paper: {
               sx: {
@@ -189,34 +195,37 @@ const AppBar = ({
             },
           }}
         >
-          {menuItems?.map((item, index) => {
-            // Is React Element then return it
-            if (isValidElement(item)) {
-              if (item.key) {
-                return item;
+          {/* Popovers opened from inside the menu (a Select, a nested Menu) must land above it, not under its backdrop */}
+          <ThemeProvider theme={(theme: Theme) => ({ ...theme, zIndex: { ...theme.zIndex, modal: theme.zIndex.snackbar + 2 } })}>
+            {menuItems?.map((item, index) => {
+              // Is React Element then return it
+              if (isValidElement(item)) {
+                if (item.key) {
+                  return item;
+                }
+
+                const key = `${menuItems}-${index}`;
+                return cloneElement(item, { key }); // Add key to the element
               }
 
-              const key = `${menuItems}-${index}`;
-              return cloneElement(item, { key }); // Add key to the element
-            }
+              // Is Object then return NavLinkItem
+              if (item && typeof item === "object" && "url" in item) {
+                const { url, label, icon, active, end, state } = item;
+                const key = `${url}-${label}-${index}`;
 
-            // Is Object then return NavLinkItem
-            if (item && typeof item === "object" && "url" in item) {
-              const { url, label, icon, active, end, state } = item;
-              const key = `${url}-${label}-${index}`;
+                return (
+                  <MenuItem key={key} sx={styles.menuItem} onClick={closeMenu}>
+                    <NavLinkItem url={url} key={key} component={NavLink} active={active} end={end} state={state}>
+                      {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                      {label && <ListItemText>{label}</ListItemText>}
+                    </NavLinkItem>
+                  </MenuItem>
+                );
+              }
 
-              return (
-                <MenuItem key={key} sx={styles.menuItem} onClick={closeMenu}>
-                  <NavLinkItem url={url} key={key} component={NavLink} active={active} end={end} state={state}>
-                    {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                    {label && <ListItemText>{label}</ListItemText>}
-                  </NavLinkItem>
-                </MenuItem>
-              );
-            }
-
-            return null;
-          })}
+              return null;
+            })}
+          </ThemeProvider>
         </Menu>
       )}
     </>

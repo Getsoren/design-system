@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.91.5](https://github.com/getsoren/design-system/compare/4.91.4...4.91.5) (2026-10-28)
+
+
+### Bug Fixes
+
+* **DialogValidation:** adjust button styles for improved layout and consistency ([5195072](https://github.com/getsoren/design-system/commit/5195072d8d5b4c6d76d08e59cad490970112b668))
+
 ## [4.91.4](https://github.com/getsoren/design-system/compare/4.91.3...4.91.4) (2026-10-27)
 
 

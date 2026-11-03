@@ -48,6 +48,8 @@ export interface BookingTimelineEvent {
   icon?: ReactNode;
   /** Renders the flag status node — green when closed, orange when open — with its tooltip. */
   status?: "open" | "closed";
+  /** Tooltip of the status node for this event, in place of the timeline's open / closed labels (e.g. "Awaiting Kiloutou's validation"). */
+  statusLabel?: string;
   /** Right-aligned formatted date (e.g. "5 juin"). */
   date?: string;
   /** Declarant avatar, next to the date. */

@@ -66,7 +66,7 @@ interface TimelineEventProps {
 
 /** Event row: status / icon node on the rail + one-line card (name, photos, avatar, date, chevron). */
 const TimelineEvent = ({ event, labels }: TimelineEventProps) => {
-  const statusLabel = event.status === "closed" ? labels.closed : labels.open;
+  const statusLabel = event.statusLabel ?? (event.status === "closed" ? labels.closed : labels.open);
 
   const row = (
     <Stack direction="row" alignItems="flex-start" spacing={1} sx={{ width: "100%" }}>

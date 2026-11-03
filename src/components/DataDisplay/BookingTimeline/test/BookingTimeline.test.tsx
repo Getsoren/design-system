@@ -54,6 +54,14 @@ describe("Test <BookingTimeline/>", () => {
     expect(queryByLabelText("Open")).not.toBeInTheDocument();
   });
 
+  it("prefers an event's own `statusLabel` over the timeline's labels", () => {
+    const { getByLabelText, queryByLabelText } = render(
+      <BookingTimeline events={[event({ status: "open", statusLabel: "Awaiting Kiloutou's validation" })]} labels={{ open: "Ouvert" }} />,
+    );
+    expect(getByLabelText("Awaiting Kiloutou's validation")).toBeInTheDocument();
+    expect(queryByLabelText("Ouvert")).not.toBeInTheDocument();
+  });
+
   it("calls `onClick` when clicking an event row", () => {
     const onClick = vi.fn();
     const { getByText } = render(<BookingTimeline events={[event({ onClick })]} />);

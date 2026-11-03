@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.92.0](https://github.com/getsoren/design-system/compare/4.91.6...4.92.0) (2026-11-03)
+
+
+### Features
+
+* **TimelineEvent:** prefer event's own statusLabel over default labels ([527eee5](https://github.com/getsoren/design-system/commit/527eee551e79823e0eb525be248347840005eb12))
+
 ## [4.91.6](https://github.com/getsoren/design-system/compare/4.91.5...4.91.6) (2026-10-28)
 
 

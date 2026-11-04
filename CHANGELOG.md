@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.92.1](https://github.com/getsoren/design-system/compare/4.92.0...4.92.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* **button:** tighten icon spacing on the link variant ([eda91d2](https://github.com/getsoren/design-system/commit/eda91d276ae5c51bfe82e0fd93509df50cbf6492))
+
 ## [4.92.0](https://github.com/getsoren/design-system/compare/4.91.6...4.92.0) (2026-11-03)
 
 

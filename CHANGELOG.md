@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.93.0](https://github.com/getsoren/design-system/compare/4.92.2...4.93.0) (2026-11-04)
+
+
+### Features
+
+* **Card:** add callout variant with specific styles and background color ([5914ea3](https://github.com/getsoren/design-system/commit/5914ea365096a96deaaa667322ef32f241a55d4e))
+
 ## [4.92.2](https://github.com/getsoren/design-system/compare/4.92.1...4.92.2) (2026-11-04)
 
 ## [4.92.1](https://github.com/getsoren/design-system/compare/4.92.0...4.92.1) (2026-11-04)

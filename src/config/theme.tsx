@@ -531,6 +531,11 @@ const commonThemeOptions: MuiThemeOptions = {
                 : theme.palette?.[ownerState?.color || "primary"]?.main;
 
             return {
+              // An inline link has no padding, so MUI's button icon margins (8px gap, -4px outer bleed)
+              // push the icon too far from the words: the icon sits 4px off the text, sized to it.
+              "& .MuiButton-endIcon": { marginLeft: 4, marginRight: 0 },
+              "& .MuiButton-startIcon": { marginLeft: 0, marginRight: 4 },
+              "& .MuiButton-startIcon > *:nth-of-type(1), & .MuiButton-endIcon > *:nth-of-type(1)": { fontSize: "1.25em" },
               "&:hover": {
                 backgroundColor: "transparent",
                 textDecoration: "underline",

@@ -129,6 +129,14 @@ declare module "@mui/material/Typography" {
   }
 }
 
+// Card variants (a Card takes the Paper's variants)
+declare module "@mui/material/Paper" {
+  interface PaperPropsVariantOverrides {
+    /** On sand, with a faint ring and a short shadow in place of the outline: a call to do something, not one more card */
+    callout: true;
+  }
+}
+
 // Shape module augmentation
 declare module "@mui/system" {
   interface Shape {
@@ -176,6 +184,8 @@ declare module "@mui/material/styles" {
 
   interface TypeBackground {
     dark: string;
+    /** A warm surface for a thing to do on the page, told apart from the white cards */
+    sand: string;
   }
 
   interface TypeText {
@@ -783,6 +793,33 @@ const commonThemeOptions: MuiThemeOptions = {
 
             return {
               backgroundImage: `linear-gradient(${backgroundImageColor}, ${backgroundImageColor})`,
+            };
+          },
+        },
+        {
+          props: {
+            variant: "callout",
+          },
+          // The edge drawn close enough to the outline of the other cards, light enough to stay a shadow: a faint
+          // ring, a short shadow, then a soft one. In the dark theme a shadow is lost on the page: the ring alone
+          style: ({ theme }) => {
+            const isDark = theme.palette.mode === "dark";
+            const ring = (opacity: number) =>
+              `0 0 0 1px ${alpha(isDark ? theme.palette.common.white : theme.palette.common.black, opacity)}`;
+            const shadow = isDark
+              ? ring(0.08)
+              : `${ring(0.04)}, 0 1px 3px ${alpha(theme.palette.common.black, 0.1)}, 0 4px 12px ${alpha(theme.palette.common.black, 0.05)}`;
+            const hoverShadow = isDark
+              ? ring(0.16)
+              : `${ring(0.06)}, 0 2px 6px ${alpha(theme.palette.common.black, 0.12)}, 0 8px 20px ${alpha(theme.palette.common.black, 0.08)}`;
+
+            return {
+              // A call to act: it lifts a little under the pointer
+              "&:hover": { boxShadow: hoverShadow },
+              backgroundColor: theme.palette.background.sand,
+              border: "none",
+              boxShadow: shadow,
+              transition: "box-shadow 0.2s ease-in-out",
             };
           },
         },

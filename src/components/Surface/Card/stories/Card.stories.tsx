@@ -234,6 +234,11 @@ Elevation.args = {
   variant: "elevation",
 };
 
+export const Callout = Template.bind({});
+Callout.args = {
+  variant: "callout",
+};
+
 export const Media = TemplateMedia.bind({});
 Media.args = {};
 

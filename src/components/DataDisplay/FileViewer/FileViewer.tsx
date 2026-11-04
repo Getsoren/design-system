@@ -34,7 +34,7 @@ const FileViewer = ({
   onClose,
   onClickThumb,
   variant,
-  iconOnly = false,
+  iconOnly: iconOnlyProp = false,
   height = 152,
   width = 220,
 }: FileViewerPros) => {
@@ -51,6 +51,11 @@ const FileViewer = ({
   const lowercaseSrc = src?.toLowerCase();
   const isImage = !(lowercaseSrc?.endsWith(".pdf") || lowercaseSrc?.startsWith("blob:") || lowercaseSrc?.endsWith(".eml"));
   const isPdf = lowercaseSrc?.endsWith(".pdf");
+  // A PDF thumbnail is an iframe of the whole file: when the browser has no PDF viewer (Chrome set to
+  // download PDFs, or the AlwaysOpenPdfExternally enterprise policy), every such iframe downloads the
+  // file as soon as it mounts. The icon is shown instead. Browsers too old to expose the flag keep the iframe.
+  const isPdfViewerDisabled = typeof navigator !== "undefined" && "pdfViewerEnabled" in navigator && !navigator.pdfViewerEnabled;
+  const iconOnly = iconOnlyProp || (!!isPdf && isPdfViewerDisabled);
   const isThumbnailReady = disableThumb ? true : !isLoading;
   const isDocument = isDocumentType(src) || isDocumentType(srcThumb);
   const isPdfOnFirefox = isPdf && isFirefox;
@@ -105,8 +110,7 @@ const FileViewer = ({
             sx={{
               ":hover": { opacity },
               alignSelf: "center",
-              backgroundColor: ({ palette }: Theme) => palette.background.paper,
-              bgcolor: iconOnly ? "transparent" : undefined,
+              backgroundColor: iconOnly ? "transparent" : ({ palette }: Theme) => palette.background.paper,
               borderRadius: variant === "rounded" ? 1 : "0",
               boxShadow: iconOnly ? "none" : undefined,
               cursor: disableLightbox ? "default" : "pointer",

@@ -12,6 +12,8 @@ const light = {
       dark: "#121212",
       default: "#F9F9F9",
       paper: "#ffffff",
+      // The sand of the landing pages: a warm surface for a thing to do, told apart from the white cards
+      sand: "#F7F5EF",
     },
     border: {
       outline: "rgba(0, 0, 0, 0.23)",
@@ -147,6 +149,8 @@ const dark = {
       dark: "#121212",
       default: "#232323",
       paper: "#121212",
+      // The same warmth a shade above the page, so the text on it keeps its contrast
+      sand: "#2A2823",
     },
     border: {
       outline: "rgba(255, 255, 255, 0.23)",

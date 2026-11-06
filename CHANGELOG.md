@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.94.0](https://github.com/getsoren/design-system/compare/4.93.0...4.94.0) (2026-11-06)
+
+
+### Features
+
+* **LogoAvatar, CheckboxCard:** add tile layout support and corresponding tests ([a5f87f7](https://github.com/getsoren/design-system/commit/a5f87f7b297a5081bbaf2b6503a02a8e8474f47f))
+
 ## [4.93.0](https://github.com/getsoren/design-system/compare/4.92.2...4.93.0) (2026-11-04)
 
 

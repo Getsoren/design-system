@@ -32,6 +32,15 @@ CustomSize.args = {
   size: 72,
 };
 
+/** The corners shrink with the logo, up to the theme's radius */
+export const Sizes: StoryFn<typeof LogoAvatar> = () => (
+  <Stack direction="row" spacing={2} height="100%" alignItems="center" justifyContent="center">
+    {[20, 24, 32, 40, 72].map((size) => (
+      <LogoAvatar key={size} size={size} src="https://placehold.co/144x144?text=S" alt="Soren" />
+    ))}
+  </Stack>
+);
+
 export default {
   component: LogoAvatar,
   title: "Components/Data Display/LogoAvatar",

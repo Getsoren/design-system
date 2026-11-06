@@ -1,10 +1,9 @@
 import { Box, ButtonBase, Skeleton, Stack, type SxProps, type Theme, Typography } from "@mui/material";
 import type { ReactNode } from "react";
 import CheckIcon from "@/components/DataDisplay/Icons/CheckIcon";
-import { getSoftOutlineColor } from "@/utils/colors";
 
 export interface CheckboxCardProps {
-  /** Main line — one line in a horizontal card, up to three in a vertical one */
+  /** Main line — one line in a horizontal card, up to three in a vertical one or a tile */
   label: string;
   /** Secondary line under the label — one line, ellipsized */
   description?: string;
@@ -14,12 +13,15 @@ export interface CheckboxCardProps {
   leading?: ReactNode;
   /** Content after the texts of a horizontal card (an icon) */
   trailing?: ReactNode;
-  /** Picture: above the texts of a vertical card, after them in a 56×48 box of a horizontal one */
+  /** Picture: above the texts of a vertical card, after them in a 56×48 box of a horizontal one, as is at the top of a tile */
   picture?: ReactNode;
-  /** Shows a skeleton over the picture box */
+  /** Shows a skeleton over the picture box, or in place of the picture of a tile */
   isPictureLoading?: boolean;
-  /** `horizontal`: texts in a row; `vertical`: picture on top, for a catalog */
-  layout?: "horizontal" | "vertical";
+  /**
+   * `horizontal`: texts in a row; `vertical`: picture on top, for a catalog; `tile`: the picture at the top, the
+   * label at the bottom, for a grid of a few big choices
+   */
+  layout?: "horizontal" | "vertical" | "tile";
   /** Selection indicator; `none` for a plain choice. The group logic (single or multi select) belongs to the consumer */
   control?: "checkbox" | "radio" | "none";
   /** `end`: a check (or a dot) fading in after the texts; `start`: a circled indicator before them */
@@ -29,6 +31,9 @@ export interface CheckboxCardProps {
   onClick: () => void;
   testId?: string;
 }
+
+/** Side of the skeleton standing for a tile's picture */
+const TILE_PICTURE_SIZE = 56;
 
 const PICTURE_BOX_SX: SxProps<Theme> = {
   alignItems: "center",
@@ -59,6 +64,7 @@ const CheckboxCard = ({
   testId,
 }: CheckboxCardProps) => {
   const isVertical = layout === "vertical";
+  const isTile = layout === "tile";
   const hasPicture = !!picture || !!isPictureLoading;
 
   /** Before the texts: a circle, filled with a check or a dot once selected */
@@ -135,7 +141,18 @@ const CheckboxCard = ({
     </Box>
   );
 
-  const texts = isVertical ? (
+  const texts = isTile ? (
+    <Stack spacing={0.25} flex={1} minWidth={0}>
+      <Typography fontWeight={500} sx={{ display: "-webkit-box", overflow: "hidden", WebkitBoxOrient: "vertical", WebkitLineClamp: 3 }}>
+        {label}
+      </Typography>
+      {description && (
+        <Typography variant="body2" color="text.secondary" noWrap>
+          {description}
+        </Typography>
+      )}
+    </Stack>
+  ) : isVertical ? (
     <Stack spacing={0.25} minWidth={0} flex={1}>
       <Typography
         variant="body2"
@@ -164,7 +181,19 @@ const CheckboxCard = ({
     </Stack>
   );
 
-  const content = isVertical ? (
+  const tilePicture = isPictureLoading ? <Skeleton variant="rounded" width={TILE_PICTURE_SIZE} height={TILE_PICTURE_SIZE} /> : picture;
+
+  const content = isTile ? (
+    // The pictures of a row of tiles line up at the top, their labels at the bottom
+    <Stack spacing={1.5} alignItems="flex-start" justifyContent="space-between" sx={{ height: "100%", padding: 2, width: "100%" }}>
+      {tilePicture}
+      <Stack direction="row" spacing={1.25} alignItems="flex-end" sx={{ width: "100%" }}>
+        {startIndicator}
+        {texts}
+        {endIndicator}
+      </Stack>
+    </Stack>
+  ) : isVertical ? (
     <Stack sx={{ height: "100%", width: "100%" }}>
       {pictureBox({ aspectRatio: "16 / 9", padding: 2, width: "100%" })}
       <Stack direction="row" spacing={1.25} alignItems="flex-start" sx={{ flex: 1, paddingBottom: 1.5, paddingX: 2 }}>
@@ -195,18 +224,19 @@ const CheckboxCard = ({
       aria-checked={control === "none" ? undefined : selected}
       aria-pressed={control === "none" ? selected : undefined}
       sx={(theme) => ({
-        "&:hover": { borderColor: theme.palette.text.primary },
+        // Hovered or focused with the keyboard, the card greys like a clickable Card, and keeps its outline
+        "&:hover, &.Mui-focusVisible": { backgroundColor: theme.palette.action.hover },
         alignItems: "stretch",
         backgroundColor: selected ? theme.palette.action.hover : theme.palette.background.paper,
-        // At rest, a lighter grey than a field's outline: a grid of cards reads as content, not as a form
-        border: `1px solid ${selected ? theme.palette.text.primary : getSoftOutlineColor(theme.palette)}`,
+        // At rest, the outline of a Card rather than a field's: a grid of cards reads as content, not as a form
+        border: `1px solid ${selected ? theme.palette.text.primary : theme.palette.divider}`,
         borderRadius: `${theme.shape.borderRadiusL}px`,
         // A second line inside the border reads as the 2px border of a selection, without moving the content
         boxShadow: selected ? `inset 0 0 0 1px ${theme.palette.text.primary}` : "none",
         display: "flex",
         flexDirection: "column",
-        // Vertical cards fill their grid cell, so a row of them shares one height
-        height: isVertical ? "100%" : undefined,
+        // Vertical cards and tiles fill their grid cell, so a row of them shares one height
+        height: isVertical || isTile ? "100%" : undefined,
         opacity: disabled ? 0.5 : 1,
         overflow: "hidden",
         textAlign: "left",

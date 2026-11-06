@@ -33,4 +33,30 @@ describe("Test <CheckboxCard/>", () => {
     expect(getByText("12 Rue de la Paix")).toBeInTheDocument();
     expect(getByTestId("card")).toBeInTheDocument();
   });
+
+  it("lays a tile out as its picture then its label, a pressed button without a control", () => {
+    const { getByRole, getByTestId, getByText } = render(
+      <CheckboxCard
+        layout="tile"
+        control="none"
+        picture={<span data-testid="picture" />}
+        label="Livraison"
+        selected={false}
+        onClick={() => undefined}
+      />,
+    );
+    const picture = getByTestId("picture");
+
+    expect(getByRole("button", { name: "Livraison" })).toHaveAttribute("aria-pressed", "false");
+    // The label follows the picture
+    expect(picture.compareDocumentPosition(getByText("Livraison")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("stands a skeleton for the picture of a loading tile", () => {
+    const { container } = render(
+      <CheckboxCard layout="tile" isPictureLoading label="Livraison" selected={false} onClick={() => undefined} />,
+    );
+
+    expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
+  });
 });

@@ -1,4 +1,4 @@
-import { Grid, Stack } from "@mui/material";
+import { Box, Grid, Stack } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import { ReactNode, useState } from "react";
 import ChatBubbleIcon from "@/components/DataDisplay/Icons/ChatBubbleIcon";
@@ -146,6 +146,35 @@ export const Catalog: StoryFn<typeof CheckboxCard> = () => {
         </Grid>
       ))}
     </Grid>
+  );
+};
+
+const TILES = [
+  { hue: 30, id: "delivery", label: "Livraison et reprise" },
+  { hue: 120, id: "stoppage", label: "Arrêt de la machine" },
+  { hue: 210, id: "documents", label: "Documents" },
+  { hue: 300, id: "other", label: "Autre événement" },
+];
+
+/** Tiles: a few big choices, the pictures lined up at the top and the labels at the bottom, one of them loading */
+export const Tiles: StoryFn<typeof CheckboxCard> = () => {
+  const [selected, setSelected] = useState("stoppage");
+
+  return (
+    <Box display="grid" gap={1.5} gridTemplateColumns="repeat(3, 1fr)" gridAutoRows="minmax(112px, auto)" maxWidth={560} marginX="auto">
+      {TILES.map((tile, index) => (
+        <CheckboxCard
+          key={tile.id}
+          layout="tile"
+          control="none"
+          picture={<div style={{ background: `hsl(${tile.hue} 60% 70%)`, borderRadius: 8, height: 56, width: 56 }} />}
+          isPictureLoading={index === TILES.length - 1}
+          label={tile.label}
+          selected={selected === tile.id}
+          onClick={() => setSelected(tile.id)}
+        />
+      ))}
+    </Box>
   );
 };
 

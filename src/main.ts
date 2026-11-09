@@ -38,6 +38,8 @@ export * from "@/components/DataDisplay/EventFlag/EventFlag";
 export { default as EventFlag } from "@/components/DataDisplay/EventFlag/EventFlag";
 export * from "@/components/DataDisplay/FileViewer/FileViewer";
 export { default as FileViewer } from "@/components/DataDisplay/FileViewer/FileViewer";
+export * from "@/components/DataDisplay/InfoLine/InfoLine";
+export { default as InfoLine } from "@/components/DataDisplay/InfoLine/InfoLine";
 export * from "@/components/DataDisplay/Kanban/Kanban";
 export { default as Kanban } from "@/components/DataDisplay/Kanban/Kanban";
 export * from "@/components/DataDisplay/ListAvatar/ListAvatar";

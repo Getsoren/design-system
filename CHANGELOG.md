@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.95.0](https://github.com/getsoren/design-system/compare/4.94.0...4.95.0) (2026-11-09)
+
+
+### Features
+
+* **InfoLine:** add InfoLine component with icon support and storybook examples ([6815927](https://github.com/getsoren/design-system/commit/6815927c2d8f16fec9b179e34c6ccfa11504ceb8))
+
 ## [4.94.0](https://github.com/getsoren/design-system/compare/4.93.0...4.94.0) (2026-11-06)
 
 

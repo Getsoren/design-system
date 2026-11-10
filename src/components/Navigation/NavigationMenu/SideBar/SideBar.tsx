@@ -68,6 +68,17 @@ const buildStyles = (tokens: NavigationDensityTokens) => ({
     flexDirection: "column",
     height: "100%",
   },
+  // A highlighted link stands on a card: white on the side bar's grey, a soft rule and the lightest shadow around it
+  highlightedBottomLink: {
+    "& > a, & > div": {
+      "&:hover": {
+        background: ({ palette }: Theme) => palette.grey[50],
+      },
+      background: ({ palette }: Theme) => palette.background.paper,
+      borderColor: "divider",
+      boxShadow: 1,
+    },
+  },
   iconWrapper: {
     alignItems: "center",
     display: "flex",
@@ -110,7 +121,7 @@ const BottomNavLink = ({
   isCollapsed: boolean;
   sx: ReturnType<typeof buildStyles>;
 }) => (
-  <Box sx={sx?.bottomLink}>
+  <Box sx={[sx.bottomLink, !!link.highlighted && sx.highlightedBottomLink]}>
     <NavLinkItem component={NavLink} {...link}>
       <Tooltip title={isCollapsed ? link?.label : ""} placement="right">
         <Stack alignItems="center" spacing={1} direction="row">

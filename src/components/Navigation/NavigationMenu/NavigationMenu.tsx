@@ -144,6 +144,12 @@ export interface BottomLinkProps {
    */
   hidden?: boolean;
   /**
+   * On a card of its own, apart from the other links: an action the side bar offers rather than a page (sending a
+   * document, say)
+   * @default false
+   */
+  highlighted?: boolean;
+  /**
    * Disable the link
    */
   disabled?: boolean;

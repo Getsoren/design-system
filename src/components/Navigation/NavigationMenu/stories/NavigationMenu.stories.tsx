@@ -1,5 +1,6 @@
 import { Alert, Box, SvgIcon, TextField, Typography } from "@mui/material";
 import type { Meta, StoryFn } from "@storybook/react-vite";
+import { AI_ASSISTANT_GLOW_COLORS } from "@/components/DataDisplay/AiAssistant/constants";
 import Logo from "@/components/DataDisplay/Logo/Logo";
 import NavigationMenu from "./NavigationMenu";
 
@@ -255,6 +256,46 @@ WithBottomLinkMenu.args = {
     label: "Settings",
     url: "#",
   },
+  items: ITEMS,
+};
+
+/**
+ * An upload arrow stroked with the assistant's gradient: an action the assistant carries out
+ */
+const AssistantUploadIcon = () => (
+  <SvgIcon viewBox="0 0 20 20" sx={{ fontSize: 20 }}>
+    <defs>
+      <linearGradient id="story-assistant-upload" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor={AI_ASSISTANT_GLOW_COLORS[0]} />
+        <stop offset="100%" stopColor={AI_ASSISTANT_GLOW_COLORS[3]} />
+      </linearGradient>
+    </defs>
+    <path
+      d="M10 12.5V2.5M6.667 5.833 10 2.5l3.333 3.333M3.333 11.667v2.5c0 1.167 0 1.75.227 2.196.2.392.519.71.911.91.446.227 1.029.227 2.196.227h6.666c1.167 0 1.75 0 2.196-.227.392-.2.711-.518.911-.91.227-.446.227-1.029.227-2.196v-2.5"
+      stroke="url(#story-assistant-upload)"
+      strokeWidth="1.66667"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </SvgIcon>
+);
+
+export const WithHighlightedBottomLink = Template.bind({});
+WithHighlightedBottomLink.args = {
+  bottomLink: [
+    {
+      highlighted: true,
+      icon: <AssistantUploadIcon />,
+      label: "Send a document",
+      onClick: () => undefined,
+    },
+    {
+      icon: "⚙️",
+      label: "Settings",
+      url: "#",
+    },
+  ],
   items: ITEMS,
 };
 

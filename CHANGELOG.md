@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.96.0](https://github.com/getsoren/design-system/compare/4.95.0...4.96.0) (2026-11-10)
+
+
+### Features
+
+* **NavigationMenu:** add highlighted bottom link support with custom icon ([1c0df28](https://github.com/getsoren/design-system/commit/1c0df28a7dda624472abd86627744b0a680c8e25))
+
 ## [4.95.0](https://github.com/getsoren/design-system/compare/4.94.0...4.95.0) (2026-11-09)
 
 

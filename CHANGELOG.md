@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.97.0](https://github.com/getsoren/design-system/compare/4.96.0...4.97.0) (2026-11-11)
+
+
+### Features
+
+* **Button:** add xLarge size variant for dashed buttons with corresponding styles ([c89d932](https://github.com/getsoren/design-system/commit/c89d93236b9295edc8d490949984a028d563e625))
+
 ## [4.96.0](https://github.com/getsoren/design-system/compare/4.95.0...4.96.0) (2026-11-10)
 
 

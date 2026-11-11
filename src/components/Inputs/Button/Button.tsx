@@ -21,6 +21,8 @@ const ICON_LOADING_SIZE = {
   large: 17,
   medium: 16,
   small: 15,
+  // The dashed variants' size at the height of a small button, its loader as its large size's
+  xLarge: 17,
   xSmall: 14,
 };
 

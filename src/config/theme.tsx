@@ -55,6 +55,10 @@ declare module "@mui/material/Button" {
   }
   interface ButtonPropsSizeOverrides {
     xSmall: true;
+    /**
+     * Dashed variants only: the height of a regular small button, to stand beside one.
+     */
+    xLarge: true;
   }
   interface ButtonPropsVariantOverrides {
     dashed: true;
@@ -706,6 +710,16 @@ const commonThemeOptions: MuiThemeOptions = {
           }),
         },
         // Dashed sizes
+        // At the height of a regular small button, to stand beside one
+        {
+          props: { size: "xLarge", variant: "dashed" },
+          style: ({ theme }) => ({
+            ...theme.typography.body2,
+            "& .MuiButton-startIcon > *:nth-of-type(1), & .MuiButton-endIcon > *:nth-of-type(1)": { fontSize: 20 },
+            height: 40,
+            minHeight: 40,
+          }),
+        },
         {
           props: { size: "large", variant: "dashed" },
           style: ({ theme }) => ({
@@ -734,6 +748,16 @@ const commonThemeOptions: MuiThemeOptions = {
           }),
         },
         // Dashed-rounded sizes
+        // At the height of a regular small button, to stand beside one
+        {
+          props: { size: "xLarge", variant: "dashed-rounded" },
+          style: ({ theme }) => ({
+            ...theme.typography.body2,
+            "& .MuiButton-startIcon > *:nth-of-type(1), & .MuiButton-endIcon > *:nth-of-type(1)": { fontSize: 20 },
+            height: 40,
+            minHeight: 40,
+          }),
+        },
         {
           props: { size: "large", variant: "dashed-rounded" },
           style: ({ theme }) => ({

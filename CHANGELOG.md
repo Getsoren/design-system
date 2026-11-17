@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.98.0](https://github.com/getsoren/design-system/compare/4.97.0...4.98.0) (2026-11-17)
+
+
+### Features
+
+* **Tile:** add Tile component with various variants and corresponding tests ([2d5b87f](https://github.com/getsoren/design-system/commit/2d5b87f955333d7a56af89ea05293831eed1138d))
+
 ## [4.97.0](https://github.com/getsoren/design-system/compare/4.96.0...4.97.0) (2026-11-11)
 
 

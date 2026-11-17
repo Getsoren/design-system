@@ -1,0 +1,1 @@
+import{i as e}from"./preload-helper-xPQekRTU.js";var t,n,r,i,a=e((()=>{t=`0 4px 24px rgba(0, 0, 0, 0.06)`,n=`0 4px 16px rgba(0, 0, 0, 0.1)`,r=`0 6px 24px rgba(0, 0, 0, 0.14)`,i=[`#FF5A1F`,`#FFB547`,`#FFC4A3`,`#FF7EB3`]}));export{a,i,r as n,n as r,t};

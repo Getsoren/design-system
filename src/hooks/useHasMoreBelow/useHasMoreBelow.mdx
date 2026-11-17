@@ -1,0 +1,33 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Hooks/useHasMoreBelow"/>
+
+# `useHasMoreBelow`
+
+Tells whether more content lies below the fold of a vertically scrollable container. It is measured
+when the container mounts, then again whenever the container or its content resizes and on every
+scroll. Hang a fade or a "see more" arrow on it.
+
+The hook reads the container once it is mounted: when the container is replaced (another step,
+another document), mount the component that calls the hook with a `key`.
+
+###  Usage
+
+```typescript jsx
+import { Box, useHasMoreBelow } from "@getsoren/design-system";
+import { useRef } from "react";
+
+const App = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hasMoreBelow = useHasMoreBelow(containerRef);
+
+  return (
+    <Box sx={{ position: "relative" }}>
+      <Box ref={containerRef} sx={{ maxHeight: 320, overflowY: "auto" }}>
+        {/* tall content */}
+      </Box>
+      {hasMoreBelow && <Box aria-hidden sx={{ bottom: 0, height: 56, left: 0, pointerEvents: "none", position: "absolute", right: 0 }} />}
+    </Box>
+  );
+};
+```

@@ -74,6 +74,7 @@ declare module "@mui/material/Chip" {
     rounded: true;
   }
   interface ChipPropsSizeOverrides {
+    tiny: true;
     xSmall: true;
     large: true;
   }
@@ -1017,6 +1018,27 @@ const commonThemeOptions: MuiThemeOptions = {
               paddingRight: 8,
             },
             height: 20,
+          }),
+        },
+        {
+          // A tag beside a title ("Beta", "New"): uppercase reads larger, hence a font size below xSmall
+          props: { size: "tiny" },
+          style: ({ theme }) => ({
+            "& .MuiChip-deleteIcon": {
+              fontSize: theme.typography.pxToRem(12),
+            },
+            "& .MuiChip-icon": {
+              fontSize: theme.typography.pxToRem(12),
+            },
+            "& .MuiChip-label": {
+              fontSize: theme.typography.pxToRem(10),
+              letterSpacing: "0.06em",
+              paddingLeft: 6,
+              paddingRight: 6,
+            },
+            fontWeight: 500,
+            height: 18,
+            textTransform: "uppercase",
           }),
         },
       ],

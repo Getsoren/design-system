@@ -19,22 +19,7 @@ const AiAssistantHeader = ({ title, tag, onClose, docked = false, onToggleDocked
         <Typography variant="subtitle1" fontWeight={500}>
           {title}
         </Typography>
-        {tag && (
-          <Chip
-            label={tag}
-            size="xSmall"
-            variant="rounded"
-            // Uppercase reads larger, hence a font size below xSmall.
-            sx={{
-              "& .MuiChip-label": { fontSize: ({ typography }) => typography.pxToRem(10), paddingX: 0.75 },
-              fontWeight: 500,
-              height: 18,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-            }}
-            data-testid="assistantHeaderTag"
-          />
-        )}
+        {tag && <Chip label={tag} size="tiny" variant="rounded" data-testid="assistantHeaderTag" />}
       </Stack>
       <Stack direction="row" alignItems="center" spacing={1}>
         {onNewConversation && (

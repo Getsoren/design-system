@@ -12,6 +12,7 @@ const AddIcon = (
 
 const Template: StoryFn<typeof Chip> = (args) => (
   <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
+    <Chip size="tiny" label="tiny" {...args} />
     <Chip size="xSmall" label="xSmall" {...args} />
     <Chip size="small" label="small" {...args} />
     <Chip size="medium" label="medium" {...args} />

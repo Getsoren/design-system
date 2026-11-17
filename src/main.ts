@@ -59,6 +59,8 @@ export * from "@/components/DataDisplay/RatingBadge/RatingBadge";
 export { default as RatingBadge } from "@/components/DataDisplay/RatingBadge/RatingBadge";
 export * from "@/components/DataDisplay/StatusIcon/StatusIcon";
 export { default as StatusIcon } from "@/components/DataDisplay/StatusIcon/StatusIcon";
+export * from "@/components/DataDisplay/Tile/Tile";
+export { default as Tile } from "@/components/DataDisplay/Tile/Tile";
 export * from "@/components/DataDisplay/TimeLine/TimeLine";
 export { default as TimeLine } from "@/components/DataDisplay/TimeLine/TimeLine";
 export * from "@/components/DataDisplay/TypographySkeleton/TypographySkeleton";
@@ -79,6 +81,8 @@ export * from "@/components/Feedback/ErrorState/ErrorState";
 export { default as ErrorState } from "@/components/Feedback/ErrorState/ErrorState";
 export * from "@/components/Feedback/Lightbox/Lightbox";
 export { default as Lightbox } from "@/components/Feedback/Lightbox/Lightbox";
+export * from "@/components/Feedback/Notice/Notice";
+export { default as Notice } from "@/components/Feedback/Notice/Notice";
 
 // Inputs
 export * from "@/components/Inputs/ActionAppBar/ActionAppBar";
@@ -99,6 +103,10 @@ export * from "@/components/Inputs/Counter/Counter";
 export { default as Counter } from "@/components/Inputs/Counter/Counter";
 export * from "@/components/Inputs/CountryAutocomplete/CountryAutocomplete";
 export { default as CountryAutocomplete } from "@/components/Inputs/CountryAutocomplete/CountryAutocomplete";
+export * from "@/components/Inputs/DecimalField/DecimalField";
+export { default as DecimalField } from "@/components/Inputs/DecimalField/DecimalField";
+export * from "@/components/Inputs/DropZone/DropZone";
+export { default as DropZone } from "@/components/Inputs/DropZone/DropZone";
 export * from "@/components/Inputs/File/File";
 export { default as File } from "@/components/Inputs/File/File";
 export * from "@/components/Inputs/PillGroup/PillGroup";
@@ -159,6 +167,7 @@ export type { ThemeProviderProps } from "@/context/Theme/ThemeProvider";
 export { default as ThemeProvider } from "@/context/Theme/ThemeProvider";
 
 // Hooks
+export { default as useHasMoreBelow } from "@/hooks/useHasMoreBelow/useHasMoreBelow";
 export * from "@/hooks/useMenu/useMenu";
 export { default as useMenu } from "@/hooks/useMenu/useMenu";
 export * from "@/hooks/usePermission/usePermission";
@@ -175,6 +184,7 @@ export type { DataAttributes } from "@/types/dataAttributes";
 
 // Utility functions
 export * from "@/utils/colors";
+export * from "@/utils/decimalInput";
 export * from "@/utils/getBackgroundImageElevation";
 export { default as getBackgroundImageElevation } from "@/utils/getBackgroundImageElevation";
 export { default as isoToEmojiFlag } from "@/utils/isoToEmojiFlag";

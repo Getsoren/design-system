@@ -215,7 +215,8 @@ const ListAvatarItemRow = ({
 
   const resolvedSecondaryAction =
     persistentSecondaryAction && secondaryAction ? (
-      <Stack direction="row" alignItems="center">
+      // A step between the hover action and the persistent one, so that the last button does not touch its text
+      <Stack direction="row" alignItems="center" spacing={1}>
         <Box className="ListAvatar-hoverAction">{secondaryAction}</Box>
         {persistentSecondaryAction}
       </Stack>

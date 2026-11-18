@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.99.0](https://github.com/getsoren/design-system/compare/4.98.0...4.99.0) (2026-11-18)
+
+
+### Features
+
+* **ListAvatar:** add spacing between hover action and persistent action buttons ([453f7c1](https://github.com/getsoren/design-system/commit/453f7c1920ee0c759e2d110af3165263c7b9a71d))
+
 ## [4.98.0](https://github.com/getsoren/design-system/compare/4.97.0...4.98.0) (2026-11-17)
 
 

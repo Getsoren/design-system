@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.102.0](https://github.com/getsoren/design-system/compare/4.101.0...4.102.0) (2026-11-19)
+
+
+### Features
+
+* **ExpandableSearch:** a search folded as a magnifier among filters, and flat menu section titles ([797cdf6](https://github.com/getsoren/design-system/commit/797cdf6610840fea3fdcbf51d030e90384e0701a))
+
 ## [4.101.0](https://github.com/getsoren/design-system/compare/4.100.0...4.101.0) (2026-11-19)
 
 

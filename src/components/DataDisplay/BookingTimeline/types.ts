@@ -44,7 +44,7 @@ export interface BookingTimelineEvent {
   label: ReactNode;
   /** Plain-text version of the label, shown in the overflow tooltip when the name is truncated. */
   labelText: string;
-  /** Neutral icon shown on the rail for events without an open/closed status. */
+  /** What the event is, on the rail: in the status flag's colour for an event with a status, neutral grey otherwise. */
   icon?: ReactNode;
   /** Renders the flag status node — green when closed, orange when open — with its tooltip. */
   status?: "open" | "closed";

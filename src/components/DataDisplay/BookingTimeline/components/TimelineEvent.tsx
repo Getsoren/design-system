@@ -133,7 +133,7 @@ const TimelineEvent = ({ event, labels }: TimelineEventProps) => {
           {event.status ? (
             // Hover on the flag says whether the event is still open or closed.
             <Tooltip title={statusLabel}>
-              <EventFlag status={event.status === "closed" ? "closed" : "open"} aria-label={statusLabel} />
+              <EventFlag status={event.status === "closed" ? "closed" : "open"} icon={event.icon} aria-label={statusLabel} />
             </Tooltip>
           ) : (
             <Box

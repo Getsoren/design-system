@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.100.0](https://github.com/getsoren/design-system/compare/4.99.0...4.100.0) (2026-11-19)
+
+
+### Features
+
+* **EventFlag:** show what the event is in its status colour ([727ec0b](https://github.com/getsoren/design-system/commit/727ec0bba0f6a24e3b8deee4ab7539f4ef97a3fa))
+
 ## [4.99.0](https://github.com/getsoren/design-system/compare/4.98.0...4.99.0) (2026-11-18)
 
 

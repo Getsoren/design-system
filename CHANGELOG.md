@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.101.0](https://github.com/getsoren/design-system/compare/4.100.0...4.101.0) (2026-11-19)
+
+
+### Features
+
+* **Icons:** export the backoffices' icons and the line icons of the events ([9e6aef7](https://github.com/getsoren/design-system/commit/9e6aef773f981b73e91af6dfbb2c20e8af87230c))
+
 ## [4.100.0](https://github.com/getsoren/design-system/compare/4.99.0...4.100.0) (2026-11-19)
 
 

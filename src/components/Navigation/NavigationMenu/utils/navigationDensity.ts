@@ -7,6 +7,8 @@ export interface NavigationDensityTokens {
   bottomLinkWrapperPaddingY: number;
   /** Vertical padding of the collapse button (its horizontal padding never changes) */
   collapseButtonPaddingY: number;
+  /** Vertical padding of a highlighted bottom link, roomier than the others: it stands on a card */
+  highlightedBottomLinkPaddingY: number;
   /** Minimum height of a group header */
   groupHeaderMinHeight: number;
   /** Space above a group of items */
@@ -38,6 +40,7 @@ export const NAVIGATION_DENSITY_TOKENS: Record<NavigationDensity, NavigationDens
     collapseButtonPaddingY: 1.5,
     groupHeaderMinHeight: 28,
     groupItemMarginTop: 1.5,
+    highlightedBottomLinkPaddingY: 1,
     itemMinHeight: 36,
     itemPaddingY: 0.5,
     listItemPaddingY: 0.125,
@@ -51,6 +54,7 @@ export const NAVIGATION_DENSITY_TOKENS: Record<NavigationDensity, NavigationDens
     collapseButtonPaddingY: 3,
     groupHeaderMinHeight: 32,
     groupItemMarginTop: 2,
+    highlightedBottomLinkPaddingY: 1.25,
     itemMinHeight: 42,
     itemPaddingY: 1,
     listItemPaddingY: 0.5,

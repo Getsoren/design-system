@@ -68,15 +68,26 @@ const buildStyles = (tokens: NavigationDensityTokens) => ({
     flexDirection: "column",
     height: "100%",
   },
-  // A highlighted link stands on a card: white on the side bar's grey, a soft rule and the lightest shadow around it
+  // A highlighted link is a button on the side bar, roomier than the links around it: white, the palette's lightest grey
+  // for its border (the shadow draws its edge), and a short shadow under it that rises under the pointer and flattens
+  // when pressed
   highlightedBottomLink: {
     "& > a, & > div": {
       "&:hover": {
-        background: ({ palette }: Theme) => palette.grey[50],
+        // Under the hover rule, so that it wins while the button is pressed
+        "&:active": {
+          boxShadow: 1,
+        },
+        background: ({ palette }: Theme) => palette.background.paper,
+        borderColor: "divider",
+        boxShadow: 3,
       },
       background: ({ palette }: Theme) => palette.background.paper,
-      borderColor: "divider",
-      boxShadow: 1,
+      borderColor: "grey.100",
+      boxShadow: 2,
+      paddingX: 1.5,
+      paddingY: tokens.highlightedBottomLinkPaddingY,
+      transition: ({ transitions }: Theme) => transitions.create(["border-color", "box-shadow"]),
     },
   },
   iconWrapper: {

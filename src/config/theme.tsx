@@ -1419,6 +1419,16 @@ const commonThemeOptions: MuiThemeOptions = {
         },
       ],
     },
+    MuiPopover: {
+      styleOverrides: {
+        // A menu's section title takes the paper's flat colour, but a raised paper is lightened by its elevation in the
+        // dark theme: the title drew a darker band. It shows the paper under it instead, and scrolls with its items
+        // rather than sticking over them, which it would now let show through.
+        paper: {
+          "& .MuiListSubheader-root": { backgroundColor: "transparent", position: "static" },
+        },
+      },
+    },
     MuiSelect: {
       variants: [
         {

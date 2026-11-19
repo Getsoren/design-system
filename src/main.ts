@@ -173,6 +173,8 @@ export * from "@/components/Inputs/DecimalField/DecimalField";
 export { default as DecimalField } from "@/components/Inputs/DecimalField/DecimalField";
 export * from "@/components/Inputs/DropZone/DropZone";
 export { default as DropZone } from "@/components/Inputs/DropZone/DropZone";
+export * from "@/components/Inputs/ExpandableSearch/ExpandableSearch";
+export { default as ExpandableSearch } from "@/components/Inputs/ExpandableSearch/ExpandableSearch";
 export * from "@/components/Inputs/File/File";
 export { default as File } from "@/components/Inputs/File/File";
 export * from "@/components/Inputs/PillGroup/PillGroup";

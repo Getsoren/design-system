@@ -1513,6 +1513,21 @@ const commonThemeOptions: MuiThemeOptions = {
       },
       variants: [
         {
+          // A field still to fill in: its frame, placeholder, unit and icons in the warning's colour until it is focused,
+          // then the usual focus
+          props: { color: "warning" },
+          style: ({ theme }) => ({
+            "& .MuiFilledInput-root:not(.Mui-focused), & .MuiOutlinedInput-root:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+              borderColor: theme.palette.warning.dark,
+            },
+            "& .MuiInputBase-root:not(.Mui-focused) .MuiInputAdornment-root, & .MuiInputBase-root:not(.Mui-focused) .MuiTypography-root, & .MuiInputBase-root:not(.Mui-focused) .MuiSvgIcon-root":
+              { color: theme.palette.warning.dark },
+            "& .MuiInputBase-root:not(.Mui-focused) .MuiInputBase-input::placeholder": { color: theme.palette.warning.dark, opacity: 1 },
+            "& .MuiInputLabel-root.Mui-focused": { color: theme.palette.primary.main },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: theme.palette.primary.main },
+          }),
+        },
+        {
           props: { variant: "standard" },
           style: {
             ".MuiInputBase-root": {

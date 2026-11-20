@@ -16,6 +16,22 @@ Basic.args = {
   variant: "outlined",
 };
 
+/**
+ * A field still to fill in: in the warning's colour until it is focused, then as any field
+ */
+export const Missing: StoryFn<typeof TextField> = () => (
+  <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" height="100%">
+    <MuiTextField color="warning" placeholder="Prix" size="small" />
+    <MuiTextField
+      color="warning"
+      placeholder="Taux"
+      size="small"
+      slotProps={{ input: { endAdornment: <InputAdornment position="end">€/h</InputAdornment> } }}
+    />
+    <MuiTextField color="warning" label="Code tâche" variant="filled" />
+  </Stack>
+);
+
 export const Filled = Template.bind({});
 Filled.args = {
   variant: "filled",

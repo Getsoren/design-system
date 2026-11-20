@@ -14,6 +14,7 @@ export { default as AiAssistant } from "@/components/DataDisplay/AiAssistant/AiA
 export { AI_ASSISTANT_DOCKED_SPACE, AI_ASSISTANT_GLOW_COLORS } from "@/components/DataDisplay/AiAssistant/constants";
 export * from "@/components/DataDisplay/AiAssistant/types";
 export { getAiAssistantNeighbourSx } from "@/components/DataDisplay/AiAssistant/utils/docked";
+export { AI_ASSISTANT_SHIMMER_TEXT_SX, aiAssistantScanLineSxOf } from "@/components/DataDisplay/AiAssistant/utils/working";
 export * from "@/components/DataDisplay/ArticleImage/ArticleImage";
 export { default as ArticleImage } from "@/components/DataDisplay/ArticleImage/ArticleImage";
 export type { AvatarProps } from "@/components/DataDisplay/Avatar/Avatar";
@@ -32,6 +33,8 @@ export { default as ChatMessageInput } from "@/components/DataDisplay/Chat/compo
 export { default as ChatParticipantDialog } from "@/components/DataDisplay/Chat/components/ChatParticipantDialog";
 export { default as ChatVoiceRecorder } from "@/components/DataDisplay/Chat/components/ChatVoiceRecorder";
 export * from "@/components/DataDisplay/Chat/types";
+export * from "@/components/DataDisplay/CheckDisc/CheckDisc";
+export { default as CheckDisc } from "@/components/DataDisplay/CheckDisc/CheckDisc";
 export * from "@/components/DataDisplay/Chip/Chip";
 export { default as Chip } from "@/components/DataDisplay/Chip/Chip";
 export * from "@/components/DataDisplay/EventFlag/EventFlag";
@@ -248,6 +251,8 @@ export * from "@/utils/decimalInput";
 export * from "@/utils/getBackgroundImageElevation";
 export { default as getBackgroundImageElevation } from "@/utils/getBackgroundImageElevation";
 export { default as isoToEmojiFlag } from "@/utils/isoToEmojiFlag";
+export * from "@/utils/motion";
 export { default as pickDataAttributes } from "@/utils/pickDataAttributes";
 export * from "@/utils/pxToRem";
 export { default as pxToRem } from "@/utils/pxToRem";
+export * from "@/utils/visuallyHidden";

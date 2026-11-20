@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.103.0](https://github.com/getsoren/design-system/compare/4.102.0...4.103.0) (2026-11-20)
+
+
+### Features
+
+* **Icons:** add ImportIcon, CalendarPlusIcon and ExcavatorPlusIcon ([255cc8a](https://github.com/getsoren/design-system/commit/255cc8aba6b6cc9cf1de0636bb036dfdb4e710e7))
+
 ## [4.102.0](https://github.com/getsoren/design-system/compare/4.101.0...4.102.0) (2026-11-19)
 
 

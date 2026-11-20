@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.104.0](https://github.com/getsoren/design-system/compare/4.103.0...4.104.0) (2026-11-20)
+
+
+### Features
+
+* add a warning field, CheckDisc, the assistant's working motions and VISUALLY_HIDDEN ([0c82563](https://github.com/getsoren/design-system/commit/0c82563609cf967933cf0138da9ca55f19064df2))
+
 ## [4.103.0](https://github.com/getsoren/design-system/compare/4.102.0...4.103.0) (2026-11-20)
 
 

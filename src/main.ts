@@ -110,6 +110,7 @@ export { default as StorefrontIcon } from "@/components/DataDisplay/Icons/Storef
 export { default as TagIcon } from "@/components/DataDisplay/Icons/TagIcon";
 export { default as TrashIcon } from "@/components/DataDisplay/Icons/TrashIcon";
 export { default as UsersIcon } from "@/components/DataDisplay/Icons/UsersIcon";
+export { default as WhatsAppIcon } from "@/components/DataDisplay/Icons/WhatsAppIcon";
 export * from "@/components/DataDisplay/InfoLine/InfoLine";
 export { default as InfoLine } from "@/components/DataDisplay/InfoLine/InfoLine";
 export * from "@/components/DataDisplay/Kanban/Kanban";
@@ -137,6 +138,10 @@ export * from "@/components/DataDisplay/TimeLine/TimeLine";
 export { default as TimeLine } from "@/components/DataDisplay/TimeLine/TimeLine";
 export * from "@/components/DataDisplay/TypographySkeleton/TypographySkeleton";
 export { default as TypographySkeleton } from "@/components/DataDisplay/TypographySkeleton/TypographySkeleton";
+export * from "@/components/DataDisplay/WhatsAppChatLink/WhatsAppChatLink";
+export { default as WhatsAppChatLink } from "@/components/DataDisplay/WhatsAppChatLink/WhatsAppChatLink";
+export * from "@/components/DataDisplay/WhatsAppPhone/WhatsAppPhone";
+export { default as WhatsAppPhone } from "@/components/DataDisplay/WhatsAppPhone/WhatsAppPhone";
 // Feedback
 export * from "@/components/Feedback/Dialog/DialogCloseIcon/DialogCloseIcon";
 export { default as DialogCloseIcon } from "@/components/Feedback/Dialog/DialogCloseIcon/DialogCloseIcon";

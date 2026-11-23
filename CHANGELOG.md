@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.105.0](https://github.com/getsoren/design-system/compare/4.104.0...4.105.0) (2026-11-23)
+
+
+### Features
+
+* add WhatsAppPhone, WhatsAppChatLink and WhatsAppIcon ([3d02542](https://github.com/getsoren/design-system/commit/3d0254273acca9aec031c009c06c47c44e31bc0d))
+
 ## [4.104.0](https://github.com/getsoren/design-system/compare/4.103.0...4.104.0) (2026-11-20)
 
 

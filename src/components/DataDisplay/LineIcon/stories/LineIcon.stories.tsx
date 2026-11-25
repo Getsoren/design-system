@@ -23,5 +23,5 @@ export const All: StoryFn = () => (
 
 export default {
   component: LineIcon,
-  title: "Components/DataDisplay/LineIcon",
+  title: "Components/Data Display/LineIcon",
 } as Meta<typeof LineIcon>;

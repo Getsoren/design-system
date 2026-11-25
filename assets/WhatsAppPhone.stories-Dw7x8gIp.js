@@ -1,7 +1,0 @@
-import{i as e}from"./preload-helper-xPQekRTU.js";import{_ as t,b as n,dt as r,v as i,y as a}from"./iframe-OaPhx3LT.js";import{n as o,t as s}from"./WhatsAppPhone-6sXyN6dG.js";var c,l,u,d,f;e((()=>{n(),o(),t(),c=()=>a(`svg`,{viewBox:`0 0 10 10`,role:`img`,"aria-label":`QR code`,children:[i(`rect`,{width:`10`,height:`10`,fill:`#fff`}),i(`path`,{d:`M1 1h3v3H1zM6 1h3v3H6zM1 6h3v3H1zM6 6h1v1H6zM8 6h1v1H8zM7 7h1v1H7zM6 8h1v1H6zM8 8h1v1H8z`,fill:`#000`})]}),l=()=>i(r,{alignItems:`center`,justifyContent:`center`,height:`100%`,children:i(s,{children:i(c,{})})}),u=()=>i(r,{alignItems:`center`,justifyContent:`center`,height:`100%`,children:i(s,{})}),d={component:s,title:`Components/Data Display/WhatsAppPhone`},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`() => <Stack alignItems="center" justifyContent="center" height="100%">
-    <WhatsAppPhone>
-      <CodePlaceholder />
-    </WhatsAppPhone>
-  </Stack>`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`() => <Stack alignItems="center" justifyContent="center" height="100%">
-    <WhatsAppPhone />
-  </Stack>`,...u.parameters?.docs?.source}}},f=[`WithCode`,`WithoutCode`]}))();export{l as WithCode,u as WithoutCode,f as __namedExportsOrder,d as default};

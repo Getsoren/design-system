@@ -115,6 +115,8 @@ export * from "@/components/DataDisplay/InfoLine/InfoLine";
 export { default as InfoLine } from "@/components/DataDisplay/InfoLine/InfoLine";
 export * from "@/components/DataDisplay/Kanban/Kanban";
 export { default as Kanban } from "@/components/DataDisplay/Kanban/Kanban";
+export * from "@/components/DataDisplay/LineIcon/LineIcon";
+export { default as LineIcon } from "@/components/DataDisplay/LineIcon/LineIcon";
 export * from "@/components/DataDisplay/ListAvatar/ListAvatar";
 export { default as ListAvatars } from "@/components/DataDisplay/ListAvatar/ListAvatar";
 export * from "@/components/DataDisplay/ListItemCard/ListItemCard";

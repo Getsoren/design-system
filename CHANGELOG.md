@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.106.0](https://github.com/getsoren/design-system/compare/4.105.0...4.106.0) (2026-11-25)
+
+
+### Features
+
+* **LineIcon:** draw a line icon by its name ([cf80390](https://github.com/getsoren/design-system/commit/cf803909108dc7b455d2d166930e6f98af1683f2))
+
 ## [4.105.0](https://github.com/getsoren/design-system/compare/4.104.0...4.105.0) (2026-11-23)
 
 

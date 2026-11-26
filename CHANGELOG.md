@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [4.107.0](https://github.com/getsoren/design-system/compare/4.106.0...4.107.0) (2026-11-26)
+
+
+### Features
+
+* **checkbox-card:** take the raised surface's tint and animate a tile's picture ([176b3af](https://github.com/getsoren/design-system/commit/176b3af44ccbb6665bf9fb3d7920928135f8aea8))
+
 ## [4.106.0](https://github.com/getsoren/design-system/compare/4.105.0...4.106.0) (2026-11-25)
 
 

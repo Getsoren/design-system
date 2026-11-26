@@ -5,6 +5,10 @@ import AiAssistant from "@/components/DataDisplay/AiAssistant/AiAssistant";
 import type { AiAssistantVote } from "@/components/DataDisplay/AiAssistant/types";
 import Chat from "@/components/DataDisplay/Chat/Chat";
 import type { ChatMessage } from "@/components/DataDisplay/Chat/types";
+import CircleHelpIcon from "@/components/DataDisplay/Icons/LineIcons/CircleHelpIcon";
+import GaugeIcon from "@/components/DataDisplay/Icons/LineIcons/GaugeIcon";
+import SettingsIcon from "@/components/DataDisplay/Icons/LineIcons/SettingsIcon";
+import ZapIcon from "@/components/DataDisplay/Icons/LineIcons/ZapIcon";
 
 const meta: Meta = {
   component: AiAssistant.Panel,
@@ -22,6 +26,12 @@ const Centered: Decorator = (Story) => (
 
 const PARTICIPANTS = [{ avatar: null, firstName: "Soren", lastName: "", userId: "assistant" }];
 const SUGGESTIONS = ["Où en sont mes demandes de devis ?", "Quelles locations se terminent cette semaine ?"];
+const CHOICES = [
+  { Icon: ZapIcon, label: "Panne électrique" },
+  { Icon: SettingsIcon, label: "Panne mécanique" },
+  { Icon: GaugeIcon, label: "Panne moteur" },
+  { Icon: CircleHelpIcon, label: "Autre panne" },
+];
 const REPLY_DELAY_MS = 2500;
 
 /**
@@ -185,6 +195,17 @@ export const ReplyActions: StoryFn = () => {
     </Stack>
   );
 };
+
+/** The answers offered to the assistant's question, each with its icon when they name kinds of things. */
+export const Choices: StoryFn = () => (
+  <Stack spacing={1} width={400}>
+    {CHOICES.map(({ Icon, label }) => (
+      <AiAssistant.Suggestion key={label} icon={<Icon />} onClick={() => undefined}>
+        {label}
+      </AiAssistant.Suggestion>
+    ))}
+  </Stack>
+);
 
 /** The gate before a mutating action; once decided, it opens what the action produced, its links going their own way. */
 export const ConfirmationCard: StoryFn = () => {

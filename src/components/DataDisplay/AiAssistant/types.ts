@@ -109,6 +109,8 @@ export interface AiAssistantSuggestionProps extends DataAttributes {
   children: ReactNode;
   onClick: () => void;
   dataTestId?: string;
+  /** Leading line icon, drawn in a tile like a choice card's, a size smaller */
+  icon?: ReactNode;
 }
 
 export interface AiAssistantThinkingStep {

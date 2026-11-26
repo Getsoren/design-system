@@ -12,13 +12,14 @@ const TRACK_INTERVAL_MS = 200;
 
 /** Two soft layers of the aura: [blur, spread, opacity] each, at rest then swollen */
 type AuraLayers = readonly [readonly [number, number, number], readonly [number, number, number]];
+// Soft on purpose: the aura says "here", it must not pull the eye off the card that explains
 const AURA_CALM: AuraLayers = [
-  [22, 5, 0.3],
-  [60, 22, 0.14],
+  [16, 3, 0.18],
+  [40, 12, 0.08],
 ];
 const AURA_PEAK: AuraLayers = [
-  [38, 12, 0.44],
-  [95, 36, 0.22],
+  [24, 6, 0.26],
+  [60, 20, 0.12],
 ];
 
 /** Pale glint at the comet's head, lighter than any tint of the palette */
@@ -107,7 +108,7 @@ const AiAssistantSpotlight = ({
           },
           // Doubled selector so this a11y override beats the base rule regardless of emission order
           "@media (prefers-reduced-motion: reduce)": { "&&": { animation: "none" } },
-          animation: "aiAssistantSpotlightAura 3.4s ease-in-out infinite",
+          animation: "aiAssistantSpotlightAura 4.6s ease-in-out infinite",
           borderRadius: 2.5,
           boxShadow: auraShadow(theme.palette.secondary.main, AURA_CALM),
           height: rect.height + SPOTLIGHT_PADDING * 2,
@@ -125,9 +126,9 @@ const AiAssistantSpotlight = ({
           being cut). Pure CSS, halo + crisp layers. */}
       {[
         // The soft halo behind…
-        { blur: 7, ringOpacity: 0.7, ringWidth: 7 },
+        { blur: 6, ringOpacity: 0.45, ringWidth: 4 },
         // …and the crisp shine on top
-        { blur: 0, ringOpacity: 1, ringWidth: 2.5 },
+        { blur: 0, ringOpacity: 0.85, ringWidth: 2 },
       ].map((layer) => (
         <Box
           key={layer.ringWidth}
@@ -140,7 +141,7 @@ const AiAssistantSpotlight = ({
               // Doubled selector so this a11y override beats the base rule regardless of emission order
               "@media (prefers-reduced-motion: reduce)": { "&&::before": { animation: "none" } },
               "&::before": {
-                animation: "aiAssistantSpotlightShine 4.2s linear infinite",
+                animation: "aiAssistantSpotlightShine 6s linear infinite",
                 // A comet with a LONG progressive tail and a soft head — abrupt ends read
                 // as the ring being cut while it orbits
                 background: `conic-gradient(transparent 0deg, ${alpha(orange, 0.05)} 70deg, ${alpha(orange, 0.16)} 150deg, ${alpha(orange, 0.42)} 215deg, ${orange} 252deg, ${COMET_HEAD} 270deg, ${alpha(COMET_HEAD, 0.4)} 285deg, transparent 310deg, transparent 360deg)`,

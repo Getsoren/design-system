@@ -33,12 +33,9 @@ const AiAssistantConfirmationCard = ({
   const isOpenable = !isPending && !!onOpen;
 
   const subject = (
-    <Stack direction="row" alignItems="flex-start" spacing={1.25}>
-      {icon && <Box sx={{ display: "flex", flexShrink: 0 }}>{icon}</Box>}
-      <Typography variant="subtitle2" sx={{ minWidth: 0 }}>
-        {summary}
-      </Typography>
-    </Stack>
+    <Typography variant="subtitle2" sx={{ minWidth: 0 }}>
+      {summary}
+    </Typography>
   );
 
   return (
@@ -74,46 +71,53 @@ const AiAssistantConfirmationCard = ({
             </Typography>
           </Stack>
         )}
-        {isOpenable ? (
-          // Stretched over the whole card, so the card opens from anywhere, while the links stay outside the button.
-          <ButtonBase
-            disableRipple
-            className={OPEN_CLASS}
-            onClick={onOpen}
-            data-testid={`${dataTestId}Open`}
-            sx={{
-              "&::after": { content: '""', inset: 0, position: "absolute" },
-              font: "inherit",
-              justifyContent: "flex-start",
-              position: "static",
-              textAlign: "left",
-            }}
-          >
-            {subject}
-          </ButtonBase>
-        ) : (
-          subject
-        )}
-        {details && (
-          <Typography variant="caption" component="pre" sx={{ fontFamily: "monospace", margin: 0, whiteSpace: "pre-wrap" }}>
-            {details}
-          </Typography>
-        )}
-        {isPending ? (
-          <Stack direction="row" spacing={1}>
-            <Button size="small" variant="contained" data-testid={`${dataTestId}Accept`} onClick={onAccept}>
-              {labels.accept}
-            </Button>
-            <Button size="small" variant="outlined" data-testid={`${dataTestId}Decline`} onClick={onDecline}>
-              {labels.decline}
-            </Button>
+        {/* The icon heads the card's body: the summary, its details and the answers line up on the text, not under the icon */}
+        <Stack direction="row" alignItems="flex-start" spacing={1.25}>
+          {icon && <Box sx={{ display: "flex", flexShrink: 0 }}>{icon}</Box>}
+          <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
+            {isOpenable ? (
+              // Stretched over the whole card, so the card opens from anywhere, while the links stay outside the button.
+              <ButtonBase
+                disableRipple
+                className={OPEN_CLASS}
+                onClick={onOpen}
+                data-testid={`${dataTestId}Open`}
+                sx={{
+                  "&::after": { content: '""', inset: 0, position: "absolute" },
+                  font: "inherit",
+                  justifyContent: "flex-start",
+                  position: "static",
+                  textAlign: "left",
+                }}
+              >
+                {subject}
+              </ButtonBase>
+            ) : (
+              subject
+            )}
+            {details && (
+              <Typography variant="caption" component="pre" sx={{ fontFamily: "monospace", margin: 0, whiteSpace: "pre-wrap" }}>
+                {details}
+              </Typography>
+            )}
+            {isPending ? (
+              // The way out first, the action last, where the eye ends: as the app's dialogs order them
+              <Stack direction="row" spacing={1}>
+                <Button size="small" variant="outlined" data-testid={`${dataTestId}Decline`} onClick={onDecline}>
+                  {labels.decline}
+                </Button>
+                <Button size="small" variant="contained" data-testid={`${dataTestId}Accept`} onClick={onAccept}>
+                  {labels.accept}
+                </Button>
+              </Stack>
+            ) : (
+              links && (
+                // Above the stretched button's layer, so a link goes its own way.
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, position: "relative", zIndex: 1 }}>{links}</Box>
+              )
+            )}
           </Stack>
-        ) : (
-          links && (
-            // Above the stretched button's layer, so a link goes its own way.
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, position: "relative", zIndex: 1 }}>{links}</Box>
-          )
-        )}
+        </Stack>
       </Stack>
     </Paper>
   );

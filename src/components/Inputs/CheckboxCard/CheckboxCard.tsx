@@ -18,6 +18,11 @@ export interface CheckboxCardProps {
   /** Shows a skeleton over the picture box, or in place of the picture of a tile */
   isPictureLoading?: boolean;
   /**
+   * Animates the picture of a tile while the card is hovered or focused with the keyboard: a picture rises and floats, an icon
+   * lifts, and both spring back once the card is left. Still for whoever asks their system for less motion
+   */
+  animatePicture?: boolean;
+  /**
    * `horizontal`: texts in a row; `vertical`: picture on top, for a catalog; `tile`: the picture at the top, the
    * label at the bottom, for a grid of a few big choices
    */
@@ -34,6 +39,45 @@ export interface CheckboxCardProps {
 
 /** Side of the skeleton standing for a tile's picture */
 const TILE_PICTURE_SIZE = 56;
+
+/** Class of the box holding a tile's picture, which the card's motion targets */
+const TILE_PICTURE_CLASS = "CheckboxCard-tilePicture";
+
+/** The card hovered, or focused with the keyboard */
+const ACTIVE = "&:hover, &.Mui-focusVisible";
+
+/** A spring: the move overshoots its end a little before settling, both when the card is reached and when it is left */
+const SPRING = "cubic-bezier(0.34, 1.56, 0.64, 1)";
+
+/** Class of the box inside, which floats while the picture is risen */
+const TILE_PICTURE_FLOAT_CLASS = "CheckboxCard-tilePictureFloat";
+
+/**
+ * A tile's picture rising and floating, or its icon lifting, while the card is active, and springing back once it is
+ * left. The rise springs on the outer box; the float loops on the inner one, two pixels at most, so its stop is lost
+ * in the spring back
+ */
+const PICTURE_MOTION: SxProps<Theme> = {
+  "@keyframes checkboxCardPictureFloat": {
+    "0%, 100%": { transform: "translate(0, 0)" },
+    "50%": { transform: "translate(1px, -2px)" },
+  },
+  "@media (prefers-reduced-motion: no-preference)": {
+    [`& .${TILE_PICTURE_CLASS}, & .${TILE_PICTURE_CLASS} .MuiSvgIcon-root`]: { transition: `transform 450ms ${SPRING}` },
+    [ACTIVE]: {
+      [`& .${TILE_PICTURE_CLASS} .MuiSvgIcon-root`]: { transform: "translateY(-2px)" },
+      // An icon only lifts: a picture, which is not one, rises and floats
+      // Rising, it eases out gently; the spring is for its way back
+      [`& .${TILE_PICTURE_CLASS}:not(:has(.MuiSvgIcon-root))`]: {
+        transform: "translate(1px, -2px)",
+        transition: "transform 600ms cubic-bezier(0.25, 0.1, 0.25, 1)",
+      },
+      [`& .${TILE_PICTURE_CLASS}:not(:has(.MuiSvgIcon-root)) .${TILE_PICTURE_FLOAT_CLASS}`]: {
+        animation: "checkboxCardPictureFloat 1600ms ease-in-out infinite",
+      },
+    },
+  },
+};
 
 const PICTURE_BOX_SX: SxProps<Theme> = {
   alignItems: "center",
@@ -55,6 +99,7 @@ const CheckboxCard = ({
   trailing,
   picture,
   isPictureLoading,
+  animatePicture,
   layout = "horizontal",
   control = "checkbox",
   controlPlacement = "end",
@@ -181,7 +226,17 @@ const CheckboxCard = ({
     </Stack>
   );
 
-  const tilePicture = isPictureLoading ? <Skeleton variant="rounded" width={TILE_PICTURE_SIZE} height={TILE_PICTURE_SIZE} /> : picture;
+  const tilePicture = isPictureLoading ? (
+    <Skeleton variant="rounded" width={TILE_PICTURE_SIZE} height={TILE_PICTURE_SIZE} />
+  ) : (
+    picture && (
+      <Box className={TILE_PICTURE_CLASS} sx={{ display: "flex" }}>
+        <Box className={TILE_PICTURE_FLOAT_CLASS} sx={{ display: "flex" }}>
+          {picture}
+        </Box>
+      </Box>
+    )
+  );
 
   const content = isTile ? (
     // The pictures of a row of tiles line up at the top, their labels at the bottom
@@ -223,28 +278,34 @@ const CheckboxCard = ({
       role={control === "none" ? undefined : control}
       aria-checked={control === "none" ? undefined : selected}
       aria-pressed={control === "none" ? selected : undefined}
-      sx={(theme) => ({
-        // Hovered or focused with the keyboard, the card greys like a clickable Card, and keeps its outline
-        "&:hover, &.Mui-focusVisible": { backgroundColor: theme.palette.action.hover },
-        alignItems: "stretch",
-        backgroundColor: selected ? theme.palette.action.hover : theme.palette.background.paper,
-        // At rest, the outline of a Card rather than a field's: a grid of cards reads as content, not as a form
-        border: `1px solid ${selected ? theme.palette.text.primary : theme.palette.divider}`,
-        borderRadius: `${theme.shape.borderRadiusL}px`,
-        // A second line inside the border reads as the 2px border of a selection, without moving the content
-        boxShadow: selected ? `inset 0 0 0 1px ${theme.palette.text.primary}` : "none",
-        display: "flex",
-        flexDirection: "column",
-        // Vertical cards and tiles fill their grid cell, so a row of them shares one height
-        height: isVertical || isTile ? "100%" : undefined,
-        opacity: disabled ? 0.5 : 1,
-        overflow: "hidden",
-        textAlign: "left",
-        transition: theme.transitions.create(["border-color", "box-shadow", "background-color"], {
-          duration: theme.transitions.duration.shorter,
+      sx={[
+        (theme) => ({
+          // Hovered or focused with the keyboard, the card greys like a clickable Card, and keeps its outline
+          "&:hover, &.Mui-focusVisible": { backgroundColor: theme.palette.action.hover },
+          alignItems: "stretch",
+          backgroundColor: selected ? theme.palette.action.hover : theme.palette.background.paper,
+          // On a raised surface in dark mode (a popover, a dialog), the paper's colour alone is darker than the surface around
+          // it: the card takes the surface's own lightening, which the surface hands down. None outside a raised surface
+          backgroundImage: selected ? undefined : "var(--Paper-overlay)",
+          // At rest, the outline of a Card rather than a field's: a grid of cards reads as content, not as a form
+          border: `1px solid ${selected ? theme.palette.text.primary : theme.palette.divider}`,
+          borderRadius: `${theme.shape.borderRadiusL}px`,
+          // A second line inside the border reads as the 2px border of a selection, without moving the content
+          boxShadow: selected ? `inset 0 0 0 1px ${theme.palette.text.primary}` : "none",
+          display: "flex",
+          flexDirection: "column",
+          // Vertical cards and tiles fill their grid cell, so a row of them shares one height
+          height: isVertical || isTile ? "100%" : undefined,
+          opacity: disabled ? 0.5 : 1,
+          overflow: "hidden",
+          textAlign: "left",
+          transition: theme.transitions.create(["border-color", "box-shadow", "background-color"], {
+            duration: theme.transitions.duration.shorter,
+          }),
+          width: "100%",
         }),
-        width: "100%",
-      })}
+        !!animatePicture && isTile && PICTURE_MOTION,
+      ]}
     >
       {content}
     </ButtonBase>

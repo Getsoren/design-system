@@ -178,6 +178,40 @@ export const Tiles: StoryFn<typeof CheckboxCard> = () => {
   );
 };
 
+/**
+ * Animated tiles: hover a tile, or reach it with the keyboard, and its picture rises and floats while its icon lifts; both spring
+ * back once it is left. Still for whoever asks their system for less motion
+ */
+export const AnimatedTiles: StoryFn<typeof CheckboxCard> = () => {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  return (
+    <Box display="grid" gap={1.5} gridTemplateColumns="repeat(3, 1fr)" gridAutoRows="minmax(112px, auto)" maxWidth={560} marginX="auto">
+      {TILES.slice(0, 2).map((tile) => (
+        <CheckboxCard
+          key={tile.id}
+          layout="tile"
+          control="none"
+          animatePicture
+          picture={<div style={{ background: `hsl(${tile.hue} 60% 70%)`, borderRadius: 8, height: 56, width: 56 }} />}
+          label={tile.label}
+          selected={selected === tile.id}
+          onClick={() => setSelected(tile.id)}
+        />
+      ))}
+      <CheckboxCard
+        layout="tile"
+        control="none"
+        animatePicture
+        picture={<InfoIcon sx={{ fontSize: 32 }} />}
+        label="Autre événement"
+        selected={selected === "other"}
+        onClick={() => setSelected("other")}
+      />
+    </Box>
+  );
+};
+
 /** A horizontal card with a picture after the texts, and a disabled one */
 export const PictureAndDisabled: StoryFn<typeof CheckboxCard> = () => (
   <Stack spacing={1.5} maxWidth={420} marginX="auto" justifyContent="center" height="100%">
